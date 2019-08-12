@@ -1,0 +1,35 @@
+{
+  "action": "opened",
+  "number": 2,
+  "repository": {
+    "full_name": "packit-service/hello-world",
+    "html_url": "https://github.com/packit-service/hello-world"
+  },
+  "pull_request": {
+    "head": {
+      "ref": "test",
+      "sha": "d3a39758121397cc76e01d79fa30a4a1b3961a0f",
+      "repo": {
+        "name": "hello-world",
+        "full_name": "TomasTomecek/hello-world",
+        "owner": {
+          "login": "TomasTomecek"
+        },
+        "html_url": "https://github.com/TomasTomecek/hello-world",
+        "clone_url": "https://github.com/TomasTomecek/hello-world.git"
+      }
+    },
+    "base": {
+      "ref": "master",
+      "repo": {
+        "name": "hello-world",
+        "full_name": "packit-service/hello-world",
+        "owner": {
+          "login": "packit-service"
+        },
+        "html_url": "https://github.com/packit-service/hello-world",
+        "clone_url": "https://github.com/packit-service/hello-world.git"
+      }
+    }
+  }
+}

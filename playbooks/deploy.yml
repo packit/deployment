@@ -1,0 +1,121 @@
+# MIT License
+#
+# Copyright (c) 2018-2019 Red Hat, Inc.
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+---
+- name: packit-service deployment
+  hosts: localhost
+  vars:
+    deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
+    httpd_config_content: "{{ lookup('file', '../secrets/{{ deployment }}/httpd-packit.conf') }}"
+    sandbox_namespace: "packit-{{ deployment }}-sandbox"
+    without_fedmsg: false
+    without_redis_commander: false
+    without_flower: false
+  tasks:
+    - name: require ansible 2.7
+      assert:
+        that:
+        - 'ansible_version.minor == 7'
+        fail_msg: 'Please downgrade to ansible 2.7, 2.8 regressed in verify_ssl.'
+
+    - name: include variables
+      include_vars: ../vars/{{ deployment }}.yml
+
+    - name: check if tokens match
+      block:
+      - command: oc whoami -t
+        register: kubeconfig_token
+      - assert:
+          that:
+          - kubeconfig_token.stdout == api_key
+          msg: "OpenShift API token defined in vars/ does not match token from your current environment."
+      ignore_errors: yes
+
+    - name: Deploy templates (need to be processed)
+      # https://docs.ansible.com/k8s_module.html
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ item }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        verify_ssl: "{{ verify_ssl }}"
+      loop:
+        - "{{ lookup('template', '../openshift/secret-packit-ssh.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/secret-packit-secrets.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/cmap-packit-httpd-conf.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/route.packit.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') | from_yaml }}"
+
+    - name: Deploy resource config - deployment (need to be processed)
+      # https://docs.ansible.com/k8s_module.html
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ item }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        verify_ssl: "{{ verify_ssl }}"
+      loop:
+        - "{{ lookup('template', '../openshift/deployment.yml.j2') | from_yaml }}"
+
+    - name: Deploy resource configs (no need to process them)
+      # https://docs.ansible.com/k8s_module.html
+      k8s:
+        namespace: "{{ project }}"
+        src: "{{ item }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        verify_ssl: "{{ verify_ssl }}"
+      loop:
+        - ../openshift/redis.yml
+        - ../openshift/service.yml
+        - ../openshift/deployment-worker.yml
+
+    - name: Deploy redis-commander.
+      k8s:
+        namespace: "{{ project }}"
+        src: ../openshift/redis-commander.yml
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        verify_ssl: "{{ verify_ssl }}"
+      when: not without_redis_commander
+
+    - name: Deploy flower.
+      k8s:
+        namespace: "{{ project }}"
+        src: ../openshift/flower.yml
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        verify_ssl: "{{ verify_ssl }}"
+      when: not without_flower
+
+    - name: Deploy fedmsg listener
+      k8s:
+        namespace: "{{ project }}"
+        src: ../openshift/deployment-fedmsg.yml
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        verify_ssl: "{{ verify_ssl }}"
+      when: not without_fedmsg
+
+    - name: Set up the sandbox namespace
+      command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
