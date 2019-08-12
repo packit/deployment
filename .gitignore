@@ -1,0 +1,9 @@
+vars/*.yml
+!vars/template.yml
+
+.idea/
+.DS_Store
+
+secrets/prod
+secrets/dev
+secrets/stg

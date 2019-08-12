@@ -1,0 +1,53 @@
+# MIT License
+#
+# Copyright (c) 2018-2019 Red Hat, Inc.
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+# Don't modify this file. Copy it to e.g. dev.yml or prod.yml and modify that one.
+
+# -------------------------------------------------------------------
+# Variables needed by Ansible playbooks in playbooks/
+# -------------------------------------------------------------------
+
+# Openshift project/namespace name
+project: myproject
+
+# Openshift cluster url (example: https://192.168.42.66:8443)
+host: https://your-openshift-cluster-url
+
+# oc login <the above host value>, oc whoami -t
+# OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
+api_key: ""
+
+# To work-around 'SSL: CERTIFICATE_VERIFY_FAILED'
+verify_ssl: no
+
+# don't deploy fedmsg dc; good for local testing
+without_fedmsg: true
+
+# don't deploy redis-commander dc; good for staging deployment
+without_redis_commander: false
+
+# don't deploy flower dc; good for staging deployment
+without_flower: false
+
+# you can set the sandbox namespace name explicitly like this
+# sandbox_namespace: "packit-prod-sandbox"
