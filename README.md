@@ -79,3 +79,11 @@ Since all our images now use digests - we reference to precise image and not to 
 ```
 $ oc rollout undo sts/packit-worker
 ```
+
+### Zuul
+
+We have to encrypt the secrets, because we are using them in Zuul CI. This repository provides helpful playbook to do this with one command:
+```
+DEPLOYMENT=stg make zuul-secrets
+```
+

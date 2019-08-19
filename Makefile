@@ -11,3 +11,6 @@ deploy:
 
 cleanup:
 	ansible-playbook -vv playbooks/cleanup.yml
+
+zuul-secrets:
+	ansible-playbook --syntax-check playbooks/zuul-secrets.yml && ansible-playbook -vv playbooks/zuul-secrets.yml
