@@ -87,6 +87,7 @@
         api_key: "{{ api_key }}"
         verify_ssl: "{{ verify_ssl }}"
       loop:
+        - ../openshift/pvc-worker.yml
         - ../openshift/redis.yml
         - ../openshift/service.yml
 
