@@ -47,7 +47,7 @@ spec:
           name: httpd-conf
       containers:
         - name: packit-service
-          image: docker.io/usercont/packit-service:master
+          image: docker.io/usercont/packit-service:{{ deployment }}
           ports:
           - containerPort: 8443
             protocol: TCP

@@ -47,7 +47,7 @@ spec:
           secretName: packit-config
       containers:
         - name: packit-service-fedmsg
-          image: docker.io/usercont/packit-service:master
+          image: docker.io/usercont/packit-service:{{ deployment }}
           volumeMounts:
           - name: packit-ssh
             mountPath: /packit-ssh
