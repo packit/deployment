@@ -67,7 +67,7 @@ spec:
           claimName: packit-worker-pvc-2
       containers:
       - name: packit-worker-1
-        image: docker.io/usercont/packit-service:master
+        image: docker.io/usercont/packit-service:{{ deployment }}
         env:
           - name: APP
             value: packit_service.worker.tasks
@@ -92,7 +92,7 @@ spec:
             memory: "512Mi"
             cpu: "800m"
       - name: packit-worker-2
-        image: docker.io/usercont/packit-service:master
+        image: docker.io/usercont/packit-service:{{ deployment }}
         env:
           - name: APP
             value: packit_service.worker.tasks
@@ -116,25 +116,3 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "800m"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: packit-worker-pvc-1
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: packit-worker-pvc-2
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi

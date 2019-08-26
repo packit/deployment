@@ -76,6 +76,7 @@
         verify_ssl: "{{ verify_ssl }}"
       loop:
         - "{{ lookup('template', '../openshift/deployment.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/deployment-worker.yml.j2') | from_yaml }}"
 
     - name: Deploy resource configs (no need to process them)
       # https://docs.ansible.com/k8s_module.html
@@ -86,9 +87,9 @@
         api_key: "{{ api_key }}"
         verify_ssl: "{{ verify_ssl }}"
       loop:
+        - ../openshift/pvc-worker.yml
         - ../openshift/redis.yml
         - ../openshift/service.yml
-        - ../openshift/deployment-worker.yml
 
     - name: Deploy redis-commander.
       k8s:
@@ -111,7 +112,7 @@
     - name: Deploy fedmsg listener
       k8s:
         namespace: "{{ project }}"
-        src: ../openshift/deployment-fedmsg.yml
+        definition: "{{ lookup('template', '../openshift/deployment-fedmsg.yml.j2') | from_yaml }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         verify_ssl: "{{ verify_ssl }}"
