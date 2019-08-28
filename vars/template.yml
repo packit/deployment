@@ -51,3 +51,9 @@ without_flower: false
 
 # you can set the sandbox namespace name explicitly like this
 # sandbox_namespace: "packit-prod-sandbox"
+
+# if set, overrides image used for packit-worker deployment; default is {{ deployment }}
+# deployment_image: "prod"
+
+# image to use for worker, service and fedmsg pods
+# image: ""

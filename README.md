@@ -48,7 +48,19 @@ $ DEPLOYMENT=dev make deploy
 
 ### Updating
 
-You don't need to redeploy the whole stack, it is just enough to rollout a new image of the specific component (usually worker):
+All our pods use images referenced to digests, e.g.
+
 ```
-$ oc rollout latest dc/packit-service-worker
+docker.io/usercont/packit-service@sha256:71b2ed8f1fb11d27eb3c8d1975237b05e8cd6a52b52ea1f80bf46e8dc21a0f16
+```
+
+If you want to update a deployment, just run `make deploy`. It may take a while for all the jobs to finish. Just have a coffee.
+
+
+### Revert a deployment
+
+Since all our images now use digests - we reference to precise image and not to a "symlink", we can now easily revert deployments.
+
+```
+$ oc rollout undo sts/packit-worker
 ```
