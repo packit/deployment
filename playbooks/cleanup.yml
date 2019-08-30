@@ -23,7 +23,7 @@
 ---
 
 - name: Clean up a project
-  hosts: all
+  hosts: localhost
   vars:
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
   tasks:

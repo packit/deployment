@@ -117,7 +117,7 @@
         - ../openshift/redis.yml
         - ../openshift/service.yml
 
-    - name: Deploy redis-commander.
+    - name: Deploy redis-commander
       k8s:
         namespace: "{{ project }}"
         src: ../openshift/redis-commander.yml
@@ -126,7 +126,7 @@
         verify_ssl: "{{ verify_ssl }}"
       when: not without_redis_commander
 
-    - name: Deploy flower.
+    - name: Deploy flower
       k8s:
         namespace: "{{ project }}"
         src: ../openshift/flower.yml
