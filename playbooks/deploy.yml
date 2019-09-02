@@ -30,6 +30,10 @@
     without_fedmsg: false
     without_redis_commander: false
     without_flower: false
+    # feel free to override this in vars
+    deployment_image: "{{ deployment }}"
+    image: ""
+    image_digest: ""
   tasks:
     - name: require ansible 2.7
       assert:
@@ -65,6 +69,28 @@
         - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/route.packit.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') | from_yaml }}"
+
+    - name: Get metadata about d.io/u-c/packit-service:{{ deployment_image }}
+      shell: skopeo inspect docker://docker.io/usercont/packit-service:{{ deployment_image }}
+      register: image_metadata
+      when: 'image_digest == "" and image == ""'
+
+    - name: set image_digest
+      set_fact:
+        image_digest: "{{ image_metadata.stdout | from_json | json_query('Digest') }}"
+      when: 'image_digest == "" and image == ""'
+
+    - name: image_digest has to be set
+      assert:
+        that:
+        - 'image_digest != ""'
+        fail_msg: 'Variable image_digest is not set when it should be.'
+      when: 'image == ""'
+
+    - name: set image var
+      set_fact:
+        image: "docker.io/usercont/packit-service@{{ image_digest }}"
+      when: 'image == ""'
 
     - name: Deploy resource config - deployment (need to be processed)
       # https://docs.ansible.com/k8s_module.html
