@@ -57,6 +57,21 @@ docker.io/usercont/packit-service@sha256:71b2ed8f1fb11d27eb3c8d1975237b05e8cd6a5
 If you want to update a deployment, just run `make deploy`. It may take a while for all the jobs to finish. Just have a coffee.
 
 
+### Images
+
+#### Service vs. service worker images
+There are separate images for the [service / web server](https://hub.docker.com/r/usercont/packit-service) (which accepts requests) and for the [workers](https://hub.docker.com/r/usercont/packit-service-worker) (which do the actual work).
+
+#### Production vs. Staging images
+
+There are separate images for staging and production deployment.
+Staging images are `:stg` tagged and built from `master` of `packit` and `packit-service`.
+Production images are `:prod` tagged and built from `stable` branch of `packit` and `packit-service`.
+If you want to re-deploy newer `packit` and/or `packit-service` code into prod, you first have to move `stable` branch(es) to a newer 'stable' commit and wait for Docker Hub to rebuild the images.
+- git branch -f stable commit-hash
+- git push [-u upstream] stable
+
+
 ### Revert a deployment
 
 Since all our images now use digests - we reference to precise image and not to a "symlink", we can now easily revert deployments.
