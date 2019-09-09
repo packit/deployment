@@ -92,8 +92,9 @@ spec:
             command:
             - bash
             - -c
-            # are there active tasks on this worker? if yes, it is not ready
-            - 'celery-3 -A $APP inspect active --destination "celery@$(cat /etc/hostname)" | grep empty'
+            # are there active tasks on this worker? if yes, it is not ready: sadly openshift hates this
+            # - 'celery-3 -A $APP inspect active --destination "celery@$(cat /etc/hostname)" | grep empty'
+            - 'celery-3 -A $APP status | grep $(cat /etc/hostname) | grep OK'
           initialDelaySeconds: 5
           periodSeconds: 5
         livenessProbe:
