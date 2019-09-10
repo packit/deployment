@@ -79,3 +79,16 @@ Since all our images now use digests - we reference to precise image and not to 
 ```
 $ oc rollout undo sts/packit-worker
 ```
+
+### Zuul
+
+We have to encrypt the secrets, because we are using them in Zuul CI. This repository provides helpful playbook to do this with one command:
+```
+DEPLOYMENT=stg make zuul-secrets
+```
+
+## How are the secrets encrypted?
+
+Zuul provides a public key for every project. The ansible playbook downloads Zuul repository and pass the project tenant and name as parameters to encryption script. This script then encypts files with public key of the project.
+For more information please refer to [official docs](https://ansible.softwarefactory-project.io/docs/user/zuul_user.html#create-a-secret-to-be-used-in-jobs).
+
