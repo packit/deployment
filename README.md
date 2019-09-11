@@ -67,10 +67,11 @@ There are separate images for the [service / web server](https://hub.docker.com/
 There are separate images for staging and production deployment.
 Staging images are `:stg` tagged and built from `master` of `packit` and `packit-service`.
 Production images are `:prod` tagged and built from `stable` branch of `packit` and `packit-service`.
-If you want to re-deploy newer `packit` and/or `packit-service` code into prod, you first have to move `stable` branch(es) to a newer 'stable' commit and wait for Docker Hub to rebuild the images.
+To move `stable` branch to a newer 'stable' commit:
 - git branch -f stable commit-hash
 - git push [-u upstream] stable
 
+Beware: [packit-service-worker image](https://cloud.docker.com/u/usercont/repository/docker/usercont/packit-service-worker) is not automatically rebuilt when its base [packit image](https://cloud.docker.com/u/usercont/repository/docker/usercont/packit) changes. You have to [trigger](https://cloud.docker.com/u/usercont/repository/docker/usercont/packit-service-worker/builds) the build manually.
 
 ### Revert a deployment
 
