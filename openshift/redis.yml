@@ -46,11 +46,11 @@
                 name: redis-pv
             resources:
               requests:
-                memory: "128Mi"
+                memory: "386Mi"
                 cpu: "100m"
               limits:
-                memory: "256Mi"
-                cpu: "200m"
+                memory: "386Mi"
+                cpu: "100m"
         volumes:
           - name: redis-pv
             persistentVolumeClaim:
