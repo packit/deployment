@@ -30,6 +30,7 @@
         "html_url": "https://github.com/packit-service/hello-world",
         "clone_url": "https://github.com/packit-service/hello-world.git"
       }
-    }
+    },
+    "user": { "login": "TomasTomecek" }
   }
 }
