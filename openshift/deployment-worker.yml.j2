@@ -95,8 +95,8 @@ spec:
             # are there active tasks on this worker? if yes, it is not ready: sadly openshift hates this
             # - 'celery-3 -A $APP inspect active --destination "celery@$(cat /etc/hostname)" | grep empty'
             - 'celery-3 -A $APP status | grep $(cat /etc/hostname) | grep OK'
-          initialDelaySeconds: 5
-          periodSeconds: 5
+          initialDelaySeconds: 10
+          periodSeconds: 60
         livenessProbe:
           exec:
             command:
@@ -104,5 +104,5 @@ spec:
             - -c
             # does this worker respond to ping?
             - 'celery-3 -A $APP inspect ping --destination "celery@$(cat /etc/hostname)"'
-          initialDelaySeconds: 5
-          periodSeconds: 5
+          initialDelaySeconds: 10
+          periodSeconds: 30
