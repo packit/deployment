@@ -134,7 +134,7 @@ Requested Host:         prod.packit.dev
 
 Deploy the stuff to the cluster:
 ```
-$ DEPLOYMENT=prod ansible-playbook -vv playbooks/get-certs.yml
+$ DEPLOYMENT=prod make get-certs
 ```
 
 If there is packit-service deployed, we need to delete the route to free the host name `{{ deployment }}.packit.dev` for `get-them-certs`:

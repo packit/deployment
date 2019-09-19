@@ -1,4 +1,4 @@
-.PHONY: send-release-event deploy cleanup
+.PHONY: send-release-event deploy cleanup zuul-secrets get-certs
 
 CONT_HOME := /opt/app-root/src
 
@@ -13,4 +13,7 @@ cleanup:
 	ansible-playbook -vv playbooks/cleanup.yml
 
 zuul-secrets:
-	ansible-playbook --syntax-check playbooks/zuul-secrets.yml && ansible-playbook -vv playbooks/zuul-secrets.yml
+	ansible-playbook -vv playbooks/zuul-secrets.yml
+
+get-certs:
+	ansible-playbook -vv playbooks/get-certs.yml
