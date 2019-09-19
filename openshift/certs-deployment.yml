@@ -38,7 +38,7 @@ spec:
         - name: certo-cont
           stdin: true
           tty: true
-          image: docker.io/certbot/certbot:v0.33.1
+          image: docker.io/certbot/certbot
           ports:
           - containerPort: 8080
             protocol: TCP
