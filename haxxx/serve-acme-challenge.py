@@ -1,13 +1,8 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
-# certbot/certbot is python 2 :(
-
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-import SocketServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import sys
 
-
-PORT = 8080
 
 path, content = sys.argv[1], sys.argv[2]
 
@@ -22,9 +17,14 @@ class ACMEHandler(BaseHTTPRequestHandler):
             self.send_response(200)
         self.send_header('Content-type', 'text/plain')
         self.end_headers()
-        self.wfile.write(content)
+        self.wfile.write(content.encode())
 
 
-httpd = SocketServer.TCPServer(("0.0.0.0", PORT), ACMEHandler)
+httpd = HTTPServer(("0.0.0.0", 8080), ACMEHandler)
 
-httpd.serve_forever()
+try:
+    httpd.serve_forever()
+except KeyboardInterrupt:
+    pass
+
+httpd.server_close()

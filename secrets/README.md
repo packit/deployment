@@ -4,8 +4,6 @@
 
 ```
 prod
-    │   ├── cert.pem
-    │   ├── chain.pem
     │   ├── copr
     │   ├── fedora.keytab
     │   ├── fullchain.pem
@@ -23,8 +21,7 @@ Some of them are pre-filled in [template](/secrets/template) directory.
 ## What are those secrets?
 
 * Let's encrypt TLS certs:
-    * `cert.pem`
-    * `chain.pem`
+    * `fullchain.pem`
     * `privkey.pem`
 * `private-key` - Specified in a Github App settings. Used to [sign access token requests](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app).
 * `packit-service.yaml` - Configuration for Packit as a service. See pre-filled template in [templates directory](/secrets/template/packit-service.yaml).
