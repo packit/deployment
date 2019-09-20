@@ -172,11 +172,10 @@ Return to first terminal and Press Enter to Continue.
 
 And that's it! We got the certs now, let's get them from the pod to this git repo:
 ```
-$ oc rsh pod/get-them-certs-1-abcde cat /tmp/live/prod.packit.dev/cert.pem | dos2unix > secrets/prod/cert.pem
-$ oc rsh pod/get-them-certs-1-abcde cat /tmp/live/prod.packit.dev/chain.pem | dos2unix > secrets/prod/chain.pem
 $ oc rsh pod/get-them-certs-1-abcde cat /tmp/live/prod.packit.dev/fullchain.pem | dos2unix > secrets/prod/fullchain.pem
 $ oc rsh pod/get-them-certs-1-abcde cat /tmp/live/prod.packit.dev/privkey.pem | dos2unix > secrets/prod/privkey.pem
 ```
+There are also `cert.pem` & `chain.pem` generated. You can copy them as well, but we don't need them at the moment.
 The files that `oc rsh pod/x cat *.pem` returns contain `^M` characters, therefore we use `dos2unix` to [fix them](https://unix.stackexchange.com/questions/32001/what-is-m-and-how-do-i-get-rid-of-it). 
 
 Don't forget to do cleanup:
