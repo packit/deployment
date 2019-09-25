@@ -25,7 +25,6 @@
   hosts: localhost
   vars:
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
-    httpd_config_content: "{{ lookup('file', '../secrets/{{ deployment }}/httpd-packit.conf') }}"
     sandbox_namespace: "packit-{{ deployment }}-sandbox"
     without_fedmsg: false
     without_redis_commander: false
