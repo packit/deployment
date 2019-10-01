@@ -65,7 +65,7 @@ spec:
             mountPath: /etc/httpd/conf.d/httpd-packit.conf
             subPath: httpd-packit.conf
           command:
-            - "/usr/bin/run-httpd"
+            - /usr/bin/run_httpd.sh
           resources:
             requests:
               memory: "128Mi"
