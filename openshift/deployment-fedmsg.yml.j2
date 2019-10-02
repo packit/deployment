@@ -48,6 +48,9 @@ spec:
       containers:
         - name: packit-service-fedmsg
           image: {{ image }}
+          env:
+          - name: FEDORA_MESSAGING_CONF
+            value: /home/packit/.config/fedora.toml
           volumeMounts:
           - name: packit-ssh
             mountPath: /packit-ssh
@@ -58,7 +61,7 @@ spec:
           command:
             - "packit-service"
             - "--debug"
-            - "listen-to-fedmsg"
+            - "listen-to-fedora-messaging"
           resources:
             requests:
               memory: "128Mi"
