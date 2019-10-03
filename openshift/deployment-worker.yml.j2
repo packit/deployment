@@ -69,6 +69,11 @@ spec:
             value: packit_service.worker.tasks
           - name: REDIS_SERVICE_HOST
             value: redis
+          - name: SENTRY_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: packit-sentry
+                key: sentry
         volumeMounts:
         - name: packit-ssh
           mountPath: /packit-ssh
