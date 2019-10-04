@@ -31,9 +31,9 @@
     without_flower: false
     # feel free to override this in vars
     deployment_image: "{{ deployment }}"
-    image: "docker.io/usercont/packit-service"
+    image: ""
     image_digest: ""
-    image_worker: "docker.io/usercont/packit-service-worker"
+    image_worker: ""
     image_worker_digest: ""
   tasks:
     - name: require ansible 2.7
@@ -73,13 +73,13 @@
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') | from_yaml }}"
 
     - block:
-      - name: Get metadata about {{ image }}:{{ deployment_image }}
-        shell: skopeo inspect docker://{{ image }}:{{ deployment_image }}
+      - name: Get metadata about d.io/u-c/packit-service:{{ deployment_image }}
+        shell: skopeo inspect docker://docker.io/usercont/packit-service:{{ deployment_image }}
         register: image_metadata
       - name: set image_digest
         set_fact:
           image_digest: "{{ image_metadata.stdout | from_json | json_query('Digest') }}"
-      when: 'image_digest == ""'
+      when: 'image_digest == "" and image == ""'
 
     - block:
       - name: image_digest has to be set
@@ -89,16 +89,17 @@
           fail_msg: 'Variable image_digest is not set when it should be.'
       - name: set image var
         set_fact:
-          image: "{{ image }}@{{ image_digest }}"
+          image: "docker.io/usercont/packit-service@{{ image_digest }}"
+      when: 'image == ""'
 
     - block:
-      - name: Get metadata about {{ image_worker }}:{{ deployment_image }}
-        shell: skopeo inspect docker://{{ image_worker }}:{{ deployment_image }}
+      - name: Get metadata about d.io/u-c/packit-service-worker:{{ deployment_image }}
+        shell: skopeo inspect docker://docker.io/usercont/packit-service-worker:{{ deployment_image }}
         register: image_worker_metadata
       - name: set image_worker_digest
         set_fact:
           image_worker_digest: "{{ image_worker_metadata.stdout | from_json | json_query('Digest') }}"
-      when: 'image_worker_digest == ""'
+      when: 'image_worker_digest == "" and image_worker == ""'
 
     - block:
       - name: image_worker_digest has to be set
@@ -108,7 +109,8 @@
           fail_msg: 'Variable image_worker_digest is not set when it should be.'
       - name: set image_worker var
         set_fact:
-          image_worker: "{{ image_worker }}@{{ image_worker_digest }}"
+          image_worker: "docker.io/usercont/packit-service-worker@{{ image_worker_digest }}"
+      when: 'image_worker == ""'
 
     - name: Deploy resource config - deployment (need to be processed)
       # https://docs.ansible.com/k8s_module.html
