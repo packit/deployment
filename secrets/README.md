@@ -9,6 +9,7 @@ prod
     │   ├── fullchain.pem
     │   ├── id_rsa
     │   ├── id_rsa.pub
+    │   ├── fedora.toml
     │   ├── packit-service.yaml
     │   ├── private-key.pem
     │   ├── privkey.pem
@@ -28,3 +29,4 @@ Some of them are pre-filled in [template](/secrets/template) directory.
 * `id_rsa` and `id_rsa.pub` - SSH keys.
 * `copr` - Your copr credentials where packit will build packages. See pre-filled template in [templates directory](/secrets/template/copr).
 * `fedora.keytab` - Fedora kerberos.
+* `fedora.toml` - [fedora-messaging configuration](https://fedora-messaging.readthedocs.io/en/stable/configuration.html).
