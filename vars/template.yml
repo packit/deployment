@@ -38,7 +38,7 @@ host: https://your-openshift-cluster-url
 api_key: ""
 
 # To work-around 'SSL: CERTIFICATE_VERIFY_FAILED'
-verify_ssl: no
+validate_certs: no
 
 # don't deploy fedmsg dc; good for local testing
 without_fedmsg: true
