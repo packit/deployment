@@ -22,7 +22,7 @@
 
 ---
 - name: get certs
-  hosts: localhost
+  hosts: all
   vars:
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
   tasks:

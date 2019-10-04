@@ -22,7 +22,7 @@
 
 ---
 - name: This is a recipe for adding let's encrypt into packit OpenShift instance
-  hosts: localhost
+  hosts: all
 
   tasks:
   - name: Check for login into OpenShift
