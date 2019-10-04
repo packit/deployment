@@ -1,7 +1,7 @@
 .PHONY: send-release-event deploy cleanup zuul-secrets get-certs
 
 CONT_HOME := /opt/app-root/src
-AP := ansible-playbook -vv -c local -i localhost,
+AP := ansible-playbook -vv -c local -i localhost, -e ansible_python_interpreter=/usr/bin/python3
 
 # use route when doing this on a remote openshift cluster
 send-release-event:
