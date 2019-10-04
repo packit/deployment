@@ -73,7 +73,7 @@
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') | from_yaml }}"
 
     - block:
-       - name: Get metadata about {{ image }}:{{ deployment_image }}
+      - name: Get metadata about {{ image }}:{{ deployment_image }}
         shell: skopeo inspect docker://{{ image }}:{{ deployment_image }}
         register: image_metadata
       - name: set image_digest
@@ -92,7 +92,7 @@
           image: "{{ image }}@{{ image_digest }}"
 
     - block:
-       - name: Get metadata about {{ image_worker }}:{{ deployment_image }}
+      - name: Get metadata about {{ image_worker }}:{{ deployment_image }}
         shell: skopeo inspect docker://{{ image_worker }}:{{ deployment_image }}
         register: image_worker_metadata
       - name: set image_worker_digest
