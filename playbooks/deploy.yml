@@ -92,7 +92,7 @@
           image: "{{ image }}@{{ image_digest }}"
 
     - block:
-      - name: Get metadata about d.io/u-c/packit-service-worker:{{ deployment_image }}
+       - name: Get metadata about {{ image_worker }}:{{ deployment_image }}
         shell: skopeo inspect docker://{{ image_worker }}:{{ deployment_image }}
         register: image_worker_metadata
       - name: set image_worker_digest
