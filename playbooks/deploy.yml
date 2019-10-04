@@ -67,8 +67,9 @@
       loop:
         - "{{ lookup('template', '../openshift/secret-packit-ssh.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/secret-packit-secrets.yml.j2') | from_yaml }}"
-        - "{{ lookup('template', '../openshift/cmap-packit-httpd-conf.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/cmap-packit-httpd-conf.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/route.packit.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') | from_yaml }}"
 
