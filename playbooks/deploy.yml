@@ -31,9 +31,9 @@
     without_flower: false
     # feel free to override this in vars
     deployment_image: "{{ deployment }}"
-    image: ""
+    image: "docker.io/usercont/packit-service"
     image_digest: ""
-    image_worker: ""
+    image_worker: "docker.io/usercont/packit-service-worker"
     image_worker_digest: ""
   tasks:
     - name: require ansible 2.7
