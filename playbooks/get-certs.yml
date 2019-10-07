@@ -22,7 +22,7 @@
 
 ---
 - name: get certs
-  hosts: localhost
+  hosts: all
   vars:
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
   tasks:
@@ -36,7 +36,7 @@
         definition: "{{ item }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ verify_ssl }}"
+        validate_certs: "{{ validate_certs }}"
       loop:
         - "{{ lookup('template', '../openshift/cert-route-http.yml.j2') | from_yaml }}"
 
@@ -47,7 +47,7 @@
         src: "{{ item }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ verify_ssl }}"
+        validate_certs: "{{ validate_certs }}"
       loop:
         - ../openshift/certs-deployment.yml
         - ../openshift/cert-service.yml
