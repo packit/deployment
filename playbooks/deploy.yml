@@ -36,12 +36,6 @@
     image_worker: ""
     image_worker_digest: ""
   tasks:
-    - name: require ansible >= 2.8
-      assert:
-        that:
-        - 'ansible_version.minor >= 8'
-        fail_msg: 'Please upgrade to ansible 2.8 or later.'
-
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml
 
@@ -64,6 +58,7 @@
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
+        verify_ssl: "{{ validate_certs }}"  # 2.7 compat
       loop:
         - "{{ lookup('template', '../openshift/secret-packit-ssh.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/secret-packit-secrets.yml.j2') | from_yaml }}"
@@ -121,6 +116,7 @@
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
+        verify_ssl: "{{ validate_certs }}"  # 2.7 compat
       loop:
         - "{{ lookup('template', '../openshift/deployment.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/deployment-worker.yml.j2') | from_yaml }}"
@@ -133,6 +129,7 @@
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
+        verify_ssl: "{{ validate_certs }}"  # 2.7 compat
       loop:
         - ../openshift/redis.yml
         - ../openshift/service.yml
@@ -144,6 +141,7 @@
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
+        verify_ssl: "{{ validate_certs }}"  # 2.7 compat
       when: not without_redis_commander
 
     - name: Deploy flower
@@ -153,6 +151,7 @@
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
+        verify_ssl: "{{ validate_certs }}"  # 2.7 compat
       when: not without_flower
 
     - name: Deploy fedmsg listener
@@ -162,6 +161,7 @@
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
+        verify_ssl: "{{ validate_certs }}"  # 2.7 compat
       when: not without_fedmsg
 
     - name: Set up the sandbox namespace
