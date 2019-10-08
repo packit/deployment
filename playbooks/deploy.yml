@@ -57,7 +57,7 @@
         definition: "{{ item }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ verify_ssl }}"
+        verify_ssl: "{{ validate_certs }}"
       loop:
         - "{{ lookup('template', '../openshift/secret-packit-ssh.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/secret-packit-secrets.yml.j2') | from_yaml }}"
@@ -114,7 +114,7 @@
         definition: "{{ item }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ verify_ssl }}"
+        verify_ssl: "{{ validate_certs }}"
       loop:
         - "{{ lookup('template', '../openshift/deployment.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/deployment-worker.yml.j2') | from_yaml }}"
@@ -126,7 +126,7 @@
         src: "{{ item }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ verify_ssl }}"
+        verify_ssl: "{{ validate_certs }}"
       loop:
         - ../openshift/redis.yml
         - ../openshift/service.yml
@@ -137,7 +137,7 @@
         src: ../openshift/redis-commander.yml
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ verify_ssl }}"
+        verify_ssl: "{{ validate_certs }}"
       when: not without_redis_commander
 
     - name: Deploy flower
@@ -146,7 +146,7 @@
         src: ../openshift/flower.yml
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ verify_ssl }}"
+        verify_ssl: "{{ validate_certs }}"
       when: not without_flower
 
     - name: Deploy fedmsg listener
@@ -155,7 +155,7 @@
         definition: "{{ lookup('template', '../openshift/deployment-fedmsg.yml.j2') | from_yaml }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ verify_ssl }}"
+        verify_ssl: "{{ validate_certs }}"
       when: not without_fedmsg
 
     - name: Set up the sandbox namespace
