@@ -34,7 +34,7 @@
     image_digest: ""
     image_worker: "docker.io/usercont/packit-service-worker"
     image_worker_digest: ""
-    skopeo_transport: "docker"
+    skopeo_transport: "docker://"
     worker_replicas: 2
   tasks:
     - name: include variables
@@ -70,7 +70,7 @@
 
     - block:
       - name: Get metadata about {{ image }}:{{ deployment }}
-        shell: skopeo inspect {{ skopeo_transport }}://{{ image }}:{{ deployment }}
+        shell: skopeo inspect {{ skopeo_transport }}{{ image }}:{{ deployment }}
         register: image_metadata
       - name: set image_digest
         set_fact:
@@ -89,7 +89,7 @@
 
     - block:
       - name: Get metadata about {{ image_worker }}:{{ deployment }}
-        shell: skopeo inspect {{ skopeo_transport }}://{{ image_worker }}:{{ deployment }}
+        shell: skopeo inspect {{ skopeo_transport }}{{ image_worker }}:{{ deployment }}
         register: image_worker_metadata
       - name: set image_worker_digest
         set_fact:
