@@ -35,6 +35,7 @@
     image_worker: "docker.io/usercont/packit-service-worker"
     image_worker_digest: ""
     skopeo_transport: "docker"
+    worker_replicas: 2
   tasks:
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml

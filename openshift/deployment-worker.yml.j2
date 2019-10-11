@@ -32,7 +32,7 @@ spec:
       name: packit-worker
       app: packit
   serviceName: "packit-worker"
-  replicas: 2
+  replicas: {{ worker_replicas }}
   volumeClaimTemplates:
   - metadata:
       name: packit-worker-vol
