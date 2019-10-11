@@ -89,7 +89,7 @@
 
     - block:
       - name: Get metadata about {{ image_worker }}:{{ deployment }}
-        shell: skopeo inspect {{ skopeo_transport }}://{{ image_worker }}:{{ deployment}}
+        shell: skopeo inspect {{ skopeo_transport }}://{{ image_worker }}:{{ deployment }}
         register: image_worker_metadata
       - name: set image_worker_digest
         set_fact:
