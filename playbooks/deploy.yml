@@ -30,11 +30,11 @@
     without_redis_commander: false
     without_flower: false
     # feel free to override this in vars
-    deployment_image: "{{ deployment }}"
     image: "docker.io/usercont/packit-service"
     image_digest: ""
     image_worker: "docker.io/usercont/packit-service-worker"
     image_worker_digest: ""
+    skopeo_transport: "docker"
   tasks:
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml
@@ -68,8 +68,8 @@
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') | from_yaml }}"
 
     - block:
-      - name: Get metadata about {{ image }}:{{ deployment_image }}
-        shell: skopeo inspect docker://{{ image }}:{{ deployment_image }}
+      - name: Get metadata about {{ image }}:{{ deployment }}
+        shell: skopeo inspect {{ skopeo_transport }}://{{ image }}:{{ deployment }}
         register: image_metadata
       - name: set image_digest
         set_fact:
@@ -87,8 +87,8 @@
           image: "{{ image }}@{{ image_digest }}"
 
     - block:
-      - name: Get metadata about {{ image_worker }}:{{ deployment_image }}
-        shell: skopeo inspect docker://{{ image_worker }}:{{ deployment_image }}
+      - name: Get metadata about {{ image_worker }}:{{ deployment }}
+        shell: skopeo inspect {{ skopeo_transport }}://{{ image_worker }}:{{ deployment}}
         register: image_worker_metadata
       - name: set image_worker_digest
         set_fact:
