@@ -67,3 +67,7 @@ without_flower: false
 
 # Number of worker pods to be deployed
 # worker_replicas : 2
+
+# Path to secrets (in case you don't have it in the root of this project)
+# path_to_secrets: /secrets
+
