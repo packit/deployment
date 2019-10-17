@@ -36,6 +36,7 @@
     image_worker_digest: ""
     skopeo_transport: "docker://"
     worker_replicas: 2
+    path_to_secrets: "../secrets"
   tasks:
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml
