@@ -52,10 +52,6 @@ without_flower: false
 # you can set the sandbox namespace name explicitly like this
 # sandbox_namespace: "packit-prod-sandbox"
 
-# For image inspection when no image[_worker] or image[_worker]_digest specified.
-# Default is {{ deployment }}
-# deployment_image: prod
-
 # image to use for service and fedmsg pods
 # image: docker.io/usercont/packit-service
 
