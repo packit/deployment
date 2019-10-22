@@ -74,22 +74,22 @@ spec:
               memory: "256Mi"
               cpu: "200m"
           # In TLS world, hostname needs to match whatever is set in the cert
-          # in our cause, k8s is doing here something like curl https://172.15.2.4:8443/healthz
+          # in our cause, k8s is doing here something like curl https://172.15.2.4:8443/api/healthz/
           # which will fail TLS validation.
           # So we need to connect to prod.packit.dev.
-          #   Liveness probe failed: Get https://10.131.30.42:8443/healthz: local error: tls: no renegotiation
+          #   Liveness probe failed: Get https://10.131.30.42:8443/api/healthz/: local error: tls: no renegotiation
           # Comment probes out, they just don't work.
           # readinessProbe:
           #   httpGet:
           #     host: {{ deployment }}.packit.dev
           #     scheme: HTTPS
-          #     path: /healthz
+          #     path: /api/healthz/
           #   initialDelaySeconds: 10
           # livenessProbe:
           #   httpGet:
           #     host: {{ deployment }}.packit.dev
           #     scheme: HTTPS
-          #     path: /healthz
+          #     path: /api/healthz/
           #   initialDelaySeconds: 30
   replicas: 1
   strategy:
