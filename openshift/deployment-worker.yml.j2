@@ -65,6 +65,8 @@ spec:
         image: {{ image_worker }}
         imagePullPolicy: IfNotPresent
         env:
+          - name: DEPLOYMENT
+            value: {{ deployment }}
           - name: APP
             value: packit_service.worker.tasks
           - name: REDIS_SERVICE_HOST
