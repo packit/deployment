@@ -30,14 +30,12 @@
     without_redis_commander: false
     without_flower: false
     # feel free to override this in vars
-    image: "docker.io/usercont/packit-service"
-    image_digest: ""
-    image_worker: "docker.io/usercont/packit-service-worker"
-    image_worker_digest: ""
-    image_fedmsg: "docker.io/usercont/packit-service-fedmsg"
-    skopeo_transport: "docker://"
+    image: "usercont/packit-service"
+    image_worker: "usercont/packit-service-worker"
+    image_fedmsg: "usercont/packit-service-fedmsg"
     worker_replicas: 2
     path_to_secrets: "../secrets"
+    continuous_deployment: false
   tasks:
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml
@@ -69,44 +67,9 @@
         - "{{ lookup('template', '../openshift/cmap-packit-httpd-conf.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/route.packit.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') | from_yaml }}"
-
-    - block:
-      - name: Get metadata about {{ image }}:{{ deployment }}
-        shell: skopeo inspect {{ skopeo_transport }}{{ image }}:{{ deployment }}
-        register: image_metadata
-      - name: set image_digest
-        set_fact:
-          image_digest: "{{ image_metadata.stdout | from_json | json_query('Digest') }}"
-      when: 'image_digest == ""'
-
-    - block:
-      - name: image_digest has to be set
-        assert:
-          that:
-          - 'image_digest != ""'
-          fail_msg: 'Variable image_digest is not set when it should be.'
-      - name: set image var
-        set_fact:
-          image: "{{ image }}@{{ image_digest }}"
-
-    - block:
-      - name: Get metadata about {{ image_worker }}:{{ deployment }}
-        shell: skopeo inspect {{ skopeo_transport }}{{ image_worker }}:{{ deployment }}
-        register: image_worker_metadata
-      - name: set image_worker_digest
-        set_fact:
-          image_worker_digest: "{{ image_worker_metadata.stdout | from_json | json_query('Digest') }}"
-      when: 'image_worker_digest == ""'
-
-    - block:
-      - name: image_worker_digest has to be set
-        assert:
-          that:
-          - 'image_worker_digest != ""'
-          fail_msg: 'Variable image_worker_digest is not set when it should be.'
-      - name: set image_worker var
-        set_fact:
-          image_worker: "{{ image_worker }}@{{ image_worker_digest }}"
+        - "{{ lookup('template', '../openshift/imagestream.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/imagestream-worker.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/imagestream-fedmsg.yml.j2') | from_yaml }}"
 
     - name: Deploy resource config - deployment (need to be processed)
       # https://docs.ansible.com/k8s_module.html
@@ -118,7 +81,7 @@
         verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
       loop:
         - "{{ lookup('template', '../openshift/deployment.yml.j2') | from_yaml }}"
-        - "{{ lookup('template', '../openshift/deployment-worker.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/statefulset-worker.yml.j2') | from_yaml }}"
 
     - name: Deploy resource configs (no need to process them)
       # https://docs.ansible.com/k8s_module.html

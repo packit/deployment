@@ -53,16 +53,13 @@ without_flower: false
 # sandbox_namespace: "packit-prod-sandbox"
 
 # image to use for service and fedmsg pods
-# image: docker.io/usercont/packit-service
+# image: usercont/packit-service
 
 # image to use for worker
-# image_worker: docker.io/usercont/packit-service-worker
+# image_worker: usercont/packit-service-worker
 
 # image to use for fedora messaging consumer
-# image_fedmsg: docker.io/usercont/packit-service-fedmsg
-
-# skopeo transport
-# skopeo_transport: "docker-daemon:"
+# image_fedmsg: usercont/packit-service-fedmsg
 
 # Number of worker pods to be deployed
 # worker_replicas : 2
@@ -70,3 +67,6 @@ without_flower: false
 # Path to secrets (in case you don't have it in the root of this project)
 # path_to_secrets: /secrets
 
+# For prod you want false (default) - so you can re-deploy whenever you're ready
+# For stg/dev you want true - to have Continuous Deployment
+# continuous_deployment: true

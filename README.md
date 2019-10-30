@@ -18,53 +18,33 @@
 
 [vars/template.yml](vars/template.yml) is a variable file template.
 
-You have to copy it to `prod.yml` or `stg.yml`
+You have to copy it to `prod.yml`, `stg.yml` or `dev.yml`
 depending on what environment you want to deploy to.
 
-If you want to deploy to 'production environment', you `cp template.yml prod.yml`
-and in `prod.yml` you set `host: your-production-cluster-url`.
-Then you run `DEPLOYMENT=prod make deploy`.
+#### Local development in a local cluster
 
-The ansible playbook then includes one of the variable files depending on the
+For example if you want to deploy to 'devel environment', do
+`cp template.yml dev.yml` and in `dev.yml` set `host:` and `api_key:`.
+Then run `DEPLOYMENT=dev make deploy`.
+
+The Ansible playbook then includes one of the variable files depending on the
 value of DEPLOYMENT environment variable and processes all the templates with
 variables defined in the file.
 
 If you want to remove all objects from the deployment (project) run e.g.
-`DEPLOYMENT=stg make cleanup`.
-
-
-## Local development in a local cluster
-
-Create a new set of variables:
-```
-$ cp -av vars/{template,dev}.yml
-```
-
-And just deploy:
-```
-$ DEPLOYMENT=dev make deploy
-```
-
-
-### Updating
-
-All our pods use images referenced to digests, e.g.
-
-```
-docker.io/usercont/packit-service@sha256:71b2ed8f1fb11d27eb3c8d1975237b05e8cd6a52b52ea1f80bf46e8dc21a0f16
-```
-
-If you want to update a deployment, just run `make deploy`. It may take a while for all the jobs to finish. Just have a coffee.
-
+`DEPLOYMENT=dev make cleanup`.
 
 ### Images
 
-#### Service vs. service worker images
-There are separate images for the [service / web server](https://hub.docker.com/r/usercont/packit-service) (which accepts requests) and for the [workers](https://hub.docker.com/r/usercont/packit-service-worker) (which do the actual work).
+#### Service vs. worker images
+There are separate images for
+* [service / web server](https://hub.docker.com/r/usercont/packit-service) - accepts webhooks and tasks workers
+* [fedora messaging consumer](https://hub.docker.com/r/usercont/packit-service-fedmsg) - listens on fedora messaging for events from Copr and tasks workers
+* [workers](https://hub.docker.com/r/usercont/packit-service-worker) - do the actual work
 
 #### Production vs. Staging images
 
-There are separate images for staging and production deployment.
+Service and worker have separate images for staging and production deployment.
 Staging images are `:stg` tagged and built from `master` of `packit` and `packit-service`.
 Production images are `:prod` tagged and built from `stable` branch of `packit` and `packit-service`.
 To move `stable` branch to a newer 'stable' commit:
@@ -73,25 +53,72 @@ To move `stable` branch to a newer 'stable' commit:
 
 Beware: [packit-service-worker image](https://cloud.docker.com/u/usercont/repository/docker/usercont/packit-service-worker) is not automatically rebuilt when its base [packit image](https://cloud.docker.com/u/usercont/repository/docker/usercont/packit) changes. You have to [trigger](https://cloud.docker.com/u/usercont/repository/docker/usercont/packit-service-worker/builds) the build manually.
 
-### Revert a deployment
+### DeploymentConfig vs. StatefulSet
 
-Since all our images now use digests - we reference to precise image and not to a "symlink", we can now easily revert deployments.
+[Service](openshift/deployment.yml.j2) and [service-fedmsg](openshift/deployment-fedmsg.yml.j2) are [DeploymentConfigs](https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html), but [worker](openshift/statefulset-worker.yml.j2) is a [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset).
+
+### Continuous Deployment
+
+We use [ImageStreams](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-streams) as intermediary between an image registry and a Deployment. It has several significant benefits:
+- We can automatically trigger Deployment when a new image is pushed to the registry.
+- We can rollback/revert/undo the Deployment (previously we had to use image digests to achieve this).
+
+There's a `continuous_deployment` variable in `vars/*.yaml` which says whether
+we want to automatically/continuously re-deploy whenever a new image appears in
+Docker Hub. It's `false` by default, but you should set it to `true` in your
+`{dev|stg}.yaml`.
+
+`Docker Hub` -> (stg:automatic / prod:manual)[1] -> `ImageStream` -> (automatic)[2] -> `DeploymentConfig`/`StatefulSet`
+
+[1] set in ImageStream->spec->tags->importPolicy->scheduled
+[2] set in DeploymentConfig->spec->triggers->imageChangeParams->automatic
+
+Warn: OpenShift Online (where we currently run Packit Service) seems to have
+turned off these periodical image registry to ImageStream updates even when
+we explicitly [request them](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-stream-mappings-working-periodic).
+
+To [manually update metadata in an ImageStream](https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#importing-tag-and-image-metadata) you can run
+```
+$ oc import-image is/packit-worker:<deployment>
+```
+
+### Rolling out new updates
+
+* On staging everything should be automatic(, but it's not due to the above described OS Online issue).
+* On prod you have to manually run `oc import-image is/packit-{service|service-fedmsg|worker}:<deployment>` once a new `:prod` image is pushed/built in Docker Hub.
+
+### Reverting to older deployment/revision/image
+
+`DeploymentConfig`s (i.e. service & service-fedmsg) can be reverted with `oc rollout undo`:
 
 ```
-$ oc rollout undo sts/packit-worker
+$ oc rollout undo dc/packit-service [--to-revision=X]
+$ oc rollout undo dc/packit-service-fedmsg [--to-revision=X]
 ```
+where `X` is revision number.
+See also `oc rollout history dc/packit-service [--revision=X]`.
 
-### Zuul
+It's more tricky in case of `StatefulSet` which we use for worker.
+`oc rollout undo` does not seem to work with `StatefulSet`
+(even it [should](https://github.com/kubernetes/kubernetes/pull/49674)).
+So when you happen to deploy broken worker and you want to revert/undo it
+because you don't know what's the cause/fix yet, you have to:
+1. `oc describe is/packit-worker` - select older image
+2. `oc tag --source=docker usercont/packit-service-worker@sha256:<older-hash> myproject/packit-worker:<deployment>`
+And see the `packit-worker-x` pods beeing re-deployed from the older image.
+
+## Zuul
 
 We have to encrypt the secrets, because we are using them in Zuul CI. This repository provides helpful playbook to do this with one command:
 ```
 DEPLOYMENT=stg make zuul-secrets
 ```
 
-## How are the secrets encrypted?
+### How are the secrets encrypted?
 
-Zuul provides a public key for every project. The ansible playbook downloads Zuul repository and pass the project tenant and name as parameters to encryption script. This script then encypts files with public key of the project.
+Zuul provides a public key for every project. The ansible playbook downloads Zuul repository and pass the project tenant and name as parameters to encryption script. This script then encrypts files with public key of the project.
 For more information please refer to [official docs](https://ansible.softwarefactory-project.io/docs/user/zuul_user.html#create-a-secret-to-be-used-in-jobs).
+
 
 ## Obtaining a Let's Encrypt cert using `certbot`
 
