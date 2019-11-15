@@ -58,6 +58,9 @@ without_flower: false
 # image to use for worker
 # image_worker: docker.io/usercont/packit-service-worker
 
+# image to use for fedora messaging consumer
+# image_fedmsg: docker.io/usercont/packit-service-fedmsg
+
 # skopeo transport
 # skopeo_transport: "docker-daemon:"
 

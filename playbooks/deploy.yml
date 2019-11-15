@@ -34,6 +34,7 @@
     image_digest: ""
     image_worker: "docker.io/usercont/packit-service-worker"
     image_worker_digest: ""
+    image_fedmsg: "docker.io/usercont/packit-service-fedmsg"
     skopeo_transport: "docker://"
     worker_replicas: 2
     path_to_secrets: "../secrets"
@@ -149,7 +150,7 @@
         verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
       when: not without_flower
 
-    - name: Deploy fedmsg listener
+    - name: Deploy fedora messaging consumer
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/deployment-fedmsg.yml.j2') | from_yaml }}"
