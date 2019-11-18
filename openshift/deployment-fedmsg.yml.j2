@@ -47,7 +47,7 @@ spec:
           secretName: packit-config
       containers:
         - name: packit-service-fedmsg
-          image: {{ image }}
+          image: {{ image_fedmsg }}
           env:
           - name: FEDORA_MESSAGING_CONF
             value: /home/packit/.config/fedora.toml
@@ -59,15 +59,13 @@ spec:
           - name: packit-config
             mountPath: /home/packit/.config
           command:
-            - "packit-service"
-            - "--debug"
             - "listen-to-fedora-messaging"
           resources:
             requests:
-              memory: "128Mi"
+              memory: "64Mi"
               cpu: "100m"
             limits:
-              memory: "256Mi"
+              memory: "128Mi"
               cpu: "200m"
   replicas: 1
   strategy:
