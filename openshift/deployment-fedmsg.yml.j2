@@ -51,6 +51,8 @@ spec:
           env:
           - name: FEDORA_MESSAGING_CONF
             value: /home/packit/.config/fedora.toml
+          - name: REDIS_SERVICE_HOST
+            value: redis
           volumeMounts:
           - name: packit-ssh
             mountPath: /packit-ssh
