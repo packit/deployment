@@ -74,13 +74,19 @@ Docker Hub. It's `false` by default, but you should set it to `true` in your
 [2] set in DeploymentConfig->spec->triggers->imageChangeParams->automatic
 
 Warn: OpenShift Online (where we currently run Packit Service) seems to have
-turned off these periodical image registry to ImageStream updates even when
-we explicitly [request them](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-stream-mappings-working-periodic).
+turned off these periodical updates from image registry to ImageStream
+(even we explicitly [request them](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-stream-mappings-working-periodic)).
+
+### Manually import a newer image
+
+This needs to be done on `prod` so that we have full control of when we re-deploy.
 
 To [manually update metadata in an ImageStream](https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#importing-tag-and-image-metadata) you can run
 ```
 $ oc import-image is/packit-worker:<deployment>
 ```
+
+There's also 'import-images' target in the Makefile, so `DEPLOYMENT=prod make import-images` does this for you for all images (image streams).
 
 ### Rolling out new updates
 
@@ -105,7 +111,7 @@ So when you happen to deploy broken worker and you want to revert/undo it
 because you don't know what's the cause/fix yet, you have to:
 1. `oc describe is/packit-worker` - select older image
 2. `oc tag --source=docker usercont/packit-service-worker@sha256:<older-hash> myproject/packit-worker:<deployment>`
-And see the `packit-worker-x` pods beeing re-deployed from the older image.
+And see the `packit-worker-x` pods being re-deployed from the older image.
 
 ## Zuul
 
