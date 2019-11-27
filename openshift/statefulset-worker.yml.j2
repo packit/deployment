@@ -1,7 +1,7 @@
 # MIT License
 #
 # Copyright (c) 2018-2019 Red Hat, Inc.
-
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -20,11 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: packit-worker
+  annotations:
+    # Setting triggers to StatefulSet is tricky (they also don't appear in GUI).
+    # I run the following and then checked how the resulting yaml looks like.
+    # oc set triggers statefulset.apps/packit-worker --from-image=packit-worker:dev -c packit-worker-1
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"packit-worker:{{ deployment }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"packit-worker-1\")].image"}]
 spec:
   selector:
     matchLabels:
@@ -62,8 +67,7 @@ spec:
           secretName: packit-config
       containers:
       - name: packit-worker-1
-        image: {{ image_worker }}
-        imagePullPolicy: IfNotPresent
+        image: packit-worker:{{ deployment }}
         env:
           - name: DEPLOYMENT
             value: {{ deployment }}

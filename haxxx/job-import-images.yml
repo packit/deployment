@@ -1,0 +1,33 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: import-images
+spec:
+  # Run every 30min
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: import-images
+            image: usercont/import-images
+            env:
+            - name: KUBECONFIG
+              value: /tmp/.kube/config
+            - name: DEPLOYMENT
+              value: stg
+            - name: TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: importimager-token-cbw75
+                  key: token
+            command: ["bash", "/usr/bin/import-images.sh"]
+            resources:
+              requests:
+                memory: "64Mi"
+                cpu: "100m"
+              limits:
+                memory: "128Mi"
+                cpu: "100m"
+          restartPolicy: OnFailure

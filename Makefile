@@ -14,6 +14,11 @@ deploy:
 cleanup:
 	$(AP) playbooks/cleanup.yml
 
+# Import newer images from registry.
+# Causes re-deployment of components with newer image available.
+import-images:
+	$(AP) playbooks/import-images.yml
+
 zuul-secrets:
 	$(AP) playbooks/zuul-secrets.yml
 

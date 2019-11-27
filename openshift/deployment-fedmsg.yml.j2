@@ -1,7 +1,7 @@
 # MIT License
 #
 # Copyright (c) 2018-2019 Red Hat, Inc.
-
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
----
 kind: DeploymentConfig
 apiVersion: v1
 metadata:
@@ -47,7 +46,7 @@ spec:
           secretName: packit-config
       containers:
         - name: packit-service-fedmsg
-          image: {{ image_fedmsg }}
+          image: packit-service-fedmsg:{{ deployment }}
           env:
           - name: FEDORA_MESSAGING_CONF
             value: /home/packit/.config/fedora.toml
@@ -69,6 +68,17 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "200m"
+  # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/basic_deployment_operations.html#image-change-trigger
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - packit-service-fedmsg
+        from:
+          kind: ImageStreamTag
+          name: packit-service-fedmsg:{{ deployment }}
   replicas: 1
   strategy:
     type: Recreate

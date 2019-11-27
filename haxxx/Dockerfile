@@ -1,0 +1,8 @@
+FROM fedora:31
+
+RUN dnf install -y origin-clients && \
+    dnf clean all
+
+COPY import-images.sh /usr/bin/
+
+CMD ["/usr/bin/import-images.sh"]

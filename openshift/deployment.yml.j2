@@ -1,7 +1,7 @@
 # MIT License
 #
 # Copyright (c) 2018-2019 Red Hat, Inc.
-
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
----
 kind: DeploymentConfig
 apiVersion: v1
 metadata:
@@ -47,7 +46,7 @@ spec:
           name: httpd-conf
       containers:
         - name: packit-service
-          image: {{ image }}
+          image: packit-service:{{ deployment }}
           ports:
           - containerPort: 8443
             protocol: TCP
@@ -91,6 +90,17 @@ spec:
           #     scheme: HTTPS
           #     path: /api/healthz/
           #   initialDelaySeconds: 30
+  # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/basic_deployment_operations.html#image-change-trigger
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - packit-service
+        from:
+          kind: ImageStreamTag
+          name: packit-service:{{ deployment }}
   replicas: 1
   strategy:
     type: Recreate
