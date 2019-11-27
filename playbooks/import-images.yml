@@ -21,9 +21,8 @@
 # SOFTWARE.
 
 
-# Import newer images from registry.
 # Causes re-deployment of components with newer image available.
-- name: Manually refresh metadata in image streams
+- name: Import newer images metadata from registry into image streams
   hosts: all
   vars:
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
@@ -33,11 +32,6 @@
 
     - name: oc login
       command: oc login {{ host }} --token={{ api_key }} --insecure-skip-tls-verify
-      # it doesn't change anything, so don't report 'changed'
-      changed_when: false
-
-    - name: oc project
-      command: oc project {{ project }}
       # it doesn't change anything, so don't report 'changed'
       changed_when: false
 

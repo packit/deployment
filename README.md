@@ -73,9 +73,13 @@ Docker Hub. It's `false` by default, but you should set it to `true` in your
 [1] set in ImageStream->spec->tags->importPolicy->scheduled
 [2] set in DeploymentConfig->spec->triggers->imageChangeParams->automatic
 
-Warn: OpenShift Online (where we currently run Packit Service) seems to have
+#### Openshift Online not periodically updating ImageStreams
+
+OpenShift Online (where we currently run Packit Service) seems to have
 turned off these periodical updates from image registry to ImageStream
 (even we explicitly [request them](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-stream-mappings-working-periodic)).
+
+See [haxxx/README.md](./haxxx/README.md) for a work-around.
 
 ### Manually import a newer image
 
@@ -91,7 +95,7 @@ There's also 'import-images' target in the Makefile, so `DEPLOYMENT=prod make im
 ### Rolling out new updates
 
 * On staging everything should be automatic(, but it's not due to the above described OS Online issue).
-* On prod you have to manually run `oc import-image is/packit-{service|service-fedmsg|worker}:<deployment>` once a new `:prod` image is pushed/built in Docker Hub.
+* On prod you have to manually run `oc import-image is/packit-{service|service-fedmsg|worker}:<deployment>` (or `make import-images`) once a new `:prod` image is pushed/built in Docker Hub.
 
 ### Reverting to older deployment/revision/image
 
