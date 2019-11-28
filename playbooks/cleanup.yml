@@ -41,4 +41,5 @@
       changed_when: false
 
     - name: oc delete all
-      command: oc delete all,cm,secrets,pvc --all
+      command: oc delete all,cm,pvc --all
+      when: '{{ deployment }} != "prod"'
