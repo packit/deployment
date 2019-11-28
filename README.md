@@ -36,7 +36,6 @@ If you want to remove all objects from the deployment (project) run e.g.
 
 ### Images
 
-#### Service vs. worker images
 There are separate images for
 * [service / web server](https://hub.docker.com/r/usercont/packit-service) - accepts webhooks and tasks workers
 * [fedora messaging consumer](https://hub.docker.com/r/usercont/packit-service-fedmsg) - listens on fedora messaging for events from Copr and tasks workers
@@ -59,43 +58,35 @@ Beware: [packit-service-worker image](https://cloud.docker.com/u/usercont/reposi
 
 ### Continuous Deployment
 
-We use [ImageStreams](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-streams) as intermediary between an image registry and a Deployment. It has several significant benefits:
+tl;dr: Newer images in registry are automatically imported and re-deployed.
+
+Long story:
+We use [ImageStreams](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-streams) as intermediary between an image registry (Docker Hub) and a Deployment/StatefulSet. It has several significant benefits:
 - We can automatically trigger Deployment when a new image is pushed to the registry.
 - We can rollback/revert/undo the Deployment (previously we had to use image digests to achieve this).
 
-There's a `continuous_deployment` variable in `vars/*.yaml` which says whether
-we want to automatically/continuously re-deploy whenever a new image appears in
-Docker Hub. It's `false` by default, but you should set it to `true` in your
-`{dev|stg}.yaml`.
+`Image registry` -> [1] -> `ImageStream` -> [2] -> `DeploymentConfig`/`StatefulSet`
 
-`Docker Hub` -> (stg:automatic / prod:manual)[1] -> `ImageStream` -> (automatic)[2] -> `DeploymentConfig`/`StatefulSet`
+[1] automatic ([example](https://github.com/packit-service/deployment/blob/master/openshift/imagestream.yml.j2#L37)).
+OpenShift Online has this turned off.
+We run a [CronJob](https://github.com/packit-service/deployment/blob/master/haxxx/job-import-images.yml) to work-around this.
+More info [here](./haxxx/README.md).
+It runs (i.e. imports newer images and re-deploys them)
+* STG: Once every hour (at minute 0)
+* PROD: At 2AM on Monday
 
-[1] set in ImageStream->spec->tags->importPolicy->scheduled
-[2] set in DeploymentConfig->spec->triggers->imageChangeParams->automatic
-
-#### Openshift Online not periodically updating ImageStreams
-
-OpenShift Online (where we currently run Packit Service) seems to have
-turned off these periodical updates from image registry to ImageStream
-(even we explicitly [request them](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-stream-mappings-working-periodic)).
-
-See [haxxx/README.md](./haxxx/README.md) for a work-around.
+[2] automatic, [example](https://github.com/packit-service/deployment/blob/master/openshift/deployment.yml.j2#L98)
 
 ### Manually import a newer image
 
-This needs to be done on `prod` so that we have full control of when we re-deploy.
-
-To [manually update metadata in an ImageStream](https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#importing-tag-and-image-metadata) you can run
+If you need to import (and deploy) newer image(s) before the CronJob does
+(see above), you can [do that manually](https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#importing-tag-and-image-metadata):
 ```
-$ oc import-image is/packit-worker:<deployment>
+$ oc import-image is/packit-{service|service-fedmsg|worker}:<deployment>
 ```
+once a new image is pushed/built in registry.
 
 There's also 'import-images' target in the Makefile, so `DEPLOYMENT=prod make import-images` does this for you for all images (image streams).
-
-### Rolling out new updates
-
-* On staging everything should be automatic(, but it's not due to the above described OS Online issue).
-* On prod you have to manually run `oc import-image is/packit-{service|service-fedmsg|worker}:<deployment>` (or `make import-images`) once a new `:prod` image is pushed/built in Docker Hub.
 
 ### Reverting to older deployment/revision/image
 

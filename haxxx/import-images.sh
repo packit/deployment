@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-oc login https://api.pro-eu-west-1.openshift.com --token="${TOKEN}" --insecure-skip-tls-verify
+oc login "${HOST}" --token="${TOKEN}" --insecure-skip-tls-verify
 
 set -x
 
