@@ -5,4 +5,4 @@ RUN dnf install -y origin-clients && \
 
 COPY import-images.sh /usr/bin/
 
-CMD ["/usr/bin/import-images.sh"]
+CMD ["bash", "/usr/bin/import-images.sh"]

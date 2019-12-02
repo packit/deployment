@@ -1,11 +1,16 @@
-## Work-around for Openshift Online not periodically updating ImageStreams
+## Periodically updating ImageStreams
 
-OpenShift Online (where we currently run Packit Service) seems to have
-turned off periodical updates from image registry to ImageStream
-(even we explicitly [request them](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-stream-mappings-working-periodic)).
+OpenShift Online seems to have turned off periodical updates from image registry
+to ImageStream (even we explicitly [request them](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-stream-mappings-working-periodic)).
 
-[job-import-images.yml](./job-import-images.yml) - CronJob to periodically import images metadata into image streams. We use this on `stg`, see `oc describe cronjob.batch/import-images`.
-There's [imageimporter](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-stg/serviceaccounts/importimager) [service account](https://docs.openshift.com/container-platform/3.11/dev_guide/service_accounts.html) with `registry-editor` [role](https://docs.openshift.com/container-platform/3.11/admin_guide/manage_rbac.html) role added.
+As a work-around, there's a CronJob to periodically import images metadata into image streams.
+See [job-import-images.yml](./job-import-images.yml) and `oc describe cronjob.batch/import-images`.
+The job uses [imageimporter@stg](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-stg/serviceaccounts/importimager) or [imageimporter@prod](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-prod/serviceaccounts/importimager) [service account](https://docs.openshift.com/container-platform/3.11/dev_guide/service_accounts.html) with `registry-editor` [role](https://docs.openshift.com/container-platform/3.11/admin_guide/manage_rbac.html) role added.
+If you ever needed to re-create it, just do:
+```bash
+$ oc create serviceaccount imageimporter
+$ oc policy add-role-to-user registry-editor -z importimager
+```
 
 [Dockerfile](./Dockerfile) - image used by the job
 

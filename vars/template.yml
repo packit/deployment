@@ -66,7 +66,3 @@ without_flower: false
 
 # Path to secrets (in case you don't have it in the root of this project)
 # path_to_secrets: /secrets
-
-# For prod you want false (default) - so you can re-deploy whenever you're ready
-# For stg/dev you want true - to have Continuous Deployment
-# continuous_deployment: true

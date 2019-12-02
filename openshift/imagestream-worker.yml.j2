@@ -32,8 +32,9 @@ spec:
         kind: DockerImage
         name: {{ image_worker }}:{{ deployment }}
       importPolicy:
-        # periodically query registry to synchronize tag and image metadata
-        scheduled: {{ continuous_deployment }}
+        # Periodically query registry to synchronize tag and image metadata.
+        # DOES NOT WORK on Openshift Online.
+        scheduled: true
   lookupPolicy:
     # allows all resources pointing to this image stream to use it in the image field
     local: true
