@@ -131,9 +131,11 @@ def check_comment(pr_id, msg):
     else:
         build_comment = [comment for comment in project.get_pr_comments(pr_id, reverse=True)
                          if comment.author.startswith("packit-as-a-service")][0]
-        if build_comment.author == "packit-as-a-service[bot]" and not build_comment.comment.startswith("Congratulations!") and not failure:
+        if build_comment.author == "packit-as-a-service[bot]" and not build_comment.comment.startswith("Congratulations!"):
             msg += "Copr build succeeded and last Github comment about unsuccessful copr build found.\n"
             return msg
+
+    return msg
 
 
 def check_build(build_id, msg):
