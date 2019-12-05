@@ -82,15 +82,26 @@ def check_build_submitted(pr_id, msg):
         time.sleep(30)
 
 
-def check_statuses(pr_id, msg):
-    statuses, msg = watch_statuses(pr_id, msg)
-    if "The build in Copr was not successful." in msg:
-        return msg
+def check_build(build_id, msg):
+    watch_end = datetime.now() + timedelta(seconds=60 * 60)
+    state_reported = ""
 
-    for status in statuses:
-        if "packit-stg" not in status.context and status.state == "failed":
-            msg += f"Status{status.context} was set to failure although the build in " \
-                   f"Copr was successful, message: {status.description}.\n"
+    while True:
+        if datetime.now() > watch_end:
+            msg += "The build did not finish in time 1 hour.\n"
+            return msg
+
+        build = copr.build_proxy.get(build_id)
+        if build.state == state_reported:
+            time.sleep(20)
+            continue
+        state_reported = build.state
+
+        if state_reported not in ["running", "pending", "starting", "forked", "importing", "waiting"]:
+            if state_reported != "succeeded":
+                msg += f"The build in Copr was not successful. Copr state: {state_reported}.\n"
+            return msg
+        time.sleep(30)
 
     return msg
 
@@ -118,6 +129,19 @@ def watch_statuses(pr_id, msg):
     return statuses, msg
 
 
+def check_statuses(pr_id, msg):
+    if "The build in Copr was not successful." in msg:
+        return msg
+
+    statuses, msg = watch_statuses(pr_id, msg)
+    for status in statuses:
+        if "packit-stg" not in status.context and status.state == "failed":
+            msg += f"Status{status.context} was set to failure although the build in " \
+                   f"Copr was successful, message: {status.description}.\n"
+
+    return msg
+
+
 def check_comment(pr_id, msg):
     failure = "The build in Copr was not successful." in msg
 
@@ -134,30 +158,6 @@ def check_comment(pr_id, msg):
         if build_comment.author == "packit-as-a-service[bot]" and not build_comment.comment.startswith("Congratulations!"):
             msg += "Copr build succeeded and last Github comment about unsuccessful copr build found.\n"
             return msg
-
-    return msg
-
-
-def check_build(build_id, msg):
-    watch_end = datetime.now() + timedelta(seconds=60 * 60)
-    state_reported = ""
-
-    while True:
-        if datetime.now() > watch_end:
-            msg += "The build did not finish in time 1 hour.\n"
-            return msg
-
-        build = copr.build_proxy.get(build_id)
-        if build.state == state_reported:
-            time.sleep(20)
-            continue
-        state_reported = build.state
-
-        if state_reported not in ["running", "pending", "starting", "forked", "importing", "waiting"]:
-            if state_reported != "succeeded":
-                msg += f"The build in Copr was not successful. Copr state: {state_reported}.\n"
-            return msg
-        time.sleep(30)
 
     return msg
 
