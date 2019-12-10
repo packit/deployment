@@ -12,212 +12,255 @@ service = GithubService(token=getenv("GITHUB_TOKEN"))
 project = service.get_project(repo="hello-world", namespace="packit-service")
 
 
-def get_statuses(pr_id):
-    commit_sha = project.get_all_pr_commits(pr_id)[-1]
-    commit = project.github_repo.get_commit(commit_sha)
-    return commit.get_combined_status().statuses
+class Testcase:
+    def __init__(self, pr_id: int, msg: str):
+        self.pr_id = pr_id
+        self.msg = msg
 
+    def run_checks(self):
+        """
+        Run all checks of the test case.
+        :return:
+        """
+        build = self.check_build_submitted()
 
-def check_statuses_set_to_pending(pr_id, msg):
-    statuses = [status.context for status in get_statuses(pr_id) if "packit-stg" not in status.context and
-                status.context != "packit/rpm-build"]
+        if not build:
+            return
 
-    watch_end = datetime.now() + timedelta(seconds=60)
+        self.check_build(build.id)
+        self.check_statuses()
+        self.check_comment()
 
-    while True:
-        if datetime.now() > watch_end:
-            msg += f"Github statuses {statuses} were not set to pending in time 1 minute.\n"
-            return msg
+    def check_statuses_set_to_pending(self):
+        """
+        Check whether the commit statuses are set to pending.
+        :return:
+        """
+        statuses = [status.context for status in self.get_statuses() if "packit-stg" not in status.context and
+                    status.context != "packit/rpm-build"]
 
-        new_statuses = [(status.context, status.state) for status in get_statuses(pr_id) if status.context in statuses]
-        for name, state in new_statuses:
-            if state == "pending":
-                statuses.remove(name)
+        watch_end = datetime.now() + timedelta(seconds=60)
 
-        if len(statuses) == 0:
-            return msg
-        time.sleep(5)
+        while True:
+            if datetime.now() > watch_end:
+                self.msg += f"Github statuses {statuses} were not set to pending in time 1 minute.\n"
+                return
 
+            new_statuses = [(status.context, status.state) for status in self.get_statuses() if
+                            status.context in statuses]
+            for name, state in new_statuses:
+                if state == "pending":
+                    statuses.remove(name)
 
-def check_build_submitted(pr_id, msg):
-    project_name = f"packit-service-hello-world-{pr_id}"
+            if len(statuses) == 0:
+                return
+            time.sleep(5)
 
-    try:
-        old_build_len = len(copr.build_proxy.get_list("packit", project_name))
-    except Exception:
-        old_build_len = 0
-
-    old_comment_len = len(project.get_pr_comments(pr_id))
-
-    project.pr_comment(pr_id, "/packit copr-build")
-    watch_end = datetime.now() + timedelta(seconds=60 * 30)
-
-    msg = check_statuses_set_to_pending(pr_id, msg)
-
-    while True:
-        if datetime.now() > watch_end:
-            msg += "The build was not submitted in Copr in time 30 minutes.\n"
-            return None, msg
+    def check_build_submitted(self):
+        """
+        Check whether the build was submitted in Copr in time 30 minutes.
+        :return:
+        """
+        project_name = f"packit-service-hello-world-{self.pr_id}"
 
         try:
-            new_builds = copr.build_proxy.get_list("packit", project_name)
+            old_build_len = len(copr.build_proxy.get_list("packit", project_name))
         except Exception:
-            continue
+            old_build_len = 0
 
-        if len(new_builds) >= old_build_len + 1:
-            return new_builds[0], msg
+        old_comment_len = len(project.get_pr_comments(self.pr_id))
 
-        new_comments = project.get_pr_comments(pr_id, reverse=True)
-        new_comments = new_comments[:(len(new_comments) - old_comment_len)]
+        project.pr_comment(self.pr_id, "/packit copr-build")
+        watch_end = datetime.now() + timedelta(seconds=60 * 30)
 
-        if len(new_comments) > 1:
-            comment = [comment.comment for comment in new_comments if comment.author == "packit-as-a-service[bot]"]
-            if len(comment) > 0:
-                if "error" in comment[0] or "whitelist" in comment[0]:
-                    msg += f"The build was not submitted in Copr, Github comment from p-s: {comment[0]}\n"
-                    return None, msg
-                else:
-                    msg += f"New github comment from p-s while submitting Copr build: {comment[0]}\n"
+        self.check_statuses_set_to_pending()
 
-        time.sleep(30)
+        while True:
+            if datetime.now() > watch_end:
+                self.msg += "The build was not submitted in Copr in time 30 minutes.\n"
+                return None
 
+            try:
+                new_builds = copr.build_proxy.get_list("packit", project_name)
+            except Exception:
+                continue
 
-def check_build(build_id, msg):
-    watch_end = datetime.now() + timedelta(seconds=60 * 60)
-    state_reported = ""
+            if len(new_builds) >= old_build_len + 1:
+                return new_builds[0]
 
-    while True:
-        if datetime.now() > watch_end:
-            msg += "The build did not finish in time 1 hour.\n"
-            return msg
+            new_comments = project.get_pr_comments(self.pr_id, reverse=True)
+            new_comments = new_comments[:(len(new_comments) - old_comment_len)]
 
-        build = copr.build_proxy.get(build_id)
-        if build.state == state_reported:
+            if len(new_comments) > 1:
+                comment = [comment.comment for comment in new_comments if comment.author == "packit-as-a-service[bot]"]
+                if len(comment) > 0:
+                    if "error" in comment[0] or "whitelist" in comment[0]:
+                        self.msg += f"The build was not submitted in Copr, Github comment from p-s: {comment[0]}\n"
+                        return None
+                    else:
+                        self.msg += f"New github comment from p-s while submitting Copr build: {comment[0]}\n"
+
+            time.sleep(30)
+
+    def check_build(self, build_id):
+        """
+        Check whether the build was successful in Copr in time 1 hour.
+        :param build_id: ID of the build
+        :return:
+        """
+        watch_end = datetime.now() + timedelta(seconds=60 * 60)
+        state_reported = ""
+
+        while True:
+            if datetime.now() > watch_end:
+                self.msg += "The build did not finish in time 1 hour.\n"
+                return
+
+            build = copr.build_proxy.get(build_id)
+            if build.state == state_reported:
+                time.sleep(20)
+                continue
+            state_reported = build.state
+
+            if state_reported not in ["running", "pending", "starting", "forked", "importing", "waiting"]:
+                if state_reported != "succeeded":
+                    self.msg += f"The build in Copr was not successful. Copr state: {state_reported}.\n"
+                return
+
+            time.sleep(30)
+
+    def watch_statuses(self):
+        """
+        Watch the statuses 20 minutes, if there is no pending commit status, return the statuses.
+        :return: [CommitStatus]
+        """
+        watch_end = datetime.now() + timedelta(seconds=60 * 20)
+
+        while True:
+            statuses = self.get_statuses()
+
+            states = [status.state for status in statuses if "packit-stg" not in status.context]
+
+            if "pending" not in states:
+                break
+
+            if datetime.now() > watch_end:
+                self.msg += "These statuses were set to pending 20 minutes after Copr build had been built:\n"
+                for status in statuses:
+                    if "packit-stg" not in status.context and status.state == "pending":
+                        self.msg += f"{status.context}\n"
+                return []
+
             time.sleep(20)
-            continue
-        state_reported = build.state
 
-        if state_reported not in ["running", "pending", "starting", "forked", "importing", "waiting"]:
-            if state_reported != "succeeded":
-                msg += f"The build in Copr was not successful. Copr state: {state_reported}.\n"
-            return msg
-        time.sleep(30)
+        return statuses
 
-    return msg
+    def check_statuses(self):
+        """
+        Check whether all statuses are set to success.
+        :return:
+        """
+        if "The build in Copr was not successful." in self.msg:
+            return
 
+        statuses = self.watch_statuses()
+        for status in statuses:
+            if "packit-stg" not in status.context and status.state == "failed":
+                self.msg += f"Status{status.context} was set to failure although the build in " \
+                       f"Copr was successful, message: {status.description}.\n"
 
-def watch_statuses(pr_id, msg):
-    watch_end = datetime.now() + timedelta(seconds=60 * 20)
+        return
 
-    while True:
-        statuses = get_statuses(pr_id)
+    def check_comment(self):
+        """
+        Check whether p-s has commented correctly about the Copr build result.
+        :return:
+        """
+        failure = "The build in Copr was not successful." in self.msg
 
-        states = [status.state for status in statuses if "packit-stg" not in status.context]
+        if failure:
+            build_comment = [comment for comment in project.get_pr_comments(self.pr_id, reverse=True)
+                             if comment.author == "packit-as-a-service[bot]"][0]
+            if build_comment.comment.startswith("Congratulations!"):
+                self.msg += "No comment from p-s about unsuccessful last copr build found.\n"
+                return
 
-        if "pending" not in states:
-            break
+        else:
+            build_comment = [comment for comment in project.get_pr_comments(self.pr_id, reverse=True)
+                             if comment.author.startswith("packit-as-a-service")][0]
+            if build_comment.author == "packit-as-a-service[bot]" and not build_comment.comment.startswith(
+                    "Congratulations!"):
+                self.msg += "Copr build succeeded and last Github comment about unsuccessful copr build found.\n"
+                return
 
-        if datetime.now() > watch_end:
-            msg += "These statuses were set to pending 20 minutes after Copr build had been built:\n"
-            for status in statuses:
-                if "packit-stg" not in status.context and status.state == "pending":
-                    msg += f"{status.context}\n"
-            return [], msg
+        return
 
-        time.sleep(20)
-
-    return statuses, msg
-
-
-def check_statuses(pr_id, msg):
-    if "The build in Copr was not successful." in msg:
-        return msg
-
-    statuses, msg = watch_statuses(pr_id, msg)
-    for status in statuses:
-        if "packit-stg" not in status.context and status.state == "failed":
-            msg += f"Status{status.context} was set to failure although the build in " \
-                   f"Copr was successful, message: {status.description}.\n"
-
-    return msg
-
-
-def check_comment(pr_id, msg):
-    failure = "The build in Copr was not successful." in msg
-
-    if failure:
-        build_comment = [comment for comment in project.get_pr_comments(pr_id, reverse=True)
-                         if comment.author=="packit-as-a-service[bot]"][0]
-        if build_comment.comment.startswith("Congratulations!"):
-            msg += "No comment from p-s about unsuccessful last copr build found.\n"
-            return msg
-
-    else:
-        build_comment = [comment for comment in project.get_pr_comments(pr_id, reverse=True)
-                         if comment.author.startswith("packit-as-a-service")][0]
-        if build_comment.author == "packit-as-a-service[bot]" and not build_comment.comment.startswith("Congratulations!"):
-            msg += "Copr build succeeded and last Github comment about unsuccessful copr build found.\n"
-            return msg
-
-    return msg
-
-
-def run_checks(pr_id):
-    build, msg = check_build_submitted(pr_id, "")
-
-    if not build:
-        return msg
-
-    msg = check_build(build.id, msg)
-    msg = check_statuses(pr_id, msg)
-    msg = check_comment(pr_id, msg)
-
-    return msg
+    def get_statuses(self):
+        """
+        Get commit statuses from the most recent commit.
+        :return: [CommitStatus]
+        """
+        commit_sha = project.get_all_pr_commits(self.pr_id)[-1]
+        commit = project.github_repo.get_commit(commit_sha)
+        return commit.get_combined_status().statuses
 
 
 def test_invalid_spec(pr_id):
+    """
+    Test case with invalid specfile that tests whether the p-s sets the statuses and comment correctly.
+    :param pr_id: ID of the pull-request with test
+    :return:
+    """
     if pr_id == -1:
         return ""
 
-    project.pr_comment(pr_id, "/packit copr-build")
+    test_case = Testcase(pr_id=pr_id, msg="")
+
+    project.pr_comment(test_case.pr_id, "/packit copr-build")
 
     time.sleep(250)
-    statuses, msg = get_statuses(pr_id)
+    statuses = test_case.get_statuses()
 
     for status in statuses:
         if status.context == "packit/rpm-build" or status.context:
             if status.state == "success":
-                msg += "Status packit/rpm-build was set to success although the build in " \
+                test_case.msg += "Status packit/rpm-build was set to success although the build in " \
                        "Copr was not successful because of invalid spec file.\n"
 
     build_comment = [comment.comment for comment in project.get_pr_comments(pr_id, reverse=True)
                      if comment.author == "packit-as-a-service[bot]"][0]
 
     if "error" not in build_comment or "SPEC" not in build_comment:
-        msg += f"No message about failure containing information about invalid spec file: {build_comment}\n"
-        return msg
+        test_case.msg += f"No message about failure containing information about invalid spec file: {build_comment}\n"
 
-    return msg
+    return test_case.msg
 
 
 def test_failing_test(pr_id):
+    """
+    Test with failing test that tests whether the testing farm tests have failed.
+    :param pr_id: ID of the pull-request with test
+    :return:
+    """
     if pr_id == -1:
         return ""
 
-    build, msg = check_build_submitted(pr_id, "")
+    test_case = Testcase(pr_id=pr_id, msg="")
+
+    build = test_case.check_build_submitted()
     if not build:
-        return msg
+        return test_case.msg
 
-    msg = check_build(build.id,  msg)
+    test_case.check_build()
 
-    statuses, msg = watch_statuses(pr_id, msg)
+    statuses = test_case.watch_statuses()
 
     for status in statuses:
         if "testing" in status.context and "packit-stg" not in status.context:
             if status.state != "failing":
-                msg += f"Status {status.context} should have failed.\n"
+                test_case.msg += f"Status {status.context} should have failed.\n"
 
-    return msg
+    return test_case.msg
 
 
 def get_pr(prs, title):
@@ -233,9 +276,11 @@ if __name__ == '__main__':
     prs = [pr for pr in project.get_pr_list() if pr.title.startswith("Basic test case:")]
 
     for pr in prs:
-        msg = run_checks(pr.id)
-        if msg:
-            sentry_sdk.capture_message(f"{pr.title} ({pr.url}) failed: {msg}")
+        testcase = Testcase(pr_id=pr.id, msg="")
+        testcase.run_checks()
+
+        if testcase.msg:
+            sentry_sdk.capture_message(f"{pr.title} ({pr.url}) failed: {testcase.msg}")
 
     msg = test_failing_test(get_pr(prs, "failing test"))
     if msg:
