@@ -38,6 +38,8 @@
   tasks:
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml
+    - name: include extra secret vars
+      include_vars: "{{ path_to_secrets }}/{{ deployment }}/extra-vars.yml"
 
     - block:
       - name: get kubeconfig token
@@ -63,6 +65,7 @@
         - "{{ lookup('template', '../openshift/secret-packit-secrets.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/cmap-packit-httpd-conf.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/route.packit.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') | from_yaml }}"
@@ -93,6 +96,7 @@
       loop:
         - ../openshift/redis.yml
         - ../openshift/service.yml
+        - ../openshift/pg.yml
 
     - name: Deploy redis-commander
       k8s:
