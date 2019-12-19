@@ -13,7 +13,8 @@ prod
     │   ├── packit-service.yaml
     │   ├── private-key.pem
     │   ├── privkey.pem
-    │   └── ssh_config
+    │   ├── privkey.pem
+    │   └── extra-vars.yml
 ```
 
 Some of them are pre-filled in [template](/secrets/template) directory.
@@ -30,3 +31,4 @@ Some of them are pre-filled in [template](/secrets/template) directory.
 * `copr` - Your copr credentials where packit will build packages. See pre-filled template in [templates directory](/secrets/template/copr).
 * `fedora.keytab` - Fedora kerberos.
 * `fedora.toml` - [fedora-messaging configuration](https://fedora-messaging.readthedocs.io/en/stable/configuration.html).
+* `extra-vars.yml` - secrets for Postgresql
