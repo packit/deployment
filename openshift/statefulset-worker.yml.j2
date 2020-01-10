@@ -67,7 +67,7 @@ spec:
           secretName: packit-config
       containers:
       - name: packit-worker-1
-        image: packit-worker:{{ deployment }}
+        image: "{{ image_worker }}:{{ deployment }}"
         env:
           - name: DEPLOYMENT
             value: {{ deployment }}
