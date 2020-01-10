@@ -75,6 +75,9 @@ It runs (i.e. imports newer images and re-deploys them)
 
 ### Manually import a newer image
 
+tl;dr; `DEPLOYMENT=prod make import-images`
+
+Long story:
 If you need to import (and deploy) newer image(s) before the CronJob does
 (see above), you can [do that manually](https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#importing-tag-and-image-metadata):
 ```
@@ -103,6 +106,17 @@ because you don't know what's the cause/fix yet, you have to:
 1. `oc describe is/packit-worker` - select older image
 2. `oc tag --source=docker usercont/packit-service-worker@sha256:<older-hash> myproject/packit-worker:<deployment>`
 And see the `packit-worker-x` pods being re-deployed from the older image.
+
+### Prod re-deployment
+
+1. Build base [packit image](https://hub.docker.com/repository/docker/usercont/packit):
+  - [move packit's `stable` branch to newer commit](#production-vs-staging-images)
+  - [wait for the image to be built successfully](https://hub.docker.com/repository/registry-1.docker.io/usercont/packit/timeline)
+2. Build service/worker images
+  - move `packit-service`'s branch to newer commit
+  - wait for [service](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker](https://hub.docker.com/repository/docker/usercont/packit-service-worker) images to be built successfully
+3. Import images -> re-deploy
+  - If you don't want to wait for [it to be done automatically](#continuous-deployment) you can [do that manually](#manually-import-a-newer-image)
 
 ## Zuul
 
