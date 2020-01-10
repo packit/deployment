@@ -52,10 +52,6 @@ To move `stable` branch to a newer 'stable' commit:
 
 Beware: [packit-service-worker image](https://cloud.docker.com/u/usercont/repository/docker/usercont/packit-service-worker) is not automatically rebuilt when its base [packit image](https://cloud.docker.com/u/usercont/repository/docker/usercont/packit) changes. You have to [trigger](https://cloud.docker.com/u/usercont/repository/docker/usercont/packit-service-worker/builds) the build manually.
 
-### DeploymentConfig vs. StatefulSet
-
-[Service](openshift/deployment.yml.j2) and [service-fedmsg](openshift/deployment-fedmsg.yml.j2) are [DeploymentConfigs](https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html), but [worker](openshift/statefulset-worker.yml.j2) is a [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset).
-
 ### Continuous Deployment
 
 tl;dr: Newer images in registry are automatically imported and re-deployed.
