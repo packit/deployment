@@ -289,6 +289,3 @@ if __name__ == '__main__':
     msg = test_invalid_spec(get_pr(prs, "Invalid specfile"))
     if msg:
         sentry_sdk.capture_message(f"Test invalid spec file failed: {msg}")
-
-
-
