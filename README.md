@@ -63,8 +63,7 @@ We use [ImageStreams](https://docs.openshift.com/container-platform/3.11/archite
 
 `Image registry` -> [1] -> `ImageStream` -> [2] -> `DeploymentConfig`/`StatefulSet`
 
-[1] automatic ([example](https://github.com/packit-service/deployment/blob/master/openshift/imagestream.yml.j2#L37)).
-OpenShift Online has this turned off.
+[1] set to automatic ([here](https://github.com/packit-service/deployment/blob/master/openshift/imagestream.yml.j2#L36)), however OpenShift Online has this turned off.
 We run a [CronJob](https://github.com/packit-service/deployment/blob/master/haxxx/job-import-images.yml) to work-around this.
 More info [here](./haxxx/README.md).
 It runs (i.e. imports newer images and re-deploys them)
