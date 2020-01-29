@@ -206,7 +206,7 @@ $ oc rsh ${CERTS_POD} cat /tmp/live/prod.packit.dev/fullchain.pem | dos2unix > s
 $ oc rsh ${CERTS_POD} cat /tmp/live/prod.packit.dev/privkey.pem | dos2unix > secrets/prod/privkey.pem
 ```
 There are also `cert.pem` & `chain.pem` generated. You can copy them as well, but we don't need them at the moment.
-The files that `oc rsh pod/x cat *.pem` returns contain `^M` characters, therefore we use `dos2unix` to [fix them](https://unix.stackexchange.com/questions/32001/what-is-m-and-how-do-i-get-rid-of-it). 
+The files that `oc rsh pod/x cat *.pem` returns contain `^M` characters, therefore we use `dos2unix` to [fix them](https://unix.stackexchange.com/questions/32001/what-is-m-and-how-do-i-get-rid-of-it).
 
 Don't forget to do cleanup:
 ```
