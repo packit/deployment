@@ -35,6 +35,8 @@
     image_fedmsg: "usercont/packit-service-fedmsg"
     worker_replicas: 2
     path_to_secrets: "../secrets"
+    # to be used in Image streams as importPolicy:scheduled value
+    auto_import_images: "{{(deployment != 'prod')}}"
   tasks:
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml
