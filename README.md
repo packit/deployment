@@ -21,22 +21,13 @@
 You have to copy it to `prod.yml`, `stg.yml` or `dev.yml`
 depending on what environment you want to deploy to.
 
-#### Local development in a local cluster
-
-For example if you want to deploy to 'devel environment', do
-`cp template.yml dev.yml` and in `dev.yml` set `host:` and `api_key:`.
-Then run `DEPLOYMENT=dev make deploy`.
-
 The Ansible playbook then includes one of the variable files depending on the
 value of DEPLOYMENT environment variable and processes all the templates with
 variables defined in the file.
 
-If you want to remove all objects from the deployment (project) run e.g.
-`DEPLOYMENT=dev make cleanup`.
-
 ### Images
 
-There are separate images for
+We build separate images for
 * [service / web server](https://hub.docker.com/r/usercont/packit-service) - accepts webhooks and tasks workers
 * [fedora messaging consumer](https://hub.docker.com/r/usercont/packit-service-fedmsg) - listens on fedora messaging for events from Copr and tasks workers
 * [workers](https://hub.docker.com/r/usercont/packit-service-worker) - do the actual work
@@ -116,6 +107,50 @@ And see the `packit-worker-x` pods being re-deployed from the older image.
   - wait for [service](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker](https://hub.docker.com/repository/docker/usercont/packit-service-worker) images to be built successfully
 3. Import images -> re-deploy
   - If you don't want to wait for [it to be done automatically](#continuous-deployment) you can [do that manually](#manually-import-a-newer-image)
+
+### Local development A.K.A. how do I test my changes?
+
+#### docker-compose (quick & dirty)
+
+There's a [docker-compose.yml in packit-service](https://github.com/packit-service/packit-service/blob/master/docker-compose.yml).
+You have to prepare `secrets/dev/` there to make it work, but then just `docker-compose up` should start whole service and the API should be accessible at https://localhost:8443/api/
+
+Things get more tricky if you want to
+test that it works with a Github App, because for that the service API needs
+to be publicly accessible (so the App can send webhooks to it).
+
+You can try to use [ngrok](https://ngrok.com):
+- [login to ngrok](https://dashboard.ngrok.com/login) with your Github account
+- [download & setup ngrok](https://dashboard.ngrok.com/get-started)
+- run it: `./ngrok http 8443` and the 'Forwarding' will tell you what's the public url
+- create github app @ https://github.com/settings/apps
+  - put http://<the-public-url>/webhooks/github into Webhook URL
+- [install](https://developer.github.com/apps/installing-github-apps/) it @ https://github.com/settings/apps/<your-github-app>/installations to some repository
+- do some action (issue, PR) in that repository and see [ngrok web ui](http://localhost:4040)
+
+#### oc cluster up (slow & better)
+
+Because we run the service in OpenShift the more reliable way to test it is to run an Openshift cluster locally and deploy the service there.
+`oc cluster up` spawns the Openshift cluster.
+Create `secrets/dev/` (steal them from our secret repo).
+`cd vars; cp template.yml dev.yml` and in `dev.yml` set `host: https://127.0.0.1:8443` and `api_key:`.
+
+Run `DEPLOYMENT=dev make deploy`.
+
+#### Staging (quick & reliable & but don't break it)
+
+If you're lazy and you're sure your changes won't do any harm, you can temporarily get hold of staging instance for that.
+Just build & push `packit-service-worker` and you can play.
+
+- in packit: `make image`
+- in packit-service:
+  - `make worker`
+  - `docker tag docker.io/usercont/packit-service-worker:dev docker.io/usercont/packit-service-worker:stg`
+  - `docker push docker.io/usercont/packit-service-worker:stg`
+- in deployment: `DEPLOYMENT=stg make import-images`
+
+Once you're done you should [revert to older image](#reverting-to-older-deploymentrevisionimage).
+Or it will be automatically replaced once a packit-service PR is merged.
 
 ## Zuul
 
