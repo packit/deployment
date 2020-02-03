@@ -42,4 +42,4 @@
 
     - name: oc delete all
       command: oc delete all,cm,pvc --all
-      when: '{{ deployment }} != "prod"'
+      when: deployment != "prod"
