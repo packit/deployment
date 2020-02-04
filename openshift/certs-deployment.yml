@@ -40,8 +40,8 @@ spec:
           tty: true
           image: docker.io/certbot/certbot
           ports:
-          - containerPort: 8080
-            protocol: TCP
+            - containerPort: 8080
+              protocol: TCP
           command:
             - "sh"
           resources:

@@ -30,7 +30,7 @@ spec:
     name: get-them-certs
     app: certo
   ports:
-  - name: certo-http
-    port: 80
-    protocol: TCP
-    targetPort: 8080
+    - name: certo-http
+      port: 80
+      protocol: TCP
+      targetPort: 8080

@@ -44,14 +44,14 @@
       include_vars: "{{ path_to_secrets }}/{{ deployment }}/extra-vars.yml"
 
     - block:
-      - name: get kubeconfig token
-        command: oc whoami -t
-        register: kubeconfig_token
-      - name: check if tokens match
-        assert:
-          that:
-          - kubeconfig_token.stdout == api_key
-          msg: "OpenShift API token defined in vars/ does not match token from your current environment."
+        - name: get kubeconfig token
+          command: oc whoami -t
+          register: kubeconfig_token
+        - name: check if tokens match
+          assert:
+            that:
+              - kubeconfig_token.stdout == api_key
+            msg: "OpenShift API token defined in vars/ does not match token from your current environment."
       ignore_errors: yes
 
     - name: Deploy templates (need to be processed)

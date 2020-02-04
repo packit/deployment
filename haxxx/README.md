@@ -7,6 +7,7 @@ As a work-around, there's a CronJob to periodically import images metadata into 
 See [job-import-images.yml](./job-import-images.yml) and `oc describe cronjob.batch/import-images`.
 The job uses [imageimporter@stg](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-stg/serviceaccounts/importimager) or [imageimporter@prod](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-prod/serviceaccounts/importimager) [service account](https://docs.openshift.com/container-platform/3.11/dev_guide/service_accounts.html) with `registry-editor` [role](https://docs.openshift.com/container-platform/3.11/admin_guide/manage_rbac.html) role added.
 If you ever needed to re-create it, just do:
+
 ```bash
 $ oc create serviceaccount imageimporter
 $ oc policy add-role-to-user registry-editor -z importimager
@@ -16,7 +17,6 @@ $ oc policy add-role-to-user registry-editor -z importimager
 
 [import-images.sh](./import-images.sh) - script in the image
 
-
 ## Obtaining a Let's Encrypt cert using `certbot`
 
-* serve-acme-challenge.py - see [main README](../README.md#just-do-it)
+- serve-acme-challenge.py - see [main README](../README.md#just-do-it)

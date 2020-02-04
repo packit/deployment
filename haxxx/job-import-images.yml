@@ -13,29 +13,29 @@ spec:
       template:
         spec:
           containers:
-          - name: import-images
-            image: usercont/import-images
-            env:
-            - name: KUBECONFIG
-              value: /tmp/.kube/config
-            - name: HOST
-              value: https://api.pro-eu-west-1.openshift.com
-            - name: DEPLOYMENT
-              value: stg
-              # PROD
-              # value: prod
-            - name: TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: importimager-token-cbw75
+            - name: import-images
+              image: usercont/import-images
+              env:
+                - name: KUBECONFIG
+                  value: /tmp/.kube/config
+                - name: HOST
+                  value: https://api.pro-eu-west-1.openshift.com
+                - name: DEPLOYMENT
+                  value: stg
                   # PROD
-                  # name: importimager-token-gl9g9
-                  key: token
-            resources:
-              requests:
-                memory: "64Mi"
-                cpu: "100m"
-              limits:
-                memory: "128Mi"
-                cpu: "100m"
+                  # value: prod
+                - name: TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: importimager-token-cbw75
+                      # PROD
+                      # name: importimager-token-gl9g9
+                      key: token
+              resources:
+                requests:
+                  memory: "64Mi"
+                  cpu: "100m"
+                limits:
+                  memory: "128Mi"
+                  cpu: "100m"
           restartPolicy: OnFailure

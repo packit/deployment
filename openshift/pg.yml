@@ -36,82 +36,82 @@ spec:
         name: postgres
     spec:
       containers:
-      - env:
-        - name: POSTGRESQL_USER
-          valueFrom:
-            secretKeyRef:
-              key: database-user
-              name: postgres-secret
-        - name: POSTGRESQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: database-password
-              name: postgres-secret
-        - name: POSTGRESQL_DATABASE
-          valueFrom:
-            secretKeyRef:
-              key: database-name
-              name: postgres-secret
-        image: registry.access.redhat.com/rhscl/postgresql-10-rhel7
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          exec:
-            command:
-            - /usr/libexec/check-container
-            - --live
-          failureThreshold: 3
-          initialDelaySeconds: 120
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 10
-        name: postgres
-        ports:
-        - containerPort: 5432
-          protocol: TCP
-        readinessProbe:
-          exec:
-            command:
-            - /usr/libexec/check-container
-          failureThreshold: 3
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        resources:
-          requests:
-            memory: "386Mi"
-            cpu: "100m"
-          limits:
-            memory: "386Mi"
-            cpu: "100m"
-        volumeMounts:
-        - mountPath: /var/lib/pgsql/data
-          name: postgres-data
+        - env:
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  key: database-user
+                  name: postgres-secret
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: database-password
+                  name: postgres-secret
+            - name: POSTGRESQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: database-name
+                  name: postgres-secret
+          image: registry.access.redhat.com/rhscl/postgresql-10-rhel7
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+                - --live
+            failureThreshold: 3
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: postgres
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            requests:
+              memory: "386Mi"
+              cpu: "100m"
+            limits:
+              memory: "386Mi"
+              cpu: "100m"
+          volumeMounts:
+            - mountPath: /var/lib/pgsql/data
+              name: postgres-data
       restartPolicy: Always
       volumes:
-      - name: postgres-data
-        persistentVolumeClaim:
-          claimName: postgres
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres
 ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: postgres
-  spec:
-    ports:
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  ports:
     - name: postgres-port
       port: 5432
       targetPort: 5432
-    selector:
-      service: postgres
+  selector:
+    service: postgres
 ---
-  apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: postgres
-  spec:
-    accessModes:
-      - ReadWriteOnce
-    resources:
-      requests:
-        storage: 1Gi
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
