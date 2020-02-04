@@ -108,7 +108,7 @@ And see the `packit-worker-x` pods being re-deployed from the older image.
 3. Import images -> re-deploy
   - If you don't want to wait for [it to be done automatically](#continuous-deployment) you can [do that manually](#manually-import-a-newer-image)
 
-### Local development A.K.A. how do I test my changes?
+### How do I test my changes?
 
 #### docker-compose (quick & dirty)
 
@@ -133,7 +133,7 @@ You can try to use [ngrok](https://ngrok.com):
 Because we run the service in OpenShift the more reliable way to test it is to run an Openshift cluster locally and deploy the service there.
 `oc cluster up` spawns the Openshift cluster.
 Create `secrets/dev/` (steal them from our secret repo).
-`cd vars; cp template.yml dev.yml` and in `dev.yml` set `host: https://127.0.0.1:8443` and `api_key:`.
+`cd vars; cp template.yml dev.yml` and in `dev.yml` set `host: https://127.0.0.1:8443` and `api_key` to the output of `oc whoami -t`.
 
 Run `DEPLOYMENT=dev make deploy`.
 
