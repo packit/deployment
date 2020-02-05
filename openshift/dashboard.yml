@@ -1,0 +1,117 @@
+# MIT License
+#
+# Copyright (c) 2018-2019 Red Hat, Inc.
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+---
+kind: DeploymentConfig
+apiVersion: v1
+metadata:
+  name: packit-dashboard
+  labels:
+    service: packit-dashboard
+spec:
+  selector:
+    service: packit-dashboard
+  template:
+    metadata:
+      labels:
+        service: packit-dashboard
+        name: packit-dashboard
+    spec:
+      containers:
+        - name: packit-dashboard
+          image: usercont/packit-dashboard:{{ deployment }}
+          ports:
+            - containerPort: 8443
+          volumeMounts:
+            - name: packit-secrets
+              mountPath: /secrets
+          env:
+            - name: DEPLOYMENT
+              value: {{ deployment }}
+          resources:
+            limits:
+              memory: 200Mi
+      volumes:
+        - name: packit-secrets
+          secret:
+            secretName: packit-secrets
+
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - packit-dashboard
+        from:
+          kind: ImageStreamTag
+          name: packit-dashboard:{{ deployment }}
+  replicas: 1
+  strategy:
+    type: Recreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: packit-dashboard
+  labels:
+    service: packit-dashboard
+spec:
+  ports:
+    - name: packit-dashboard-https
+      port: 443
+      targetPort: 8443
+  selector:
+    service: packit-dashboard
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: packit-dashboard
+spec:
+  host: "{{ 'dashboard.stg.packit.dev' if deployment == 'stg' else 'dashboard.packit.dev' if deployment == 'prod'}}"
+  port:
+    targetPort: packit-dashboard-https
+  to:
+    kind: Service
+    name: packit-dashboard
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough
+---
+kind: ImageStream
+apiVersion: v1
+metadata:
+  name: packit-dashboard
+spec:
+  tags:
+    - name: stg
+      from:
+        kind: DockerImage
+        name: {{ image_dashboard }}
+      importPolicy:
+        # Periodically query registry to synchronize tag and image metadata.
+        # DOES NOT WORK on Openshift Online.
+        scheduled: {{ auto_import_images }}
+  lookupPolicy:
+    # allows all resources pointing to this image stream to use it in the image field
+    local: true
