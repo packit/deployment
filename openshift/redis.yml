@@ -38,7 +38,7 @@
       spec:
         containers:
           - name: redis
-            image: registry.fedoraproject.org/f28/redis
+            image: registry.fedoraproject.org/f31/redis
             ports:
               - containerPort: 6379
             volumeMounts:
@@ -46,10 +46,10 @@
                 name: redis-pv
             resources:
               requests:
-                memory: "386Mi"
+                memory: "64Mi"
                 cpu: "100m"
               limits:
-                memory: "386Mi"
+                memory: "128Mi"
                 cpu: "100m"
         volumes:
           - name: redis-pv
