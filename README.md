@@ -128,9 +128,9 @@ because you don't know what's the cause/fix yet, you have to:
 There's a [docker-compose.yml in packit-service](https://github.com/packit-service/packit-service/blob/master/docker-compose.yml).
 You have to prepare `secrets/dev/` there to make it work, but then just `docker-compose up` should start whole service and the API should be accessible at https://localhost:8443/api/
 
-Things get more tricky if you want to
-test that it works with a Github App, because for that the service API needs
-to be publicly accessible (so the App can send webhooks to it).
+Things get more tricky if you want to test that it works with a Github App,
+because for that the service API needs to be publicly accessible
+(so the App can send webhooks to it).
 
 You can try to use [ngrok](https://ngrok.com):
 
