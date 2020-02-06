@@ -40,18 +40,10 @@
     "merged_at": null,
     "merge_commit_sha": "fdde7105bbb3f0c127e7d5a879b759511edfb6ea",
     "assignee": null,
-    "assignees": [
-
-    ],
-    "requested_reviewers": [
-
-    ],
-    "requested_teams": [
-
-    ],
-    "labels": [
-
-    ],
+    "assignees": [],
+    "requested_reviewers": [],
+    "requested_teams": [],
+    "labels": [],
     "milestone": null,
     "commits_url": "https://api.github.com/repos/packit-service/hello-world/pulls/4/commits",
     "review_comments_url": "https://api.github.com/repos/packit-service/hello-world/pulls/4/comments",

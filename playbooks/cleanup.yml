@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 ---
-
 - name: Clean up a project
   hosts: all
   vars:

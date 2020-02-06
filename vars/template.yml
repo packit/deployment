@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 # Don't modify this file. Copy it to e.g. dev.yml or prod.yml and modify that one.
 
 # -------------------------------------------------------------------
@@ -48,7 +47,6 @@ without_redis_commander: false
 
 # don't deploy flower dc; good for staging deployment
 without_flower: false
-
 # you can set the sandbox namespace name explicitly like this
 # sandbox_namespace: "packit-prod-sandbox"
 

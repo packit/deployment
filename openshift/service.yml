@@ -30,7 +30,7 @@ spec:
     name: packit-service
     app: packit
   ports:
-  - name: prod-packit
-    port: 443
-    protocol: TCP
-    targetPort: 8443
+    - name: prod-packit
+      port: 443
+      protocol: TCP
+      targetPort: 8443
