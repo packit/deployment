@@ -53,6 +53,13 @@ spec:
             value: /home/packit/.config/fedora.toml
           - name: REDIS_SERVICE_HOST
             value: redis
+          - name: DEPLOYMENT
+            value: {{ deployment }}
+          - name: SENTRY_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: packit-sentry
+                key: sentry
           volumeMounts:
           - name: packit-ssh
             mountPath: /packit-ssh
