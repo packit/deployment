@@ -68,6 +68,7 @@
         - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') | from_yaml }}"
+        - "{{ lookup('template', '../openshift/secret-redis-commander.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/cmap-packit-httpd-conf.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/route.packit.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') | from_yaml }}"

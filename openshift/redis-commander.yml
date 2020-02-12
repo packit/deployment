@@ -44,6 +44,16 @@ spec:
               value: redis
             - name: REDIS_PORT
               value: "6379"
+            - name: HTTP_USER
+              valueFrom:
+                secretKeyRef:
+                  key: redis-commander-user
+                  name: redis-commander-secret
+            - name: HTTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: redis-commander-password
+                  name: redis-commander-secret
           ports:
             - containerPort: 8081
           resources:
@@ -79,3 +89,6 @@ spec:
   to:
     kind: Service
     name: redis-commander
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: None
