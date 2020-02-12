@@ -40,8 +40,12 @@
   tasks:
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml
+      tags:
+        - always
     - name: include extra secret vars
       include_vars: "{{ path_to_secrets }}/{{ deployment }}/extra-vars.yml"
+      tags:
+        - redis-commander
 
     - block:
         - name: get kubeconfig token
@@ -53,6 +57,8 @@
               - kubeconfig_token.stdout == api_key
             msg: "OpenShift API token defined in vars/ does not match token from your current environment."
       ignore_errors: yes
+      tags:
+        - always
 
     - name: Deploy templates (need to be processed)
       # https://docs.ansible.com/k8s_module.html
@@ -68,7 +74,6 @@
         - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') | from_yaml }}"
-        - "{{ lookup('template', '../openshift/secret-redis-commander.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/cmap-packit-httpd-conf.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/route.packit.yml.j2') | from_yaml }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') | from_yaml }}"
@@ -97,9 +102,34 @@
         api_key: "{{ api_key }}"
         verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
       loop:
-        - ../openshift/redis.yml
         - ../openshift/service.yml
         - ../openshift/pg.yml
+
+    - name: Deploy redis
+      k8s:
+        namespace: "{{ project }}"
+        src: ../openshift/redis.yml
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        apply: yes
+      tags:
+        - redis
+
+    - name: Create redis-commander secrets
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ item }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        apply: yes
+      loop:
+        - "{{ lookup('template', '../openshift/secret-redis-commander.yml.j2') | from_yaml }}"
+      tags:
+        - redis-commander
+      notify:
+        - Rollout redis-commander
 
     - name: Deploy redis-commander
       k8s:
@@ -108,7 +138,11 @@
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        apply: yes
       when: not without_redis_commander
+      tags:
+        - redis-commander
+      register: redis_commander
 
     - name: Deploy flower
       k8s:
@@ -130,3 +164,10 @@
 
     - name: Set up the sandbox namespace
       command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
+
+  handlers:
+    - name: Rollout redis-commander
+      command: oc rollout latest dc/redis-commander
+      # Run this rollout only if the DeploymentConfig above didn't change,
+      # and so it wasn't rolled out yet.
+      when: not redis_commander.changed
