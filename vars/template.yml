@@ -51,13 +51,13 @@ without_flower: false
 # sandbox_namespace: "packit-prod-sandbox"
 
 # image to use for service and fedmsg pods
-# image: usercont/packit-service
+# image: usercont/packit-service:{{ deployment }}
 
 # image to use for worker
-# image_worker: usercont/packit-service-worker
+# image_worker: usercont/packit-service-worker:{{ deployment }}
 
 # image to use for fedora messaging consumer
-# image_fedmsg: usercont/packit-service-fedmsg
+# image_fedmsg: usercont/packit-service-fedmsg:latest
 
 # Number of worker pods to be deployed
 # worker_replicas : 2
