@@ -30,9 +30,9 @@
     without_redis_commander: false
     without_flower: false
     # feel free to override this in vars
-    image: "usercont/packit-service"
-    image_worker: "usercont/packit-service-worker"
-    image_fedmsg: "usercont/packit-service-fedmsg"
+    image: "usercont/packit-service:{{ deployment }}"
+    image_worker: "usercont/packit-service-worker:{{ deployment }}"
+    image_fedmsg: "usercont/packit-service-fedmsg:{{ deployment }}"
     worker_replicas: 2
     path_to_secrets: "../secrets"
     # to be used in Image streams as importPolicy:scheduled value

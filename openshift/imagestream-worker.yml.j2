@@ -30,7 +30,7 @@ spec:
     - name: {{ deployment }}
       from:
         kind: DockerImage
-        name: {{ image_worker }}:{{ deployment }}
+        name: {{ image_worker }}
       importPolicy:
         # Periodically query registry to synchronize tag and image metadata.
         scheduled: {{ auto_import_images }}
