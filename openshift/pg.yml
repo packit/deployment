@@ -20,19 +20,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ---
-apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
+apiVersion: v1
 metadata:
-  labels:
-    app: postgres
   name: postgres
+  labels:
+    service: postgres
 spec:
   replicas: 1
   selector:
-    name: postgres
+    service: postgres
   template:
     metadata:
       labels:
+        service: postgres
         name: postgres
     spec:
       containers:
