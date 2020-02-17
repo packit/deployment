@@ -33,7 +33,7 @@
     image: "usercont/packit-service:{{ deployment }}"
     image_worker: "usercont/packit-service-worker:{{ deployment }}"
     image_fedmsg: "usercont/packit-service-fedmsg:{{ deployment }}"
-    worker_replicas: 2
+    worker_replicas: 1
     path_to_secrets: "../secrets"
     # to be used in Image streams as importPolicy:scheduled value
     auto_import_images: "{{(deployment != 'prod')}}"
