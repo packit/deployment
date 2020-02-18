@@ -83,6 +83,19 @@ once a new image is pushed/built in registry.
 
 There's also 'import-images' target in the Makefile, so `DEPLOYMENT=prod make import-images` does this for you for all images (image streams).
 
+### Partial deployments
+
+To run only the tasks related to some of the services, this way doing a
+partial deployment, you can set the `TAGS` environment variable before calling
+`make`. For example, to run only the tasks to deploy Redis and Redis
+Commander, run:
+
+```
+$ DEPLOYMENT=dev TAGS="redis,redis-commander" make deploy
+```
+
+Use `make tags` to list the currently available tags.
+
 ### Reverting to older deployment/revision/image
 
 `DeploymentConfig`s (i.e. service & service-fedmsg) can be reverted with `oc rollout undo`:
