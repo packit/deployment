@@ -30,3 +30,4 @@ zuul-secrets:
 
 get-certs:
 	$(AP) playbooks/get-certs.yml
+

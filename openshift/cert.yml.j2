@@ -21,26 +21,65 @@
 # SOFTWARE.
 
 ---
+kind: DeploymentConfig
+apiVersion: v1
+metadata:
+  labels:
+    service: get-them-certs
+  name: get-them-certs
+spec:
+  template:
+    metadata:
+      labels:
+        name: get-them-certs
+        app: certo
+    spec:
+      containers:
+        - name: certo-cont
+          stdin: true
+          tty: true
+          image: docker.io/certbot/certbot
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          command:
+            - "sh"
+          resources:
+            requests:
+              memory: "60Mi"
+              cpu: "200m"
+            limits:
+              memory: "80Mi"
+              cpu: "400m"
+  replicas: 1
+  strategy:
+    type: Recreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: get-them-certs
+spec:
+  selector:
+    name: get-them-certs
+    app: certo
+  ports:
+    - name: certo-http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+---
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   labels:
-    app: packit
-    name: packit-service
-  name: packit-service
+    name: get-them-certs
+    app: certo
+  name: get-them-certs
 spec:
-# for local deployment (dev) creates default route for testing.
-# e.g https://packit-service-myproject.127.0.0.1.nip.io/
-# For dev/prod creates host {dev,prod}.packit.dev
-{% if 'dev' != deployment %}
   host: "{{ deployment }}.packit.dev"
-{% endif %}
   port:
-    targetPort: prod-packit
+    targetPort: certo-http
   to:
     kind: Service
-    name: packit-service
-  tls:
-    # not sure about this one, whether we should do it in httpd or here
-    insecureEdgeTerminationPolicy: Redirect
-    termination: passthrough
+    name: get-them-certs

@@ -42,3 +42,6 @@
 
     - name: check/import newer usercont/packit-service-worker image into image stream
       command: oc import-image is/packit-worker:{{ deployment }} -n packit-{{ deployment }}
+
+    - name: check/import newer usercont/packit-dashboard image into image stream
+      command: oc import-image is/packit-dashboard:{{ deployment }} -n packit-{{ deployment }}

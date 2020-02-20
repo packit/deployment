@@ -36,49 +36,49 @@ spec:
         app: packit
     spec:
       volumes:
-      - name: packit-secrets
-        secret:
-          secretName: packit-secrets
-      - name: packit-config
-        secret:
-          secretName: packit-config
-      - name: httpd-conf
-        configMap:
-          name: httpd-conf
+        - name: packit-secrets
+          secret:
+            secretName: packit-secrets
+        - name: packit-config
+          secret:
+            secretName: packit-config
+        - name: httpd-conf
+          configMap:
+            name: httpd-conf
       containers:
         - name: packit-service
           image: packit-service:{{ deployment }}
           ports:
-          - containerPort: 8443
-            protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
           env:
-           - name: DEPLOYMENT
-             value: {{ deployment }}
-           - name: REDIS_SERVICE_HOST
-             value: redis
-           - name: POSTGRESQL_USER
-             valueFrom:
-               secretKeyRef:
-                 key: database-user
-                 name: postgres-secret
-           - name: POSTGRESQL_PASSWORD
-             valueFrom:
-               secretKeyRef:
-                 key: database-password
-                 name: postgres-secret
-           - name: POSTGRESQL_DATABASE
-             valueFrom:
-               secretKeyRef:
-                 key: database-name
-                 name: postgres-secret
+            - name: DEPLOYMENT
+              value: {{ deployment }}
+            - name: REDIS_SERVICE_HOST
+              value: redis
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  key: database-user
+                  name: postgres-secret
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: database-password
+                  name: postgres-secret
+            - name: POSTGRESQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: database-name
+                  name: postgres-secret
           volumeMounts:
-          - name: packit-secrets
-            mountPath: /secrets
-          - name: packit-config
-            mountPath: /home/packit/.config
-          - name: httpd-conf
-            mountPath: /etc/httpd/conf.d/httpd-packit.conf
-            subPath: httpd-packit.conf
+            - name: packit-secrets
+              mountPath: /secrets
+            - name: packit-config
+              mountPath: /home/packit/.config
+            - name: httpd-conf
+              mountPath: /etc/httpd/conf.d/httpd-packit.conf
+              subPath: httpd-packit.conf
           command:
             - /usr/bin/run_httpd.sh
           resources:
@@ -120,3 +120,60 @@ spec:
   replicas: 1
   strategy:
     type: Recreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: packit-service
+spec:
+  selector:
+    name: packit-service
+    app: packit
+  ports:
+    - name: prod-packit
+      port: 443
+      protocol: TCP
+      targetPort: 8443
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: packit
+    name: packit-service
+  name: packit-service
+spec:
+# for local deployment (dev) creates default route for testing.
+# e.g https://packit-service-myproject.127.0.0.1.nip.io/
+# For dev/prod creates host {dev,prod}.packit.dev
+{% if 'dev' != deployment %}
+  host: "{{ deployment }}.packit.dev"
+{% endif %}
+
+  port:
+    targetPort: prod-packit
+  to:
+    kind: Service
+    name: packit-service
+  tls:
+    # not sure about this one, whether we should do it in httpd or here
+    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough
+---
+# https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#writing-image-stream-definitions
+kind: ImageStream
+apiVersion: v1
+metadata:
+  name: packit-service
+spec:
+  tags:
+    - name: {{ deployment }}
+      from:
+        kind: DockerImage
+        name: {{ image }}
+      importPolicy:
+        # Periodically query registry to synchronize tag and image metadata.
+        scheduled: {{ auto_import_images }}
+  lookupPolicy:
+    # allows all resources pointing to this image stream to use it in the image field
+    local: true
