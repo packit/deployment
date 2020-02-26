@@ -141,6 +141,7 @@
         - redis-commander
       notify:
         - Rollout redis-commander
+      when: not without_redis_commander
 
     - name: Deploy redis-commander
       k8s:
