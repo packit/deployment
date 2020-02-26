@@ -21,35 +21,35 @@
 # SOFTWARE.
 
 ---
-  apiVersion: v1
-  kind: ConfigMap
-  metadata:
-    name: httpd-conf
-  data:
-    httpd-packit.conf: |
-      # FIXME: if we load this from a file, ansible interprets it as yaml
-      #        this is why the httpd config file is inlined here
-      #        feel free to fix it
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: httpd-conf
+data:
+  httpd-packit.conf: |
+    # FIXME: if we load this from a file, ansible interprets it as yaml
+    #        this is why the httpd config file is inlined here
+    #        feel free to fix it
 
-      LogLevel info
-      LogLevel wsgi:debug
-      ErrorLog /dev/stderr
-      TransferLog /dev/stdout
+    LogLevel info
+    LogLevel wsgi:debug
+    ErrorLog /dev/stderr
+    TransferLog /dev/stdout
 
-      <VirtualHost *:8443>
-          SSLEngine on
-          SSLCertificateFile /secrets/fullchain.pem
-          SSLCertificateKeyFile /secrets/privkey.pem
+    <VirtualHost *:8443>
+        SSLEngine on
+        SSLCertificateFile /secrets/fullchain.pem
+        SSLCertificateKeyFile /secrets/privkey.pem
 
-          # This is required! Otherwise the default testing page is served.
-          DocumentRoot /usr/share/packit/
-          ServerName {{ deployment }}.packit.dev
-          ServerAdmin user-cont-team@redhat.com
+        # This is required! Otherwise the default testing page is served.
+        DocumentRoot /usr/share/packit/
+        ServerName {{ deployment }}.packit.dev
+        ServerAdmin user-cont-team@redhat.com
 
-          WSGIDaemonProcess packit threads=5
-          WSGIScriptAlias / /usr/share/packit/packit.wsgi
+        WSGIDaemonProcess packit threads=5
+        WSGIScriptAlias / /usr/share/packit/packit.wsgi
 
-          <Directory /usr/share/packit>
-              Require all granted
-          </Directory>
-      </VirtualHost>
+        <Directory /usr/share/packit>
+            Require all granted
+        </Directory>
+    </VirtualHost>
