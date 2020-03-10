@@ -43,10 +43,11 @@
       include_vars: ../vars/{{ deployment }}.yml
       tags:
         - always
+
     - name: include extra secret vars
       include_vars: "{{ path_to_secrets }}/{{ deployment }}/extra-vars.yml"
       tags:
-        - redis-commander
+        - always
 
     - block:
         - name: get kubeconfig token
