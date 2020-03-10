@@ -42,9 +42,6 @@ spec:
         - name: packit-config
           secret:
             secretName: packit-config
-        - name: httpd-conf
-          configMap:
-            name: httpd-conf
       containers:
         - name: packit-service
           image: packit-service:{{ deployment }}
@@ -76,9 +73,6 @@ spec:
               mountPath: /secrets
             - name: packit-config
               mountPath: /home/packit/.config
-            - name: httpd-conf
-              mountPath: /etc/httpd/conf.d/httpd-packit.conf
-              subPath: httpd-packit.conf
           command:
             - /usr/bin/run_httpd.sh
           resources:

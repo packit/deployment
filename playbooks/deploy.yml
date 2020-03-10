@@ -62,7 +62,7 @@
       tags:
         - always
 
-    - name: Deploy secrets, sandbox namespace, httpd config map
+    - name: Deploy secrets, sandbox namespace
       # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
@@ -76,7 +76,6 @@
         - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') }}"
-        - "{{ lookup('template', '../openshift/cmap-packit-httpd-conf.yml.j2') }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') }}"
       tags:
         - always
