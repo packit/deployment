@@ -207,6 +207,26 @@
     - name: Set up the sandbox namespace
       command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
 
+    - name: Wait for worker-0 to be running
+      k8s:
+        namespace: "{{ project }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        verify_ssl: "{{ validate_certs }}"
+        name: packit-worker-0
+        kind: Pod
+        wait: yes
+        wait_condition:
+          type: Ready
+        wait_timeout: 180  # 3 minutes to pull the image and run the container
+    # you can't wait for DC nor service, so let's make sure the stuff was rolled out
+    - name: Wait for p-s rollout to complete
+      command: oc rollout status -w dc packit-service
+      register: oc_rollout_status
+    - name: Check the rollout was successful
+      assert:
+        that: '"successfully rolled out" in oc_rollout_status.stdout'
+
   handlers:
     - name: Rollout redis-commander
       command: oc rollout latest dc/redis-commander
