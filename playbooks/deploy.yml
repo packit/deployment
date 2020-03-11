@@ -29,7 +29,7 @@
     without_fedmsg: false
     without_redis_commander: false
     without_flower: false
-    without_dashboard: true  # deploy w/o dashboard by default
+    without_dashboard: true # deploy w/o dashboard by default
     # feel free to override this in vars
     image: "usercont/packit-service:{{ deployment }}"
     image_worker: "usercont/packit-service-worker:{{ deployment }}"
