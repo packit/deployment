@@ -39,14 +39,16 @@ api_key: ""
 # To work-around 'SSL: CERTIFICATE_VERIFY_FAILED'
 validate_certs: no
 
-# don't deploy fedmsg dc; good for local testing
+# don't deploy fedmsg by default
+# if you want to deploy fedmsg, please make sure to
+# edit the queue name in secrets/*/fedora.toml
 without_fedmsg: true
 
-# don't deploy redis-commander dc; good for staging deployment
-without_redis_commander: false
+# don't deploy redis-commander by default
+without_redis_commander: true
 
-# don't deploy flower dc; good for staging deployment
-without_flower: false
+# don't deploy flower by default
+without_flower: true
 
 # don't deploy dashboard by default
 without_dashboard: true
