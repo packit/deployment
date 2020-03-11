@@ -50,7 +50,8 @@
       tags:
         - always
 
-    - block:
+    - name: Get k8s token and check it.
+      block:
         - name: get kubeconfig token
           command: oc whoami -t
           register: kubeconfig_token
