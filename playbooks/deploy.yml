@@ -218,7 +218,7 @@
         wait: yes
         wait_condition:
           type: Ready
-        wait_timeout: 180  # 3 minutes to pull the image and run the container
+        wait_timeout: 600 # 10 minutes to pull the image and run the container
     # you can't wait for DC nor service, so let's make sure the stuff was rolled out
     - name: Wait for p-s rollout to complete
       command: oc rollout status -w dc packit-service
