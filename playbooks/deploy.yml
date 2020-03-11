@@ -29,11 +29,11 @@
     without_fedmsg: false
     without_redis_commander: false
     without_flower: false
-    without_dashboard: true  # deploy w/o dashboard by default
+    without_dashboard: true # deploy w/o dashboard by default
     # feel free to override this in vars
-    image: "usercont/packit-service:{{ deployment }}"
-    image_worker: "usercont/packit-service-worker:{{ deployment }}"
-    image_fedmsg: "usercont/packit-service-fedmsg:{{ deployment }}"
+    image: "docker.io/usercont/packit-service:{{ deployment }}"
+    image_worker: "docker.io/usercont/packit-service-worker:{{ deployment }}"
+    image_fedmsg: "docker.io/usercont/packit-service-fedmsg:{{ deployment }}"
     image_dashboard: "usercont/packit-dashboard:{{ deployment }}"
     worker_replicas: 1
     path_to_secrets: "../secrets"
@@ -50,7 +50,8 @@
       tags:
         - always
 
-    - block:
+    - name: Get k8s token and check it.
+      block:
         - name: get kubeconfig token
           command: oc whoami -t
           register: kubeconfig_token
@@ -63,7 +64,18 @@
       tags:
         - always
 
-    - name: Deploy secrets, sandbox namespace
+    - name: Push dev images to local registry
+      block:
+        - shell: docker login -u developer -p $(oc whoami -t) 172.30.1.1:5000
+        - command: docker inspect {{ image }}
+        - command: docker tag {{ image }} 172.30.1.1:5000/myproject/packit-service:dev
+        - command: docker push 172.30.1.1:5000/myproject/packit-service:dev
+        - command: docker inspect {{ image_worker }}
+        - command: docker tag {{ image_worker }} 172.30.1.1:5000/myproject/packit-worker:dev
+        - command: docker push 172.30.1.1:5000/myproject/packit-worker:dev
+      when: deployment == "dev"
+
+    - name: Deploy templates (need to be processed)
       # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
@@ -218,7 +230,7 @@
         wait: yes
         wait_condition:
           type: Ready
-        wait_timeout: 180  # 3 minutes to pull the image and run the container
+        wait_timeout: 600 # 10 minutes to pull the image and run the container
     # you can't wait for DC nor service, so let's make sure the stuff was rolled out
     - name: Wait for p-s rollout to complete
       command: oc rollout status -w dc packit-service
