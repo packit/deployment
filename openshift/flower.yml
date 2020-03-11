@@ -44,6 +44,11 @@ spec:
               value: redis://redis:6379/0
             - name: FLOWER_PORT
               value: "5555"
+            - name: FLOWER_BASIC_AUTH
+              valueFrom:
+                secretKeyRef:
+                  key: flower-basic-auth
+                  name: flower-secret
           ports:
             - containerPort: 5555
           resources:
@@ -79,3 +84,6 @@ spec:
   to:
     kind: Service
     name: flower
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: None

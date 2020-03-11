@@ -164,6 +164,22 @@
         - redis-commander
       register: redis_commander
 
+    - name: Create flower secret
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ item }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        apply: yes
+      loop:
+        - "{{ lookup('template', '../openshift/secret-flower.yml.j2') }}"
+      tags:
+        - flower
+      notify:
+        - Rollout flower
+      when: not without_flower
+
     - name: Deploy flower
       k8s:
         namespace: "{{ project }}"
@@ -172,6 +188,9 @@
         api_key: "{{ api_key }}"
         verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
       when: not without_flower
+      tags:
+        - flower
+      register: flower
 
     - name: Deploy packit-service-fedmsg
       # https://docs.ansible.com/k8s_module.html
@@ -194,3 +213,9 @@
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not redis_commander.changed
+
+    - name: Rollout flower
+      command: oc rollout latest dc/flower
+      # Run this rollout only if the DeploymentConfig above didn't change,
+      # and so it wasn't rolled out yet.
+      when: not flower.changed
