@@ -29,7 +29,7 @@
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml
 
-    - name: Deploy templates (need to be processed)
+    - name: Deploy cert tools
       # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
@@ -38,16 +38,4 @@
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
       loop:
-        - "{{ lookup('template', '../openshift/cert-route-http.yml.j2') | from_yaml }}"
-
-    - name: Deploy resource configs (no need to process them)
-      # https://docs.ansible.com/k8s_module.html
-      k8s:
-        namespace: "{{ project }}"
-        src: "{{ item }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-      loop:
-        - ../openshift/certs-deployment.yml
-        - ../openshift/cert-service.yml
+        - "{{ lookup('template', '../openshift/cert.yml.j2') | from_yaml_all | list }}"
