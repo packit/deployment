@@ -47,6 +47,9 @@ without_fedmsg: true
 # don't deploy redis-commander by default
 without_redis_commander: true
 
+# don't deploy centosmsg dc; good for local testing
+without_centosmsg: true
+
 # don't deploy flower by default
 without_flower: true
 

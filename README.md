@@ -165,31 +165,37 @@ Create `secrets/dev/` (steal them from our secret repo).
 Run `DEPLOYMENT=dev make deploy`.
 
 #### Pushing images to local openshift deployment
- - get the registry IP
-   - you need to do it on user that can get svc on project 'default' (for example system:admin `oc login -u system:admin`)
-    ```
-    REGISTRY_IP=$(oc get svc -n default docker-registry --template '{{.spec.clusterIP}}')
-    ```
 
- - Get your token and use it for logging to REGISTRY (you might need to login from system:admin back to developer acount `oc login -u developer`)
-    ```
-    docker login -p $(oc whoami -t) -u unused $REGISTRY_IP:5000
-    ```
+- get the registry IP
 
- - get image expected value, for example:
-    ```
-    IMAGE_NAME=$(oc get is/packit-worker --template '{{.status.dockerImageRepository}}')
-    ```
+  - you need to do it on user that can get svc on project 'default' (for example system:admin `oc login -u system:admin`)
 
- - tag the image, for example:
-    ```
-    docker tag docker.io/usercont/packit-service-worker:dev $IMAGE_NAME
-    ```
+  ```
+  REGISTRY_IP=$(oc get svc -n default docker-registry --template '{{.spec.clusterIP}}')
+  ```
 
- - push the image to registry
-    ```
-    docker push $IMAGE_NAME
-    ```
+- Get your token and use it for logging to REGISTRY (you might need to login from system:admin back to developer acount `oc login -u developer`)
+
+  ```
+  docker login -p $(oc whoami -t) -u unused $REGISTRY_IP:5000
+  ```
+
+- get image expected value, for example:
+
+  ```
+  IMAGE_NAME=$(oc get is/packit-worker --template '{{.status.dockerImageRepository}}')
+  ```
+
+- tag the image, for example:
+
+  ```
+  docker tag docker.io/usercont/packit-service-worker:dev $IMAGE_NAME
+  ```
+
+- push the image to registry
+  ```
+  docker push $IMAGE_NAME
+  ```
 
 In case of issues, you can use [this guide](https://github.com/debianmaster/Notes/wiki/How-to-push-docker-images-to-openshift-internal-registry-and-create-application-from-it.) as reference.
 
