@@ -29,7 +29,7 @@
 # Openshift project/namespace name
 project: myproject
 
-# Openshift cluster url (example: https://192.168.42.66:8443)
+# Openshift cluster url (example: https://console.pro-eu-west-1.openshift.com)
 host: https://your-openshift-cluster-url
 
 # oc login <the above host value>, oc whoami -t
