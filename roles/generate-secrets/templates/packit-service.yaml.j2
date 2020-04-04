@@ -1,0 +1,28 @@
+---
+deployment: dev
+debug: true
+fas_user: {{ fas_user }}
+fas_password: {{ fas_passwd }}
+keytab_path: /secrets/fedora.keytab
+
+authentication:
+  src.fedoraproject.org:
+    instance_url: https://src.fedoraproject.org
+    # user's API Key from https://src.fedoraproject.org/settings#nav-api-tab
+    token: {{ package_api_key }}
+  github.com:
+    # https://github.com/organizations/packit-service/settings/apps/packit-as-a-service
+    github_app_id: "{{ github_app_id }}"
+    # openssl rsa -in PATH_TO_PEM_FILE -pubout -outform DER | openssl sha1 -c
+    github_app_private_key_path: /secrets/private-key.pem
+
+validate_webhooks: False
+webhook_secret: <webhook_secret>
+testing_farm_secret: <testing-farm-secret>
+
+command_handler: {{ command_handler }}
+command_handler_work_dir: /sandcastle
+command_handler_image_reference: docker.io/usercont/sandcastle
+command_handler_k8s_namespace: packit-dev-sandbox
+
+server_name: "{{ server_hostname }}:{{ server_port }}"

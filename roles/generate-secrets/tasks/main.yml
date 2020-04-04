@@ -1,0 +1,7 @@
+---
+- include: ./create-directories.yml
+- include: ./generate-cert.yml
+- include: ./generate-packit-config.yml
+- include: ./generate-fedora-config.yml
+- include: ./generate-copr-config.yml
+- include: ./check-github-key.yml

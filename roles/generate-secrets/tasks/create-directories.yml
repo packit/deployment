@@ -1,0 +1,3 @@
+---
+- name: Create secrets directory hierarchy
+  command: mkdir -p {{ path_to_secrets }}

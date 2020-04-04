@@ -1,0 +1,20 @@
+# Credentials used to login at https://admin.fedoraproject.org/accounts/
+fas_user: <fas_user>
+fas_passwd: <fas_passwd>
+
+# Get user's API Key from https://src.fedoraproject.org/settings#nav-api-tab
+package_api_key: <package_api_key>
+
+# After creating new github app
+# Also generate and place github app key as private-key.pem under secrets
+github_app_id: "<github_app_id>"
+
+command_handler: local
+server_hostname: localhost
+server_port: "8443"
+path_to_secrets: ../secrets/dev
+path_to_templates: ./
+
+# Get from https://copr.fedorainfracloud.org/api/
+copr_login: <copr_login>
+copr_token: <copr_token>
