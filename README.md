@@ -123,12 +123,13 @@ because you don't know what's the cause/fix yet, you have to:
 1. Build base [packit image](https://hub.docker.com/repository/docker/usercont/packit):
 
 - [move packit's `stable` branch to newer commit](#production-vs-staging-images)
-- [wait for the image to be built successfully](https://hub.docker.com/repository/registry-1.docker.io/usercont/packit/timeline)
+- [WAIT for the image to be built successfully](https://hub.docker.com/repository/registry-1.docker.io/usercont/packit/timeline) - REALLY, don't proceed to the next step until this is built
 
 2. Build service/worker images
 
+- you REALLY HAVE TO WAIT for the [base image](https://hub.docker.com/repository/registry-1.docker.io/usercont/packit/timeline) above to be built first
 - move `packit-service`'s branch to newer commit
-- wait for [service](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker](https://hub.docker.com/repository/docker/usercont/packit-service-worker) images to be built successfully
+- WAIT for [service](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker](https://hub.docker.com/repository/docker/usercont/packit-service-worker) images to be built successfully
 
 3. Import images -> re-deploy
 
