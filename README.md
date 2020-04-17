@@ -10,6 +10,7 @@
 ## What's in here
 
 - [playbooks](playbooks/) - Ansible playbooks.
+- [roles](roles/) - Ansible roles.
 - [vars](vars/) - Variable file(s). See section below for more info.
 - [Openshift](openshift/) - Openshift resource configuration files (templates).
 - [secrets](secrets/) - secret stuff to be used from `openshift/secret-*.yml.j2`
@@ -214,6 +215,17 @@ Just build & push `packit-service-worker` and you can play.
 
 Once you're done you should [revert to older image](#reverting-to-older-deploymentrevisionimage).
 Or it will be automatically replaced once a packit-service PR is merged.
+
+### Generating secrets for local packit-service deployment
+
+Local deployment of Packit service needs some secrets which can be generated using the steps listed below:
+
+1. Create `dev` directory under `secrets`
+2. Create a [new GitHub app](https://github.com/settings/apps/new) or [open existing one](https://github.com/settings/apps) and download key file as `secrets/dev/private-key.pem`
+3. Replace variables with your user specific values in `roles/generate-secrets/vars/main.yml`
+4. Run the playbook `make generate-local-secrets`
+
+Then, copy the `secrets` directory to your `packit-service` directory
 
 ## Zuul
 

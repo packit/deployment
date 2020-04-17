@@ -1,0 +1,19 @@
+---
+- name: Generate an OpenSSL private key
+  openssl_privatekey:
+    path: "{{ path_to_secrets }}/privkey.pem"
+- name: Generate an OpenSSL CSR
+  openssl_csr:
+    path: "{{ path_to_secrets }}/signing_request.csr"
+    privatekey_path: "{{ path_to_secrets }}/privkey.pem"
+    common_name: "{{ server_hostname }}"
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: "{{ path_to_secrets }}/fullchain.pem"
+    privatekey_path: "{{ path_to_secrets }}/privkey.pem"
+    csr_path: "{{ path_to_secrets }}/signing_request.csr"
+    provider: selfsigned
+- name: Remove CSR for safety
+  file:
+    path: "{{ path_to_secrets }}/signing_request.csr"
+    state: absent
