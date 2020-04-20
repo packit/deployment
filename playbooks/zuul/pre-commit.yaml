@@ -1,0 +1,15 @@
+---
+- name: Run pre-commit
+  hosts: all
+  tasks:
+    - include_tasks: project-setup.yaml
+    - name: Install pre-commit RPM
+      dnf:
+        name:
+          - pre-commit
+      become: true
+
+    - name: Run pre-commit
+      command: pre-commit run --verbose --all-files
+      args:
+        chdir: "{{ project_dir }}"
