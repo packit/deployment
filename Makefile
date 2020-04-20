@@ -31,5 +31,8 @@ zuul-secrets:
 get-certs:
 	$(AP) playbooks/get-certs.yml
 
+get-certs-dashboard:
+	$(AP) -e domain=dashboard.stg.packit.dev playbooks/get-certs.yml
+
 generate-local-secrets:
 	$(AP) playbooks/generate-local-secrets.yml
