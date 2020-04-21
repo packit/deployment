@@ -25,10 +25,15 @@
   hosts: all
   vars:
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
+    domain: "{{ deployment }}.packit.dev"
   tasks:
+    - name: Make sure that deployment variable is set
+      assert:
+        that: deployment != ""
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml
-
+    - debug:
+        msg: "Deploying certbot pod for {{ domain }}"
     - name: Deploy cert tools
       # https://docs.ansible.com/k8s_module.html
       k8s:

@@ -242,9 +242,8 @@ For more information please refer to [official docs](https://ansible.softwarefac
 
 ## Obtaining a Let's Encrypt cert using `certbot`
 
-Please beer (Milk coffee stout) in mind this is the easiest process I was able
-to figure out: there is a ton of places for improvements and ideally make it
-automated 100%.
+Please bear in mind this is the easiest process I was able to figure out: there
+is a ton of places for improvements and ideally make it automated 100%.
 
 TL;DR
 
@@ -252,7 +251,7 @@ TL;DR
 2. Use the manual challenge.
 3. Run certbot and obtain the challenge.
 4. Run a custom script and serve the secret.
-5. Collect the certs and get that stout!
+5. Collect the certs.
 
 ### Prep
 
@@ -298,6 +297,16 @@ Now, run `certbot` in the pod:
 ```
 $ export CERTS_POD=$(oc get pods | grep certs | awk '{print $1}')
 $ oc rsh ${CERTS_POD} certbot certonly --config-dir /tmp --work-dir /tmp --logs-dir /tmp --manual --email user-cont-team@redhat.com -d prod.packit.dev
+
+...
+
+Create a file containing just this data:
+
+<abc>
+
+And make it available on your web server at this URL:
+
+http://prod.packit.dev/.well-known/acme-challenge/<xyz>
 ```
 
 and answer questions until it tells you to create a file containing data **abc** and make it available on your web server at URL http://prod.packit.dev/.well-known/acme-challenge/xyz.
@@ -310,6 +319,11 @@ We'll use another session for that. First, copy the script into the pod:
 $ export CERTS_POD=$(oc get pods | grep certs | awk '{print $1}')
 $ oc rsh ${CERTS_POD} mkdir /tmp/haxxx/
 $ oc rsync haxxx/ ${CERTS_POD}:/tmp/haxxx/
+```
+
+Now we're going to serve the secret so LE can make sure it's us.
+
+```
 $ oc rsh ${CERTS_POD} python3 /tmp/haxxx/serve-acme-challenge.py /.well-known/acme-challenge/xyz abc
 ```
 
