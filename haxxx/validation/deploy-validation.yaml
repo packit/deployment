@@ -40,7 +40,7 @@
         definition: "{{ item }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}"
+        validate_certs: "{{ validate_certs }}"
       loop:
         - "{{ lookup('template', './openshift/secret-config.yml.j2') }}"
         - "{{ lookup('template', './openshift/secret-sentry.yml.j2') }}"
@@ -54,4 +54,4 @@
         definition: "{{ lookup('template', './openshift/job-run-validation.yaml')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}"
+        validate_certs: "{{ validate_certs }}"

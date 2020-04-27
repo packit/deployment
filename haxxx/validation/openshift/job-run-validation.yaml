@@ -32,6 +32,10 @@ spec:
     spec:
       template:
         spec:
+          volumes:
+            - name: copr-config
+              secret:
+                secretName: copr-config
           containers:
             - name: run-validation
               image: usercont/packit-service-validation
@@ -48,7 +52,7 @@ spec:
                       key: sentry
               command: ["python3", "/usr/bin/packit-service-validation.py"]
               volumeMounts:
-                - name: config
+                - name: copr-config
                   mountPath: ~/.config/
               resources:
                 requests:
