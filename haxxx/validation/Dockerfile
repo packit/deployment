@@ -1,6 +1,6 @@
 FROM fedora:31
 
-RUN dnf install -y python-ogr python-copr python-copr-doc pip && dnf clean all
+RUN dnf install -y python3-ogr python3-copr python3-pip && dnf clean all
 
 RUN pip install --upgrade sentry-sdk==0.14.2
 
