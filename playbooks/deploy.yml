@@ -84,7 +84,7 @@
         definition: "{{ item }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
       loop:
         - "{{ lookup('template', '../openshift/secret-packit-ssh.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-packit-secrets.yml.j2') }}"
@@ -103,7 +103,7 @@
         definition: "{{ lookup('template', '../openshift/packit-service.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
       tags:
         - packit-service
 
@@ -114,7 +114,7 @@
         definition: "{{ lookup('template', '../openshift/packit-service-worker.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
       tags:
         - packit-service-worker
 
@@ -125,7 +125,7 @@
         definition: "{{ lookup('template', '../openshift/dashboard.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
       when: not without_dashboard
       tags:
         - dashboard
@@ -137,7 +137,7 @@
         definition: "{{ lookup('template', '../openshift/pg.yml')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
 
     - name: Deploy redis
       k8s:
@@ -145,7 +145,7 @@
         src: ../openshift/redis.yml
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
         apply: yes
       tags:
         - redis
@@ -156,7 +156,7 @@
         definition: "{{ item }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
         apply: yes
       loop:
         - "{{ lookup('template', '../openshift/secret-redis-commander.yml.j2') }}"
@@ -172,7 +172,7 @@
         src: ../openshift/redis-commander.yml
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
         apply: yes
       when: not without_redis_commander
       tags:
@@ -185,7 +185,7 @@
         definition: "{{ item }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
         apply: yes
       loop:
         - "{{ lookup('template', '../openshift/secret-flower.yml.j2') }}"
@@ -201,7 +201,7 @@
         src: ../openshift/flower.yml
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
       when: not without_flower
       tags:
         - flower
@@ -214,7 +214,7 @@
         definition: "{{ lookup('template', '../openshift/packit-service-fedmsg.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
       tags:
         - fedmsg
       when: not without_fedmsg
@@ -226,7 +226,7 @@
         definition: "{{ lookup('template', '../openshift/packit-service-centosmsg.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}" # 2.7 compatibility
+        validate_certs: "{{ validate_certs }}"
       tags:
         - centosmsg
       when: not without_centosmsg
@@ -239,7 +239,7 @@
         namespace: "{{ project }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
-        verify_ssl: "{{ validate_certs }}"
+        validate_certs: "{{ validate_certs }}"
         name: packit-worker-0
         kind: Pod
         wait: yes
