@@ -36,3 +36,6 @@ get-certs-dashboard:
 
 generate-local-secrets:
 	$(AP) playbooks/generate-local-secrets.yml
+
+deploy-validation:
+    $(AP) haxxx/validation/deploy-validation.yaml
