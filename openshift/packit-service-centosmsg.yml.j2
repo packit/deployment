@@ -45,6 +45,12 @@ spec:
           env:
             - name: DEPLOYMENT
               value: {{ deployment }}
+            - name: MQTT_TOPICS
+              value: git.stg.centos.org/#
+            - name: MQTT_SUBTOPICS
+              value: pull-request
+            - name: LOG_LEVEL
+              value: INFO
             - name: SENTRY_SECRET
               valueFrom:
                 secretKeyRef:
