@@ -53,7 +53,7 @@ spec:
               command: ["python3", "/usr/bin/packit-service-validation.py"]
               volumeMounts:
                 - name: copr-config
-                  mountPath: ~/.config/
+                  mountPath: /.config
               resources:
                 requests:
                   memory: "64Mi"
