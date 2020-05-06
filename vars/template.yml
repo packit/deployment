@@ -65,10 +65,10 @@ without_dashboard: true
 # image_worker: usercont/packit-service-worker:{{ deployment }}
 
 # image to use for fedora messaging consumer
-# image_fedmsg: usercont/packit-service-fedmsg:latest
+# image_fedmsg: usercont/packit-service-fedmsg:{{ deployment }}
 
 # image to use for centos messaging consumer
-# image_centosmsg: usercont/packit-sevice-centosmsg:latest
+# image_centosmsg: usercont/packit-sevice-centosmsg:{{ deployment }}
 
 # Number of worker pods to be deployed
 # worker_replicas : 2
