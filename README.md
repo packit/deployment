@@ -32,13 +32,14 @@ We build separate images for
 
 - [service / web server](https://hub.docker.com/r/usercont/packit-service) - accepts webhooks and tasks workers
 - [fedora messaging consumer](https://hub.docker.com/r/usercont/packit-service-fedmsg) - listens on fedora messaging for events from Copr and tasks workers
+- [CentOS messaging consumer](https://hub.docker.com/r/usercont/packit-service-centosmsg) - listens on the CentOS MQTT message bus for events from git.centos.org
 - [workers](https://hub.docker.com/r/usercont/packit-service-worker) - do the actual work
 
 #### Production vs. Staging images
 
-Service and worker have separate images for staging and production deployment.
-Staging images are `:stg` tagged and built from `master` of `packit` and `packit-service`.
-Production images are `:prod` tagged and built from `stable` branch of `packit` and `packit-service`.
+Separate images are built for staging and production deployment.
+Staging images are `:stg` tagged and built from `master` of `packit`, `packit-service`, `packit-service-fedmsg` and `packit-service-centosmg` .
+Production images are `:prod` tagged and built from `stable` branch of `packit`, `packit-service`, `packit-service-fedmsg` and `packit-service-centosmg`.
 To move `stable` branch to a newer 'stable' commit:
 
 - git branch -f stable commit-hash
@@ -126,11 +127,14 @@ because you don't know what's the cause/fix yet, you have to:
 - [move packit's `stable` branch to newer commit](#production-vs-staging-images)
 - [WAIT for the image to be built successfully](https://hub.docker.com/repository/registry-1.docker.io/usercont/packit/timeline) - REALLY, don't proceed to the next step until this is built
 
-2. Build service/worker images
+2. Build service, worker and listener images
 
 - you REALLY HAVE TO WAIT for the [base image](https://hub.docker.com/repository/registry-1.docker.io/usercont/packit/timeline) above to be built first
-- move `packit-service`'s branch to newer commit
+- move `packit-service`'s `stable` branch to newer commit
+- move `packit-service-fedmsg`'s `stable` branch to newer commit
 - WAIT for [service](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker](https://hub.docker.com/repository/docker/usercont/packit-service-worker) images to be built successfully
+- WAIT for the [fedmsg listener
+  image](https://hub.docker.com/repository/docker/usercont/packit-service-fedmsg) to be built successfully
 
 3. Import images -> re-deploy
 
