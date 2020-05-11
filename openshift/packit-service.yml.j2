@@ -77,10 +77,10 @@ spec:
             - /usr/bin/run_httpd.sh
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: "96Mi"
+              cpu: "50m"
             limits:
-              memory: "256Mi"
+              memory: "128Mi"
               cpu: "200m"
           # In TLS world, hostname needs to match whatever is set in the cert
           # in our cause, k8s is doing here something like curl https://172.15.2.4:8443/api/healthz/
