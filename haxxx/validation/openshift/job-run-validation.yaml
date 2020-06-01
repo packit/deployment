@@ -55,10 +55,7 @@ spec:
                 - name: copr-config
                   mountPath: /.config
               resources:
-                requests:
-                  memory: "64Mi"
-                  cpu: "100m"
                 limits:
-                  memory: "128Mi"
+                  memory: "80Mi"
                   cpu: "100m"
           restartPolicy: OnFailure

@@ -62,11 +62,8 @@ spec:
           command:
             - "listen-to-centos-messaging"
           resources:
-            requests:
-              memory: "32Mi"
-              cpu: "50m"
             limits:
-              memory: "64Mi"
+              memory: "80Mi"
               cpu: "100m"
   # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/basic_deployment_operations.html#image-change-trigger
   triggers:
