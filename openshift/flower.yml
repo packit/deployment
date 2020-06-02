@@ -52,11 +52,8 @@ spec:
           ports:
             - containerPort: 5555
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "50m"
             limits:
-              memory: "128Mi"
+              memory: "80Mi"
               cpu: "100m"
   replicas: 1
   strategy:
