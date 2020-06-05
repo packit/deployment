@@ -75,3 +75,6 @@ without_dashboard: true
 
 # Path to secrets (in case you don't have it in the root of this project)
 # path_to_secrets: /secrets
+
+# used in dev/zuul deployment to tag&push images to cluster, default: "podman"
+# container_engine: "docker"
