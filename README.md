@@ -249,15 +249,26 @@ For more information please refer to [official docs](https://ansible.softwarefac
 Please bear in mind this is the easiest process I was able to figure out: there
 is a ton of places for improvements and ideally make it automated 100%.
 
+We are using multi-domain wildcard certificates for following domains:
+
+- \*.packit.dev
+- \*.prod.packit.dev
+- \*.stg.packit.dev
+
+In case procedure bellow will not work, previously used http challenge can be used instead [link](https://github.com/packit-service/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot).
+Be aware that http challenge approach is more complex, includes destructive actions and longer downtime.
+
 TL;DR
 
-1. Deploy a certbot container in the project.
-2. Use the manual challenge.
-3. Run certbot and obtain the challenge.
-4. Run a custom script and serve the secret.
-5. Collect the certs.
+1. Check prerequisites.
+2. Run certbot to obtain the challenges.
+3. Configure DNS TXT records based on values requested in 2.
+4. Update secrets repository.
+5. Re-deploy stg&prod.
 
-### Prep
+_Note: If certbot was excuted against multiple domains you will repeat step 3. for each domain._
+
+### 1. Prerequisites
 
 Make sure the DNS is all set up:
 
@@ -272,90 +283,77 @@ pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 60 IN A 52.30.203.24
 pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 60 IN A 52.50.44.252
 ```
 
-### Just do it
+Check if you have access to packit.dev domain in [Google Domains](https://domains.google.com/m/registrar/packit.dev).
 
-Deploy the stuff to the cluster:
+Check/install [certbot](https://certbot.eff.org/all-instructions) locally.
 
-```
-$ DEPLOYMENT=prod make get-certs
-```
+### 2. Run certbot to obtain the challenges.
 
-Verify the `get-them-certs` route exposes the `prod.packit.dev`:
+Run certbot:
 
 ```
-$ oc describe route.route.openshift.io/get-them-certs
-Name:                   get-them-certs
-Namespace:              packit-prod
-Requested Host:         prod.packit.dev
-                          exposed on router router (host elb.e4ff.pro-eu-west-1.openshiftapps.com) 10 minutes ago
+certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email user-cont-team@redhat.com -d *.packit.dev -d *.prod.packit.dev -d *.stg.packit.dev
 ```
 
-If there is `packit-service` deployed, you need to delete the route to free the host for `get-them-certs`:
+You will be asked to set TXT record for every domain requested:
 
 ```
-$ oc delete route packit-service
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please deploy a DNS TXT record under the name
+_acme-challenge.prod.packit.dev with the following value:
+
+123456abcdef
+
+Before continuing, verify the record is deployed.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Press Enter to Continue
 ```
 
-Now, run `certbot` in the pod:
+### 3. Update DNS record
+
+Go to [Google Domains](https://domains.google.com/m/registrar/packit.dev/dns) and create/set the corresponding value: TXT record called \_acme-challenge/\_acme-challenge.prod/\_acme-challenge.stg
+
+Wait till is distributed - in another terminal check with:
 
 ```
-$ export CERTS_POD=$(oc get pods | grep certs | awk '{print $1}')
-$ oc rsh ${CERTS_POD} certbot certonly --config-dir /tmp --work-dir /tmp --logs-dir /tmp --manual --email user-cont-team@redhat.com -d prod.packit.dev
-
-...
-
-Create a file containing just this data:
-
-<abc>
-
-And make it available on your web server at this URL:
-
-http://prod.packit.dev/.well-known/acme-challenge/<xyz>
+nslookup -q=TXT _acme-challenge.prod.packit.dev
 ```
 
-and answer questions until it tells you to create a file containing data **abc** and make it available on your web server at URL http://prod.packit.dev/.well-known/acme-challenge/xyz.
-Don't close the session yet!!!
-
-Now we need to serve the challenge using the [haxxx/serve-acme-challenge.py](./haxxx/serve-acme-challenge.py) script.
-We'll use another session for that. First, copy the script into the pod:
+once it returns the configured value
 
 ```
-$ export CERTS_POD=$(oc get pods | grep certs | awk '{print $1}')
-$ oc rsh ${CERTS_POD} mkdir /tmp/haxxx/
-$ oc rsync haxxx/ ${CERTS_POD}:/tmp/haxxx/
+[~/]$ nslookup -q=TXT _acme-challenge.packit.dev
+Server:         213.46.172.37
+Address:        213.46.172.37#53
+
+Non-authoritative answer:
+_acme-challenge.packit.dev      text = "123456abcdef"
+
+Authoritative answers can be found from:
+
+[~/]$ ping dashboard.packit.dev
 ```
 
-Now we're going to serve the secret so LE can make sure it's us.
+Go to the terminal with certbot command waiting for your action and hit Enter.
+
+Repeat this for all requested domains.
+
+Once finished copy certificates to secrets repository (prod&stg)
 
 ```
-$ oc rsh ${CERTS_POD} python3 /tmp/haxxx/serve-acme-challenge.py /.well-known/acme-challenge/xyz abc
+cp /var/tmp/live/packit.dev/{fullchain,privkey}.pem _path_to_prod_secrets_
+cp /var/tmp/live/packit.dev/{fullchain,privkey}.pem _path_to_stg_secrets_
 ```
 
-Values of `<abc>` and `<xyz>` are generated by cert-bot in the first terminal session.
+### 4. Update secret repository
 
-Return to first terminal and Press Enter to Continue.
+- push new branch and merge.
 
-And that's it! We got the certs now, let's get them from the pod to this git repo:
-
-```
-$ oc rsh ${CERTS_POD} cat /tmp/live/prod.packit.dev/fullchain.pem | dos2unix > secrets/prod/fullchain.pem
-$ oc rsh ${CERTS_POD} cat /tmp/live/prod.packit.dev/privkey.pem | dos2unix > secrets/prod/privkey.pem
-```
-
-There are also `cert.pem` & `chain.pem` generated. You can copy them as well, but we don't need them at the moment.
-The files that `oc rsh pod/x cat *.pem` returns contain `^M` characters, therefore we use `dos2unix` to [fix them](https://unix.stackexchange.com/questions/32001/what-is-m-and-how-do-i-get-rid-of-it).
-
-Don't forget to do cleanup:
+### 5.Re-deploy stg and prod environment:
 
 ```
-$ oc delete all -l name=get-them-certs
-$ oc delete all -l service=get-them-certs
-```
-
-And deploy the `packit-service` (route & new certs):
-
-```
-$ DEPLOYMENT=prod make deploy
+DEPLOYMENT=stg make deploy
+DEPLOYMENT=prod make deploy
 ```
 
 Docs: https://certbot.eff.org/docs/using.html#manual
