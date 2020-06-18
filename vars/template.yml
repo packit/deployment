@@ -76,5 +76,7 @@ without_dashboard: true
 # Path to secrets (in case you don't have it in the root of this project)
 # path_to_secrets: /secrets
 
-# used in dev/zuul deployment to tag&push images to cluster, default: "podman"
+# Used in dev/Zuul deployment to tag & push images to cluster.
+# It's set to "/usr/bin/podman" if there's podman command, or to 'docker' otherwise.
+# If you still want to use docker even when there's podman installed, set:
 # container_engine: "docker"
