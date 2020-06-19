@@ -26,3 +26,5 @@
     var: zuul.executor.src_root
 - debug:
     var: zuul_work_dir
+- debug:
+    var: zuul_output_dir
