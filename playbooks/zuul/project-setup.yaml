@@ -14,3 +14,15 @@
   assert:
     that:
       - "src_path.stat.isdir"
+- debug:
+    var: playbook_dir
+- debug:
+    var: ansible_user_dir
+- debug:
+    var: zuul.project.src_dir
+- debug:
+    var: zuul_workspace_root
+- debug:
+    var: zuul.executor.src_root
+- debug:
+    var: zuul_work_dir
