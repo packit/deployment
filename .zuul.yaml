@@ -7,15 +7,3 @@
     gate:
       jobs:
         - pre-commit
-
-- job:
-    name: pre-commit
-    parent: base
-    description: Check pre-commit
-    run: playbooks/zuul/pre-commit.yaml
-    extra-vars:
-      ansible_python_interpreter: /usr/bin/python3
-    nodeset:
-      nodes:
-        - name: test-node
-          label: cloud-fedora-31
