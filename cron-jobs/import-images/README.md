@@ -4,7 +4,7 @@ OpenShift Online seems to have turned off periodical updates from image registry
 to ImageStream (even we explicitly [request them](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-stream-mappings-working-periodic)).
 
 As a work-around, there's a CronJob to periodically import images metadata into image streams.
-See [job-import-images.yml](./job-import-images.yml) and `oc describe cronjob.batch/import-images`.
+See [job-import-images.yaml](./job-import-images.yaml) and `oc describe cronjob.batch/import-images`.
 The job uses [imageimporter@stg](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-stg/serviceaccounts/importimager) or [imageimporter@prod](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-prod/serviceaccounts/importimager) [service account](https://docs.openshift.com/container-platform/3.11/dev_guide/service_accounts.html) with `registry-editor` [role](https://docs.openshift.com/container-platform/3.11/admin_guide/manage_rbac.html) role added.
 If you ever needed to re-create it, just do:
 
@@ -16,7 +16,3 @@ $ oc policy add-role-to-user registry-editor -z importimager
 [Dockerfile](./Dockerfile) - image used by the job
 
 [import-images.sh](./import-images.sh) - script in the image
-
-## Obtaining a Let's Encrypt cert using `certbot`
-
-- serve-acme-challenge.py - see [main README](../README.md#just-do-it)
