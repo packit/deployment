@@ -1,0 +1,36 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: delete-pvcs
+spec:
+  # https://crontab.guru
+  # Once every hour (at minute 0)
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: delete-pvcs
+              image: usercont/delete-pvcs
+              env:
+                - name: KUBECONFIG
+                  value: /tmp/.kube/config
+                - name: HOST
+                  value: https://api.pro-eu-west-1.openshift.com
+                - name: DEPLOYMENT
+                  value: stg
+                  # PROD
+                  # value: prod
+                - name: TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: pvcdeleter-token-spqmw
+                      # PROD
+                      # name: pvcdeleter-token-fjgcz
+                      key: token
+              resources:
+                limits:
+                  memory: "80Mi"
+                  cpu: "100m"
+          restartPolicy: OnFailure

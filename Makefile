@@ -38,4 +38,4 @@ generate-local-secrets:
 	$(AP) playbooks/generate-local-secrets.yml
 
 deploy-validation:
-	$(AP) haxxx/validation/deploy-validation.yaml
+	$(AP) cron-jobs/validation/deploy-validation.yaml
