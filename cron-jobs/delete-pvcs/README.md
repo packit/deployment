@@ -3,7 +3,7 @@
 [It happens from time to time](https://github.com/packit-service/packit-service/issues/409) that leftover PVCs in a sandbox namespace consume all storage quota.
 
 As a work-around, here's a CronJob to periodically delete old PVCs.
-See CronJob definition [job-delete-pvcs.yaml](./job-delete-pvcs.yaml) or `oc describe cronjob.batch/delete-pvcs`.
+See CronJob definition [job-delete-pvcs.yaml](./job-delete-pvcs.yaml) or `oc describe cronjob/delete-pvcs`.
 It runs this script: [delete-pvcs.sh](./delete-pvcs.sh)
 
 The job uses
