@@ -24,6 +24,8 @@
 - name: packit-service deployment
   hosts: all
   vars:
+    # feel free to override these in vars/
+    validate_certs: no
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
     sandbox_namespace: "packit-{{ deployment }}-sandbox"
     without_fedmsg: false
@@ -31,7 +33,6 @@
     without_redis_commander: false
     without_flower: false
     without_dashboard: true # deploy w/o dashboard by default
-    # feel free to override this in vars
     image: "docker.io/usercont/packit-service:{{ deployment }}"
     image_worker: "docker.io/usercont/packit-service-worker:{{ deployment }}"
     image_fedmsg: "docker.io/usercont/packit-service-fedmsg:{{ deployment }}"
