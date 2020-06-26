@@ -28,11 +28,11 @@
     validate_certs: no
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
     sandbox_namespace: "packit-{{ deployment }}-sandbox"
-    without_fedmsg: false
-    without_centosmsg: false
-    without_redis_commander: false
-    without_flower: false
-    without_dashboard: true # deploy w/o dashboard by default
+    with_fedmsg: true
+    with_centosmsg: true
+    with_redis_commander: true
+    with_flower: true
+    with_dashboard: false # deploy w/o dashboard by default
     image: "docker.io/usercont/packit-service:{{ deployment }}"
     image_worker: "docker.io/usercont/packit-service-worker:{{ deployment }}"
     image_fedmsg: "docker.io/usercont/packit-service-fedmsg:{{ deployment }}"
@@ -130,7 +130,7 @@
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
-      when: not without_dashboard
+      when: with_dashboard
       tags:
         - dashboard
 
@@ -168,7 +168,7 @@
         - redis-commander
       notify:
         - Rollout redis-commander
-      when: not without_redis_commander
+      when: with_redis_commander
 
     - name: Deploy redis-commander
       k8s:
@@ -178,7 +178,7 @@
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
         apply: yes
-      when: not without_redis_commander
+      when: with_redis_commander
       tags:
         - redis-commander
       register: redis_commander
@@ -197,7 +197,7 @@
         - flower
       notify:
         - Rollout flower
-      when: not without_flower
+      when: with_flower
 
     - name: Deploy flower
       k8s:
@@ -206,7 +206,7 @@
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
-      when: not without_flower
+      when: with_flower
       tags:
         - flower
       register: flower
@@ -221,7 +221,7 @@
         validate_certs: "{{ validate_certs }}"
       tags:
         - fedmsg
-      when: not without_fedmsg
+      when: with_fedmsg
 
     - name: Deploy packit-service-centosmsg
       # https://docs.ansible.com/k8s_module.html
@@ -233,7 +233,7 @@
         validate_certs: "{{ validate_certs }}"
       tags:
         - centosmsg
-      when: not without_centosmsg
+      when: with_centosmsg
 
     - name: Set up the sandbox namespace
       command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default

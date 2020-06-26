@@ -38,16 +38,16 @@ api_key: ""
 
 # if you want to deploy fedmsg, please make sure to
 # edit the queue name in secrets/*/fedora.toml
-# without_fedmsg: false
+# with_fedmsg: true
 
-# without_centosmsg: false
+# with_centosmsg: true
 
-# without_redis_commander: false
+# with_redis_commander: true
 
-# without_flower: false
+# with_flower: true
 
 # don't deploy dashboard by default
-# without_dashboard: true
+# with_dashboard: false
 
 # you can set the sandbox namespace name explicitly like this
 # sandbox_namespace: "packit-prod-sandbox"
