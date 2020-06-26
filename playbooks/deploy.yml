@@ -32,7 +32,7 @@
     with_centosmsg: true
     with_redis_commander: true
     with_flower: true
-    with_dashboard: false # deploy w/o dashboard by default
+    with_dashboard: true
     image: "docker.io/usercont/packit-service:{{ deployment }}"
     image_worker: "docker.io/usercont/packit-service-worker:{{ deployment }}"
     image_fedmsg: "docker.io/usercont/packit-service-fedmsg:{{ deployment }}"

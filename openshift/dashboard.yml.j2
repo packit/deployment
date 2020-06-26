@@ -104,7 +104,7 @@ metadata:
   name: packit-dashboard
 spec:
   tags:
-    - name: stg
+    - name: {{ deployment }}
       from:
         kind: DockerImage
         name: {{ image_dashboard }}
