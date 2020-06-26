@@ -28,7 +28,7 @@
 project: myproject
 
 # Openshift cluster url (example: https://console.pro-eu-west-1.openshift.com)
-host: https://your-openshift-cluster-url
+host: https://127.0.0.1:8443
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
@@ -38,19 +38,18 @@ api_key: ""
 
 # if you want to deploy fedmsg, please make sure to
 # edit the queue name in secrets/*/fedora.toml
-# with_fedmsg: true
+with_fedmsg: false
 
-# with_centosmsg: true
+with_centosmsg: false
 
-# with_redis_commander: true
+with_redis_commander: false
 
-# with_flower: true
-
+with_flower: false
 # don't deploy dashboard by default
 # with_dashboard: false
 
 # you can set the sandbox namespace name explicitly like this
-# sandbox_namespace: "packit-prod-sandbox"
+# sandbox_namespace: "packit-dev-sandbox"
 
 # image to use for service
 # image: docker.io/usercont/packit-service:{{ deployment }}

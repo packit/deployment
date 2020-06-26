@@ -25,10 +25,10 @@
 # -------------------------------------------------------------------
 
 # Openshift project/namespace name
-project: myproject
+project: packit-prod
 
-# Openshift cluster url (example: https://console.pro-eu-west-1.openshift.com)
-host: https://your-openshift-cluster-url
+# Openshift cluster url
+host: https://console.pro-eu-west-1.openshift.com
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
@@ -40,7 +40,8 @@ api_key: ""
 # edit the queue name in secrets/*/fedora.toml
 # with_fedmsg: true
 
-# with_centosmsg: true
+# not yet
+with_centosmsg: false
 
 # with_redis_commander: true
 
@@ -68,8 +69,7 @@ api_key: ""
 # image_dashboard: "docker.io/usercont/packit-dashboard:{{ deployment }}"
 
 # Number of worker pods to be deployed
-# worker_replicas : 1
-
+worker_replicas: 3
 # Path to secrets (in case you don't have it in the root of this project)
 # path_to_secrets: ../secrets
 

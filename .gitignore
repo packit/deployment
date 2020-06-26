@@ -1,9 +1,10 @@
 vars/*.yml
-!vars/template.yml
+!vars/*template.yml
+!vars/README.md
 
 .idea/
 .DS_Store
 
 secrets/prod
-secrets/dev
 secrets/stg
+secrets/dev

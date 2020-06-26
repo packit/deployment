@@ -25,10 +25,10 @@
 # -------------------------------------------------------------------
 
 # Openshift project/namespace name
-project: myproject
+project: packit-stg
 
-# Openshift cluster url (example: https://console.pro-eu-west-1.openshift.com)
-host: https://your-openshift-cluster-url
+# Openshift cluster url
+host: https://console.pro-eu-west-1.openshift.com
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
@@ -50,7 +50,7 @@ api_key: ""
 # with_dashboard: false
 
 # you can set the sandbox namespace name explicitly like this
-# sandbox_namespace: "packit-prod-sandbox"
+# sandbox_namespace: "packit-stg-sandbox"
 
 # image to use for service
 # image: docker.io/usercont/packit-service:{{ deployment }}
