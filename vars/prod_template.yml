@@ -1,0 +1,79 @@
+# MIT License
+#
+# Copyright (c) 2018-2019 Red Hat, Inc.
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# -------------------------------------------------------------------
+# Variables needed by Ansible playbooks in playbooks/
+# -------------------------------------------------------------------
+
+# Openshift project/namespace name
+project: packit-prod
+
+# Openshift cluster url
+host: https://console.pro-eu-west-1.openshift.com
+
+# oc login <the above host value>, oc whoami -t
+# OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
+api_key: ""
+# To work-around 'SSL: CERTIFICATE_VERIFY_FAILED'
+# validate_certs: no
+
+# if you want to deploy fedmsg, please make sure to
+# edit the queue name in secrets/*/fedora.toml
+# with_fedmsg: true
+
+# not yet
+with_centosmsg: false
+
+# with_redis_commander: true
+
+# with_flower: true
+
+# don't deploy dashboard by default
+# with_dashboard: false
+
+# you can set the sandbox namespace name explicitly like this
+# sandbox_namespace: "packit-prod-sandbox"
+
+# image to use for service
+# image: docker.io/usercont/packit-service:{{ deployment }}
+
+# image to use for worker
+# image_worker: docker.io/usercont/packit-service-worker:{{ deployment }}
+
+# image to use for fedora messaging consumer
+# image_fedmsg: docker.io/usercont/packit-service-fedmsg:{{ deployment }}
+
+# image to use for centos messaging consumer
+# image_centosmsg: docker.io/usercont/packit-sevice-centosmsg:{{ deployment }}
+
+# image to use for dashboard
+# image_dashboard: "docker.io/usercont/packit-dashboard:{{ deployment }}"
+
+# Number of worker pods to be deployed
+worker_replicas: 3
+# Path to secrets (in case you don't have it in the root of this project)
+# path_to_secrets: ../secrets
+
+# Used in dev/Zuul deployment to tag & push images to cluster.
+# It's set to "/usr/bin/podman" if there's podman installed, or to 'docker' otherwise.
+# If you still want to use docker even when podman is installed, set:
+# container_engine: "docker"

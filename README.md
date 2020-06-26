@@ -3,7 +3,7 @@
 ## tl;dr How to deploy
 
 1. Obtain all the necessary [secrets](/secrets/README.md).
-2. in [vars](vars/) copy [vars/template.yml](vars/template.yml) to `{deployment}.yml` where `{deployment}` is one of `prod` or `stg` and fill in values
+2. in [vars](vars/) copy `{deployment}_template.yml` to `{deployment}.yml` where `{deployment}` is one of `prod`, `stg` or `dev` and fill in values
 3. `dnf install ansible origin-clients python3-openshift`
 4. `DEPLOYMENT={deployment} make deploy`
 
@@ -11,20 +11,9 @@
 
 - [playbooks](playbooks/) - Ansible playbooks.
 - [roles](roles/) - Ansible roles.
-- [vars](vars/) - Variable file(s). See section below for more info.
+- [vars](vars/) - Variable file(s). See [vars/README.md](vars/README.md).
 - [Openshift](openshift/) - Openshift resource configuration files (templates).
 - [secrets](secrets/) - secret stuff to be used from `openshift/secret-*.yml.j2`
-
-### Variable files
-
-[vars/template.yml](vars/template.yml) is a variable file template.
-
-You have to copy it to `prod.yml`, `stg.yml` or `dev.yml`
-depending on what environment you want to deploy to.
-
-The Ansible playbook then includes one of the variable files depending on the
-value of DEPLOYMENT environment variable and processes all the templates with
-variables defined in the file.
 
 ### Images
 
