@@ -67,7 +67,7 @@ If you need to import (and deploy) newer image(s) before the CronJob does
 (see above), you can [do that manually](https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#importing-tag-and-image-metadata):
 
 ```
-$ oc import-image is/packit-{service|service-fedmsg|worker}:<deployment>
+$ oc import-image is/packit-{service|service-fedmsg|worker|dashboard}:<deployment>
 ```
 
 once a new image is pushed/built in registry.
@@ -116,14 +116,16 @@ because you don't know what's the cause/fix yet, you have to:
 - [move packit's `stable` branch to newer commit](#production-vs-staging-images)
 - [WAIT for the image to be built successfully](https://hub.docker.com/repository/registry-1.docker.io/usercont/packit/timeline) - REALLY, don't proceed to the next step until this is built
 
-2. Build service, worker and listener images
+2. Build service, worker, listener and dashboard images
 
 - you REALLY HAVE TO WAIT for the [base image](https://hub.docker.com/repository/registry-1.docker.io/usercont/packit/timeline) above to be built first
 - move `packit-service`'s `stable` branch to newer commit
 - move `packit-service-fedmsg`'s `stable` branch to newer commit
+- move `dashboard`'s `stable` branch to newer commit
 - WAIT for [service](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker](https://hub.docker.com/repository/docker/usercont/packit-service-worker) images to be built successfully
 - WAIT for the [fedmsg listener
-  image](https://hub.docker.com/repository/docker/usercont/packit-service-fedmsg) to be built successfully
+- WAIT for the [dashboard
+  image](https://hub.docker.com/repository/docker/usercont/packit-dashboard) to be built successfully
 
 3. Import images -> re-deploy
 
