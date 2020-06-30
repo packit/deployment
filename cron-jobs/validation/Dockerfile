@@ -1,4 +1,4 @@
-FROM fedora:31
+FROM fedora:32
 
 RUN dnf install -y python3-ogr python3-copr python3-pip && dnf clean all
 
