@@ -40,8 +40,7 @@ api_key: ""
 # edit the queue name in secrets/*/fedora.toml
 # with_fedmsg: true
 
-# not yet
-with_centosmsg: false
+# with_centosmsg: true
 
 # with_redis_commander: true
 
