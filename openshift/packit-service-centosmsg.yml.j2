@@ -45,6 +45,8 @@ spec:
           env:
             - name: DEPLOYMENT
               value: {{ deployment }}
+            - name: MQTT_HOST
+              value: {{ "mqtt.git.centos.org" if deployment == "prod" else "mqtt.stg.centos.org" }}
             - name: MQTT_TOPICS
               value: {{ "git.centos.org/#" if deployment == "prod" else "git.stg.centos.org/#" }}
             - name: MQTT_SUBTOPICS
