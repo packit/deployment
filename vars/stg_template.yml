@@ -46,8 +46,7 @@ api_key: ""
 
 # with_flower: true
 
-# don't deploy dashboard by default
-# with_dashboard: false
+# with_dashboard: true
 
 # you can set the sandbox namespace name explicitly like this
 # sandbox_namespace: "packit-stg-sandbox"
