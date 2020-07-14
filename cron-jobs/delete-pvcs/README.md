@@ -25,3 +25,8 @@ $ oc policy add-role-to-user edit -z pvcdeleter
 $ oc create role pvcdelete --verb=delete,list --resource=persistentvolumeclaims
 $ oc policy add-role-to-user pvcdelete -z pvcdeleter
 ```
+
+## How to deploy the cron job
+
+Edit [job-delete-pvcs.yaml](./job-delete-pvcs.yaml) if needed
+(to change `HOST`, `TOKEN` or `DEPLOYMENT`) and run `make deploy`.

@@ -5,14 +5,19 @@ to ImageStream (even we explicitly [request them](https://docs.openshift.com/con
 
 As a work-around, there's a CronJob to periodically import images metadata into image streams.
 See [job-import-images.yaml](./job-import-images.yaml) and `oc describe cronjob.batch/import-images`.
-The job uses [imageimporter@stg](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-stg/serviceaccounts/importimager) or [imageimporter@prod](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-prod/serviceaccounts/importimager) [service account](https://docs.openshift.com/container-platform/3.11/dev_guide/service_accounts.html) with `registry-editor` [role](https://docs.openshift.com/container-platform/3.11/admin_guide/manage_rbac.html) role added.
+The job uses [importimager@stg](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-stg/serviceaccounts/importimager) or [importimager@prod](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-prod/serviceaccounts/importimager) [service account](https://docs.openshift.com/container-platform/3.11/dev_guide/service_accounts.html) with `registry-editor` [role](https://docs.openshift.com/container-platform/3.11/admin_guide/manage_rbac.html) role added.
 If you ever needed to re-create it, just do:
 
 ```bash
-$ oc create serviceaccount imageimporter
+$ oc create serviceaccount importimager
 $ oc policy add-role-to-user registry-editor -z importimager
 ```
 
 [Dockerfile](./Dockerfile) - image used by the job
 
 [import-images.sh](./import-images.sh) - script in the image
+
+## How to deploy the cron job
+
+Edit [job-import-images.yaml](./job-import-images.yaml) if needed
+(to change `HOST`, `TOKEN` or `DEPLOYMENT`) and run `make deploy`.
