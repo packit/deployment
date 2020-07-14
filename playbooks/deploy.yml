@@ -138,7 +138,7 @@
       # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/pg.yml')  }}"
+        src: ../openshift/pg.yml
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -157,13 +157,11 @@
     - name: Create redis-commander secrets
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ item }}"
+        definition: "{{ lookup('template', '../openshift/secret-redis-commander.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
         apply: yes
-      loop:
-        - "{{ lookup('template', '../openshift/secret-redis-commander.yml.j2') }}"
       tags:
         - redis-commander
       notify:
@@ -186,13 +184,11 @@
     - name: Create flower secret
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ item }}"
+        definition: "{{ lookup('template', '../openshift/secret-flower.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
         apply: yes
-      loop:
-        - "{{ lookup('template', '../openshift/secret-flower.yml.j2') }}"
       tags:
         - flower
       notify:
