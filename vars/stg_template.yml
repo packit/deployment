@@ -46,6 +46,8 @@ api_key: ""
 
 # with_flower: true
 
+# with_beat: true
+
 # with_dashboard: true
 
 # you can set the sandbox namespace name explicitly like this

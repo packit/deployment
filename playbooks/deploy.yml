@@ -33,6 +33,7 @@
     with_redis_commander: true
     with_flower: true
     with_dashboard: true
+    with_beat: true
     image: "docker.io/usercont/packit-service:{{ deployment }}"
     image_worker: "docker.io/usercont/packit-service-worker:{{ deployment }}"
     image_fedmsg: "docker.io/usercont/packit-service-fedmsg:{{ deployment }}"
@@ -121,6 +122,18 @@
         validate_certs: "{{ validate_certs }}"
       tags:
         - packit-service-worker
+
+    - name: Deploy packit-service-beat
+      # https://docs.ansible.com/k8s_module.html
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '../openshift/packit-service-beat.yml.j2')  }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      when: with_beat
+      tags:
+        - packit-service-beat
 
     - name: Deploy dashboard
       # https://docs.ansible.com/k8s_module.html
