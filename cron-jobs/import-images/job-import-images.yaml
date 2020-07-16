@@ -14,7 +14,7 @@ spec:
         spec:
           containers:
             - name: import-images
-              image: usercont/import-images
+              image: docker.io/usercont/import-images
               env:
                 - name: KUBECONFIG
                   value: /tmp/.kube/config
@@ -24,6 +24,8 @@ spec:
                   value: stg
                   # PROD
                   # value: prod
+                #- name: NAMESPACE
+                #  value: packit-stg
                 - name: TOKEN
                   valueFrom:
                     secretKeyRef:

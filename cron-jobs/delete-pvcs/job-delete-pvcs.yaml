@@ -22,6 +22,8 @@ spec:
                   value: stg
                   # PROD
                   # value: prod
+                # - name: SANDBOX_NAMESPACE
+                #   value: different-sandbox
                 - name: TOKEN
                   valueFrom:
                     secretKeyRef:

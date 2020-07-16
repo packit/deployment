@@ -61,7 +61,7 @@ api_key: ""
 # image_fedmsg: docker.io/usercont/packit-service-fedmsg:{{ deployment }}
 
 # image to use for centos messaging consumer
-# image_centosmsg: docker.io/usercont/packit-sevice-centosmsg:{{ deployment }}
+# image_centosmsg: docker.io/usercont/packit-service-centosmsg:{{ deployment }}
 
 # image to use for dashboard
 # image_dashboard: "docker.io/usercont/packit-dashboard:{{ deployment }}"
