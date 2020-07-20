@@ -46,6 +46,8 @@ api_key: ""
 
 # with_flower: true
 
+# with_beat: true
+
 # don't deploy dashboard by default
 # with_dashboard: false
 
