@@ -28,9 +28,8 @@ We build separate images for
 #### Production vs. Staging images
 
 Separate images are built for staging and production deployment.
-Staging images are `:stg` tagged and built from `master` of `packit`, `packit-service`, `packit-service-fedmsg` and `packit-service-centosmg` .
-Production images are `:prod` tagged and built from `stable` branch of `packit`, `packit-service`, `packit-service-fedmsg` and `packit-service-centosmg`.
-To move `stable` branch to a newer 'stable' commit:
+Staging images are `:stg` tagged and built from `master` of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg` and `sandcastle`.
+Production images are `:prod` tagged and built from `stable` branch of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg` and `sandcastle. To move`stable` branch to a newer 'stable' commit:
 
 - git branch -f stable commit-hash
 - git push [-u upstream] stable
@@ -129,11 +128,13 @@ because you don't know what's the cause/fix yet, you have to:
 - move `packit-service-fedmsg`'s `stable` branch to newer commit
 - move `dashboard`'s `stable` branch to newer commit
 - move `packit-service-centosmsg`'s `stable` branch to newer commit
+- move `sandcastle`'s `stable` branch to newer commit
 - WAIT for [service](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker](https://hub.docker.com/repository/docker/usercont/packit-service-worker) images to be built successfully
 - WAIT for the [fedmsg listener](https://hub.docker.com/repository/docker/usercont/packit-service-fedmsg) to be built successfully
 - WAIT for the [dashboard
   image](https://hub.docker.com/repository/docker/usercont/packit-dashboard) to be built successfully
 - WAIT for the [centosmsg listener](https://hub.docker.com/repository/docker/usercont/packit-service-centosmsg) to be built successfully
+- WAIT for the [sandcastle image](https://hub.docker.com/repository/docker/usercont/sandcastle) to be built successfully
 
 3. Import images -> re-deploy
 
