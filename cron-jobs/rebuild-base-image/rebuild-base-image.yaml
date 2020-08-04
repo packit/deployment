@@ -1,0 +1,30 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: rebuild-base-image
+spec:
+  # runs every day at 3 a.m.
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: rebuild-base-image
+              image: fedora
+              env:
+                - name: BASE_BUILD_WEBHOOK
+                  valueFrom:
+                    secretKeyRef:
+                      name: rebuild-base-image
+                      key: base_build_webhook
+              command:
+                ["/bin/bash", "-c", "/usr/bin/curl -X POST $BASE_BUILD_WEBHOOK"]
+              resources:
+                limits:
+                  memory: "80Mi"
+                  cpu: "100m"
+          restartPolicy: OnFailure

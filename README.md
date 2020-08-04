@@ -15,6 +15,8 @@
 - [Openshift](openshift/) - Openshift resource configuration files (templates).
 - [secrets](secrets/) - secret stuff to be used from `openshift/secret-*.yml.j2`
 - [scripts](scripts/) - devops scripts used in multiple repositories
+- [cron-jobs](cron-jobs/) - OpenShift cron jobs
+- [containers](containers/) - files used to build container images
 
 ### Images
 
@@ -40,6 +42,8 @@ Image builds are triggered by new commits on Docker Hub. ([Autobuild docs](https
 
 In packit-service we use a custom build hook to be able to inject ENV variables
 provided by the build process. ([docs](https://docs.docker.com/docker-hub/builds/advanced/))
+
+From more details about local builds pls check [link](https://github.com/packit/packit-service/blob/master/CONTRIBUTING.md#building-images-locally)
 
 ### Continuous Deployment
 

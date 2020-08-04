@@ -39,3 +39,8 @@ generate-local-secrets:
 
 deploy-validation:
 	$(AP) cron-jobs/validation/deploy-validation.yaml
+
+# DEPLOYMENT is always stg because this cronjob is not related to specific deployment stage a
+# needs be configure only once
+deploy-rebuild-base-image:
+	DEPLOYMENT=stg $(AP) playbooks/rebuild-base-image.yml

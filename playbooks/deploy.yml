@@ -56,6 +56,11 @@
       tags:
         - always
 
+    - name: secrets not related specific deployment stage
+      include_vars: "{{ path_to_secrets }}/secrets.yaml"
+      tags:
+        - always
+
     - name: Get k8s token and check it.
       block:
         - name: get kubeconfig token
@@ -97,6 +102,7 @@
         - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') }}"
+        - "{{ lookup('template', '../openshift/secret-rebuild-base-image.yml.j2') }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') }}"
       tags:
         - always

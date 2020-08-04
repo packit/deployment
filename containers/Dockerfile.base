@@ -1,3 +1,6 @@
+# Be aware that this image is used for all stages, so if a dependency is removed be sure that it is
+# not required in anywhere
+
 FROM fedora:31
 
 ENV LANG=en_US.UTF-8 \
