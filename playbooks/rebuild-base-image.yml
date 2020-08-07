@@ -1,0 +1,18 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+- name: Rebuild base image
+  hosts: all
+  vars:
+    deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
+  tasks:
+    - name: include variables
+      include_vars: ../vars/{{ deployment }}.yml
+
+    - name: oc login
+      command: oc login {{ host }} --token={{ api_key }} --insecure-skip-tls-verify
+      # it doesn't change anything, so don't report 'changed'
+      changed_when: false
+
+    - name: deploy rebuild-base-image cronjob
+      command: oc apply -f ../cron-jobs/rebuild-base-image/rebuild-base-image.yaml
