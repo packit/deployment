@@ -105,10 +105,23 @@
         - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') }}"
-        - "{{ lookup('template', '../openshift/secret-rebuild-base-image.yml.j2') }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') }}"
       tags:
         - always
+
+    - name: Deploy templates only to stg
+      # https://docs.ansible.com/k8s_module.html
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ item }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      loop:
+        - "{{ lookup('template', '../openshift/secret-rebuild-base-image.yml.j2') }}"
+      tags:
+        - always
+      when: deployment == "stg"
 
     - name: Deploy packit-service
       # https://docs.ansible.com/k8s_module.html
