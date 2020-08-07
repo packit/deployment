@@ -58,6 +58,9 @@
 
     - name: secrets not related specific deployment stage
       include_vars: "{{ path_to_secrets }}/secrets.yaml"
+      # deployed only to stg as here are hosted stage-independent infrastructure components
+      # e.g. rebuild-base-image cronjob
+      when: deployment  == "stg"
       tags:
         - always
 
