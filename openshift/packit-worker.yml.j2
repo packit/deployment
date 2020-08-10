@@ -75,6 +75,8 @@ spec:
           env:
             - name: DEPLOYMENT
               value: {{ deployment }}
+            - name: DISTGIT_URL
+              value: {{ "https://src.fedoraproject.org/" if deployment == "prod" else "https://src.stg.fedoraproject.org/" }}
             - name: APP
               value: packit_service.worker.tasks
             - name: AWS_ACCESS_KEY_ID

@@ -63,6 +63,8 @@ spec:
                   key: secret-access-key
             - name: QUEUE_NAME_PREFIX
               value: {{ queue_name_prefix }}
+            - name: DISTGIT_URL
+              value: {{ "https://src.fedoraproject.org/" if deployment == "prod" else "https://src.stg.fedoraproject.org/" }}
             - name: REDIS_SERVICE_HOST
               value: redis
             - name: POSTGRESQL_USER
