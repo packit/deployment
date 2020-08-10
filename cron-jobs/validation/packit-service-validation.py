@@ -30,7 +30,7 @@ from ogr.services.github import GithubService
 
 copr = Client.create_from_config_file()
 service = GithubService(token=getenv("GITHUB_TOKEN"))
-project = service.get_project(repo="hello-world", namespace="packit-service")
+project = service.get_project(repo="hello-world", namespace="packit")
 
 
 class Testcase:
@@ -89,7 +89,7 @@ class Testcase:
         Check whether the build was submitted in Copr in time 30 minutes.
         :return:
         """
-        project_name = f"packit-service-hello-world-{self.pr_id}"
+        project_name = f"packit-hello-world-{self.pr_id}"
 
         try:
             old_build_len = len(copr.build_proxy.get_list("packit", project_name))
