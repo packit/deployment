@@ -1,0 +1,121 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+# https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html
+kind: DeploymentConfig
+apiVersion: v1
+metadata:
+  labels:
+    app: packit
+    name: tokman
+  name: tokman
+spec:
+  template:
+    metadata:
+      labels:
+        name: tokman
+        app: packit
+    spec:
+      volumes:
+        - name: github-app-private-key
+          secret:
+            secretName: github-app-private-key
+        - name: tokman-config
+          configMap:
+            name: tokman-config
+      containers:
+        - name: tokman
+          image: tokman:{{ deployment }}
+          env:
+            - name: LOG_LEVEL
+              value: DEBUG
+            - name: WORKERS
+              value: "1"
+            - name: TOKMAN_CONFIG
+              value: /etc/config/config.py
+            - name: BIND_ADDR
+              value: "0.0.0.0:8000"
+          volumeMounts:
+            - name: github-app-private-key
+              mountPath: /secrets
+            - name: tokman-config
+              mountPath: /etc/config
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+            limits:
+              memory: "200Mi"
+              cpu: "200m"
+          ports:
+            - containerPort: 8000
+              protocol: "TCP"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8000
+            timeoutSeconds: 2
+            periodSeconds: 20
+  # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/basic_deployment_operations.html#image-change-trigger
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - tokman
+        from:
+          kind: ImageStreamTag
+          name: tokman:{{ deployment }}
+  replicas: 1
+  strategy:
+    type: Recreate
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: tokman-config
+data:
+  config.py: |-
+    SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/access_tokens.db"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    GITHUB_APP_ID = {{ packit_service_config.authentication["github.com"].github_app_id }}
+    GITHUB_APP_PRIVATE_KEY = "/secrets/private-key.pem"
+    TOKEN_RENEW_AT = 60
+---
+kind: ImageStream
+apiVersion: v1
+metadata:
+  name: tokman
+spec:
+  tags:
+    - name: {{ deployment }}
+      from:
+        kind: DockerImage
+        name: {{ image_tokman }}
+      importPolicy:
+        # Periodically query registry to synchronize tag and image metadata.
+        scheduled: {{ auto_import_images }}
+  lookupPolicy:
+    # allows all resources pointing to this image stream to use it in the image field
+    local: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tokman
+spec:
+  selector:
+    name: tokman
+    app: packit
+  ports:
+    - name: tokman
+      port: 80
+      protocol: TCP
+      targetPort: 8000
