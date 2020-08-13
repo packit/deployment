@@ -52,12 +52,13 @@
       tags:
         - always
 
+    # to be able to read the github_app_id from the configuration file in tokman
     - name: include packit-service configuration
       include_vars:
         file: "{{ path_to_secrets }}/{{ deployment }}/packit-service.yaml"
         name: packit_service_config
       tags:
-        - always
+        - tokman
 
     - name: include extra secret vars
       include_vars: "{{ path_to_secrets }}/{{ deployment }}/extra-vars.yml"
