@@ -23,27 +23,30 @@
 We build separate images for
 
 - [service / web server](https://hub.docker.com/r/usercont/packit-service) - accepts webhooks and tasks workers
+- [workers](https://hub.docker.com/r/usercont/packit-service-worker) - do the actual work
 - [fedora messaging consumer](https://hub.docker.com/r/usercont/packit-service-fedmsg) - listens on fedora messaging for events from Copr and tasks workers
 - [CentOS messaging consumer](https://hub.docker.com/r/usercont/packit-service-centosmsg) - listens on the CentOS MQTT message bus for events from git.centos.org
-- [workers](https://hub.docker.com/r/usercont/packit-service-worker) - do the actual work
+- [Sandcastle](https://hub.docker.com/r/usercont/sandcastle) - sandboxing
 
 #### Production vs. Staging images
 
 Separate images are built for staging and production deployment.
-Staging images are `:stg` tagged and built from `master` of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg` and `sandcastle`.
-Production images are `:prod` tagged and built from `stable` branch of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg` and `sandcastle. To move`stable` branch to a newer 'stable' commit:
+Staging images are `:stg` tagged and built from `master` of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
+Production images are `:prod` tagged and built from `stable` branch of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
+To move `stable` branch to a newer 'stable' commit:
 
 - git branch -f stable commit-hash
 - git push [-u upstream] stable
 
 #### Image build process
 
-Image builds are triggered by new commits on Docker Hub. ([Autobuild docs](https://docs.docker.com/docker-hub/builds/))
+Image builds are triggered by new commits on Docker Hub.
+([Autobuild docs](https://docs.docker.com/docker-hub/builds/))
 
 In packit-service we use a custom build hook to be able to inject ENV variables
 provided by the build process. ([docs](https://docs.docker.com/docker-hub/builds/advanced/))
 
-From more details about local builds pls check [link](https://github.com/packit/packit-service/blob/master/CONTRIBUTING.md#building-images-locally)
+For more details about local builds see [packit-service/CONTRIBUTING.md](https://github.com/packit/packit-service/blob/master/CONTRIBUTING.md#building-images-locally)
 
 ### Continuous Deployment
 
@@ -120,29 +123,17 @@ because you don't know what's the cause/fix yet, you have to:
 
 ### Prod re-deployment
 
-1. Build base [packit image](https://hub.docker.com/repository/docker/usercont/packit):
+1. Trigger `:prod` images builds
 
-- [move packit's `stable` branch to newer commit](#production-vs-staging-images)
-- [WAIT for the image to be built successfully](https://hub.docker.com/repository/registry-1.docker.io/usercont/packit/timeline) - REALLY, don't proceed to the next step until this is built
+- move `packit`'s and `packit-service`'s `stable` branches to a newer commit to trigger `:prod` [service image](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker image](https://hub.docker.com/repository/docker/usercont/packit-service-worker) images builds
+- move `packit-service-fedmsg`'s `stable` branch to a newer commit to trigger `:prod` [fedmsg listener image](https://hub.docker.com/repository/docker/usercont/packit-service-fedmsg) build
+- move `packit-service-centosmsg`'s `stable` branch to a newer commit to trigger `:prod` [centosmsg listener image](https://hub.docker.com/repository/docker/usercont/packit-service-centosmsg) build
+- move `sandcastle`'s `stable` branch to a newer commit to trigger `:prod` [sandcastle image](https://hub.docker.com/repository/docker/usercont/sandcastle) build
+- move `dashboard`'s `stable` branch to a newer commit to trigger `:prod` [dashboard image](https://hub.docker.com/repository/docker/usercont/packit-dashboard) build
 
-2. Build service, worker, listeners and dashboard images
+2. Import images -> re-deploy
 
-- you REALLY HAVE TO WAIT for the [base image](https://hub.docker.com/repository/registry-1.docker.io/usercont/packit/timeline) above to be built first
-- move `packit-service`'s `stable` branch to newer commit
-- move `packit-service-fedmsg`'s `stable` branch to newer commit
-- move `dashboard`'s `stable` branch to newer commit
-- move `packit-service-centosmsg`'s `stable` branch to newer commit
-- move `sandcastle`'s `stable` branch to newer commit
-- WAIT for [service](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker](https://hub.docker.com/repository/docker/usercont/packit-service-worker) images to be built successfully
-- WAIT for the [fedmsg listener](https://hub.docker.com/repository/docker/usercont/packit-service-fedmsg) to be built successfully
-- WAIT for the [dashboard
-  image](https://hub.docker.com/repository/docker/usercont/packit-dashboard) to be built successfully
-- WAIT for the [centosmsg listener](https://hub.docker.com/repository/docker/usercont/packit-service-centosmsg) to be built successfully
-- WAIT for the [sandcastle image](https://hub.docker.com/repository/docker/usercont/sandcastle) to be built successfully
-
-3. Import images -> re-deploy
-
-- If you don't want to wait for [it to be done automatically](#continuous-deployment) you can [do that manually](#manually-import-a-newer-image)
+- If you don't want to wait for [it to be done automatically](#continuous-deployment) you can [do that manually](#manually-import-a-newer-image) once the images are built.
 
 ### How do I test my changes?
 
