@@ -80,6 +80,10 @@ spec:
               memory: "96Mi"
               cpu: "50m"
             limits:
+              # run_httpd.sh does 'alembic upgrade head' which might require more memory
+              # If you see '/usr/bin/run_httpd.sh: line 16:   Killed     alembic upgrade head'
+              # you have to temporarily increase the limit (last time 196M wasn't enough, 512M was),
+              # re-deploy service and once the alembic upgrade passes, revert
               memory: "128Mi"
               cpu: "200m"
           # In TLS world, hostname needs to match whatever is set in the cert
