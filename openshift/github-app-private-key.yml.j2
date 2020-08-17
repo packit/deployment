@@ -1,0 +1,12 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-app-private-key
+type: Opaque
+data:
+  # Github app cert
+  private-key.pem: "{{ lookup('file', '{{ path_to_secrets }}/{{ deployment }}/private-key.pem') | b64encode }}"

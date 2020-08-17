@@ -68,6 +68,9 @@ with_beat: false
 # image to use for dashboard
 # image_dashboard: "docker.io/usercont/packit-dashboard:{{ deployment }}"
 
+# image to use for tokman
+# image_tokman: "docker.io/usercont/tokman:{{ deployment }}"
+
 # Number of worker pods to be deployed
 # worker_replicas : 1
 

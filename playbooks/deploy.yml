@@ -39,6 +39,7 @@
     image_fedmsg: "docker.io/usercont/packit-service-fedmsg:{{ deployment }}"
     image_centosmsg: "docker.io/usercont/packit-service-centosmsg:{{ deployment }}"
     image_dashboard: "docker.io/usercont/packit-dashboard:{{ deployment }}"
+    image_tokman: "docker.io/usercont/tokman:{{ deployment }}"
     worker_replicas: 1
     path_to_secrets: "../secrets"
     # to be used in Image streams as importPolicy:scheduled value
@@ -50,6 +51,14 @@
       include_vars: ../vars/{{ deployment }}.yml
       tags:
         - always
+
+    # to be able to read the github_app_id from the configuration file in tokman
+    - name: include packit-service configuration
+      include_vars:
+        file: "{{ path_to_secrets }}/{{ deployment }}/packit-service.yaml"
+        name: packit_service_config
+      tags:
+        - tokman
 
     - name: include extra secret vars
       include_vars: "{{ path_to_secrets }}/{{ deployment }}/extra-vars.yml"
@@ -266,6 +275,29 @@
         - centosmsg
       when: with_centosmsg
 
+    - name: Deploy GitHub App Private Key
+      # https://docs.ansible.com/k8s_module.html
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '../openshift/github-app-private-key.yml.j2')  }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      tags:
+        - tokman
+
+    - name: Deploy tokman
+      # https://docs.ansible.com/k8s_module.html
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '../openshift/tokman.yml.j2')  }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      tags:
+        - tokman
+      register: tokman
+
     - name: Set up the sandbox namespace
       command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
 
@@ -295,6 +327,12 @@
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not redis_commander.changed
+
+    - name: Rollout tokman
+      command: oc rollout latest dc/tokman
+      # Run this rollout only if the DeploymentConfig above didn't change,
+      # and so it wasn't rolled out yet.
+      when: not tokman.changed
 
     - name: Rollout flower
       command: oc rollout latest dc/flower
