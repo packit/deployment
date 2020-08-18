@@ -8,3 +8,5 @@ vars/*.yml
 secrets/prod
 secrets/stg
 secrets/dev
+
+secrets/secrets.yaml
