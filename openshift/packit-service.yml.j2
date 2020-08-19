@@ -68,6 +68,11 @@ spec:
                 secretKeyRef:
                   key: database-name
                   name: postgres-secret
+            - name: SENTRY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: packit-sentry
+                  key: sentry
           volumeMounts:
             - name: packit-secrets
               mountPath: /secrets

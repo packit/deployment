@@ -30,6 +30,8 @@ spec:
         - name: tokman
           image: tokman:{{ deployment }}
           env:
+            - name: DEPLOYMENT
+              value: {{ deployment }}
             - name: LOG_LEVEL
               value: DEBUG
             - name: WORKERS
@@ -38,6 +40,11 @@ spec:
               value: /etc/config/config.py
             - name: BIND_ADDR
               value: "0.0.0.0:8000"
+            - name: SENTRY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: packit-sentry
+                  key: sentry
           volumeMounts:
             - name: github-app-private-key
               mountPath: /secrets
