@@ -98,6 +98,10 @@
         - command: "{{ container_engine }} tag {{ image_worker }} 172.30.1.1:5000/myproject/packit-worker:dev"
         - command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-worker:dev {{ tls_verify_false }}"
       when: deployment == "dev"
+      tags:
+        - packit-service
+        - packit-service-worker
+        - packit-service-beat
 
     - name: Deploy templates
       # https://docs.ansible.com/k8s_module.html
