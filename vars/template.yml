@@ -48,6 +48,8 @@ api_key: ""
 
 # with_beat: true
 
+# with_pushgateway: true
+
 # don't deploy dashboard by default
 # with_dashboard: false
 

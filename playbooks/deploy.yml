@@ -35,6 +35,7 @@
     with_dashboard: true
     with_beat: true
     push_dev_images: false
+    with_pushgateway: true
     image: "docker.io/usercont/packit-service:{{ deployment }}"
     image_worker: "docker.io/usercont/packit-service-worker:{{ deployment }}"
     image_fedmsg: "docker.io/usercont/packit-service-fedmsg:{{ deployment }}"
@@ -302,6 +303,18 @@
       tags:
         - tokman
       register: tokman
+
+    - name: Deploy prometheus pushgateway
+      # https://docs.ansible.com/k8s_module.html
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '../openshift/pushgateway.yml.j2')  }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      tags:
+        - pushgateway
+      when: with_pushgateway
 
     - name: Set up the sandbox namespace
       command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default

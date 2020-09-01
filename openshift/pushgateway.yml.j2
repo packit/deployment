@@ -1,0 +1,87 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+---
+kind: DeploymentConfig
+apiVersion: v1
+metadata:
+  labels:
+    app: packit
+    name: pushgateway
+  name: pushgateway
+spec:
+  template:
+    metadata:
+      labels:
+        name: pushgateway
+        app: packit
+    spec:
+      volumes:
+        - name: pushgateway-data
+          persistentVolumeClaim:
+            claimName: pushgateway-data
+      containers:
+        - name: pushgateway
+        # https://hub.docker.com/r/prom/pushgateway/tags
+          image: prom/pushgateway:v1.2.0
+          args:
+            - "--web.listen-address=:9091"
+            - "--persistence.file=/data/pushgateway"
+            - "--persistence.interval=1m"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9091
+          volumeMounts:
+            - mountPath: /data
+              name: pushgateway-data
+          resources:
+            limits:
+              cpu: 50m
+              memory: 80Mi
+  replicas: 1
+  strategy:
+    type: Recreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pushgateway
+spec:
+  selector:
+    name: pushgateway
+    app: packit
+  ports:
+    - name: prometheus-push
+      port: 80
+      protocol: TCP
+      targetPort: 9091
+---
+apiVersion: v1
+kind: Route
+metadata:
+  labels:
+    app: packit
+    name: pushgateway
+  name: pushgateway
+spec:
+  host: "{{ 'workers.stg.packit.dev' if deployment == 'stg' else 'workers.packit.dev' if deployment == 'prod'}}"
+  port:
+    targetPort: prometheus-push
+  to:
+    kind: Service
+    name: pushgateway
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pushgateway-data
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
