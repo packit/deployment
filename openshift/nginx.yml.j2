@@ -1,0 +1,92 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+---
+kind: DeploymentConfig
+apiVersion: v1
+metadata:
+  name: nginx
+  labels:
+    service: nginx
+spec:
+  selector:
+    service: nginx
+  template:
+    metadata:
+      labels:
+        service: nginx
+        name: nginx
+    spec:
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+      - name: metrics-secret
+        secret:
+          secretName: metrics-secret
+      containers:
+      - name: nginx
+        image: nginxinc/nginx-unprivileged
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx
+        - name: metrics-secret
+          mountPath: /conf
+
+  replicas: 1
+  strategy:
+    type: Recreate
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |-
+    pid /tmp/nginx.pid;
+    events {}
+    http {
+        server {
+             listen 8080;
+
+             location  / {
+                proxy_pass              http://pushgateway;
+                auth_basic              "Authentication for access to Pushgateway required";
+                auth_basic_user_file    /conf/.htpasswd;
+             }
+         }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    service: nginx
+spec:
+  ports:
+    - name: nginx-http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    service: nginx
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: nginx
+  labels:
+    service: nginx
+spec:
+  host: "{{ 'workers.stg.packit.dev' if deployment == 'stg' else 'workers.packit.dev' if deployment == 'prod'}}"
+  port:
+    targetPort: nginx-http
+  to:
+    kind: Service
+    name: nginx
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough

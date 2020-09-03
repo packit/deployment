@@ -121,6 +121,7 @@
         - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') }}"
+        - "{{ lookup('template', '../openshift/secret-metrics.yml.j2') }}"
       tags:
         - always
 
@@ -309,6 +310,18 @@
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/pushgateway.yml.j2')  }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      tags:
+        - pushgateway
+      when: with_pushgateway
+
+    - name: Deploy nginx to reverse proxy the pushgateway
+      # https://docs.ansible.com/k8s_module.html
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '../openshift/nginx.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"

@@ -4,6 +4,7 @@
 
 ```
 prod
+    │   ├── .htpasswd
     │   ├── copr
     │   ├── fedora.keytab
     │   ├── fullchain.pem
@@ -32,3 +33,4 @@ Some of them are pre-filled in [template](/secrets/template) directory.
 - `fedora.keytab` - Fedora kerberos.
 - `fedora.toml` - [fedora-messaging configuration](https://fedora-messaging.readthedocs.io/en/stable/configuration.html).
 - `extra-vars.yml` - secrets for Postgresql
+- `.htpasswd` - password file for pushgateway authentication
