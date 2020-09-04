@@ -121,7 +121,6 @@
         - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') }}"
-        - "{{ lookup('template', '../openshift/secret-metrics.yml.j2') }}"
       tags:
         - always
 

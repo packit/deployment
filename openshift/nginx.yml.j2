@@ -20,19 +20,19 @@ spec:
       - name: nginx-config
         configMap:
           name: nginx-config
-      - name: metrics-secret
+      - name: packit-secrets
         secret:
-          secretName: metrics-secret
+          secretName: packit-secrets
       containers:
       - name: nginx
         image: nginxinc/nginx-unprivileged
         ports:
-        - containerPort: 8080
+        - containerPort: 8443
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx
-        - name: metrics-secret
-          mountPath: /conf
+        - name: packit-secrets
+          mountPath: /secrets
 
   replicas: 1
   strategy:
@@ -48,12 +48,20 @@ data:
     events {}
     http {
         server {
-             listen 8080;
+             listen 8443 ssl;
+             ssl_certificate     /secrets/fullchain.pem;
+             ssl_certificate_key /secrets/privkey.pem;
 
-             location  / {
-                proxy_pass              http://pushgateway;
-                auth_basic              "Authentication for access to Pushgateway required";
-                auth_basic_user_file    /conf/.htpasswd;
+             # Serve only the /metrics endpoint (exact match) externally, and
+             # make sure it's served only using the GET method.
+             # Return 404 for all other paths.
+             location = /metrics {
+                proxy_pass       http://pushgateway;
+                proxy_method     GET;
+             }
+
+             location / {
+                return           404;
              }
          }
     }
@@ -66,10 +74,10 @@ metadata:
     service: nginx
 spec:
   ports:
-    - name: nginx-http
-      port: 80
+    - name: nginx-https
+      port: 443
       protocol: TCP
-      targetPort: 8080
+      targetPort: 8443
   selector:
     service: nginx
   type: LoadBalancer
@@ -83,7 +91,7 @@ metadata:
 spec:
   host: "{{ 'workers.stg.packit.dev' if deployment == 'stg' else 'workers.packit.dev' if deployment == 'prod'}}"
   port:
-    targetPort: nginx-http
+    targetPort: nginx-https
   to:
     kind: Service
     name: nginx
