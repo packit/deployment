@@ -81,3 +81,5 @@ with_beat: false
 # It's set to "/usr/bin/podman" if there's podman installed, or to 'docker' otherwise.
 # If you still want to use docker even when podman is installed, set:
 # container_engine: "docker"
+
+push_dev_images: true
