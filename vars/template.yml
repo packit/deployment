@@ -42,9 +42,9 @@ api_key: ""
 
 # with_centosmsg: true
 
-# with_redis_commander: true
+# with_redis_commander: false
 
-# with_flower: true
+# with_flower: false
 
 # with_beat: true
 
