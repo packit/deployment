@@ -52,6 +52,16 @@ spec:
               value: {{ deployment }}
             - name: APP
               value: packit_service.worker.tasks
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws
+                  key: secret-access-key
             - name: REDIS_SERVICE_HOST
               value: redis
             - name: SENTRY_SECRET

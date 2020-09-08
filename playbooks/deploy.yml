@@ -120,6 +120,7 @@
         - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') }}"
+        - "{{ lookup('template', '../openshift/secret-aws.yml.j2') }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') }}"
       tags:
         - always
