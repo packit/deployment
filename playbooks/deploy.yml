@@ -30,8 +30,8 @@
     sandbox_namespace: "packit-{{ deployment }}-sandbox"
     with_fedmsg: true
     with_centosmsg: true
-    with_redis_commander: true
-    with_flower: true
+    with_redis_commander: false
+    with_flower: false
     with_dashboard: true
     with_beat: true
     push_dev_images: false
