@@ -126,7 +126,6 @@
         - always
 
     - name: Deploy templates only to stg
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ item }}"
@@ -140,7 +139,6 @@
       when: deployment == "stg"
 
     - name: Deploy packit-service
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/packit-service.yml.j2')  }}"
@@ -151,7 +149,6 @@
         - packit-service
 
     - name: Deploy packit-service-worker
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/packit-service-worker.yml.j2')  }}"
@@ -162,7 +159,6 @@
         - packit-service-worker
 
     - name: Deploy packit-service-beat
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/packit-service-beat.yml.j2')  }}"
@@ -174,7 +170,6 @@
         - packit-service-beat
 
     - name: Deploy dashboard
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/dashboard.yml.j2')  }}"
@@ -186,10 +181,9 @@
         - dashboard
 
     - name: Deploy postgres
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
-        src: ../openshift/pg.yml
+        src: ../openshift/postgres.yml
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -259,7 +253,6 @@
       register: flower
 
     - name: Deploy packit-service-fedmsg
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/packit-service-fedmsg.yml.j2')  }}"
@@ -271,7 +264,6 @@
       when: with_fedmsg
 
     - name: Deploy packit-service-centosmsg
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/packit-service-centosmsg.yml.j2')  }}"
@@ -283,7 +275,6 @@
       when: with_centosmsg
 
     - name: Deploy GitHub App Private Key
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/github-app-private-key.yml.j2')  }}"
@@ -294,7 +285,6 @@
         - tokman
 
     - name: Deploy tokman
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/tokman.yml.j2')  }}"
@@ -306,7 +296,6 @@
       register: tokman
 
     - name: Deploy prometheus pushgateway
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/pushgateway.yml.j2')  }}"
@@ -318,7 +307,6 @@
       when: with_pushgateway
 
     - name: Deploy nginx to reverse proxy the pushgateway
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/nginx.yml.j2')  }}"
