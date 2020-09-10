@@ -1,0 +1,100 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+---
+kind: DeploymentConfig
+apiVersion: v1
+metadata:
+  name: nginx
+  labels:
+    service: nginx
+spec:
+  selector:
+    service: nginx
+  template:
+    metadata:
+      labels:
+        service: nginx
+        name: nginx
+    spec:
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+      - name: packit-secrets
+        secret:
+          secretName: packit-secrets
+      containers:
+      - name: nginx
+        image: nginxinc/nginx-unprivileged
+        ports:
+        - containerPort: 8443
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx
+        - name: packit-secrets
+          mountPath: /secrets
+
+  replicas: 1
+  strategy:
+    type: Recreate
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |-
+    pid /tmp/nginx.pid;
+    events {}
+    http {
+        server {
+             listen 8443 ssl;
+             ssl_certificate     /secrets/fullchain.pem;
+             ssl_certificate_key /secrets/privkey.pem;
+
+             # Serve only the /metrics endpoint (exact match) externally, and
+             # make sure it's served only using the GET method.
+             # Return 404 for all other paths.
+             location = /metrics {
+                proxy_pass       http://pushgateway;
+                proxy_method     GET;
+             }
+
+             location / {
+                return           404;
+             }
+         }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    service: nginx
+spec:
+  ports:
+    - name: nginx-https
+      port: 443
+      protocol: TCP
+      targetPort: 8443
+  selector:
+    service: nginx
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: nginx
+  labels:
+    service: nginx
+spec:
+  host: "{{ 'workers.stg.packit.dev' if deployment == 'stg' else 'workers.packit.dev' if deployment == 'prod'}}"
+  port:
+    targetPort: nginx-https
+  to:
+    kind: Service
+    name: nginx
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough

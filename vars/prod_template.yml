@@ -50,6 +50,8 @@ api_key: ""
 
 # with_dashboard: true
 
+# with_pushgateway: true
+
 # you can set the sandbox namespace name explicitly like this
 # sandbox_namespace: "packit-prod-sandbox"
 

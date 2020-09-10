@@ -47,6 +47,8 @@ with_redis_commander: false
 with_flower: false
 
 with_beat: false
+
+with_pushgateway: false
 # don't deploy dashboard by default
 # with_dashboard: false
 
