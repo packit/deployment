@@ -100,6 +100,10 @@
         - command: "{{ container_engine }} inspect {{ image_worker }}"
         - command: "{{ container_engine }} tag {{ image_worker }} 172.30.1.1:5000/myproject/packit-worker:dev"
         - command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-worker:dev {{ tls_verify_false }}"
+      #        - command: "{{ container_engine }} tag {{ image_fedmsg }} 172.30.1.1:5000/myproject/packit-service-fedmsg:dev"
+      #        - command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-service-fedmsg:dev {{ tls_verify_false }}"
+      #        - command: "{{ container_engine }} tag {{ image_centosmsg }} 172.30.1.1:5000/myproject/packit-service-centosmsg:dev"
+      #        - command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-service-centosmsg:dev {{ tls_verify_false }}"
       when: push_dev_images
       tags:
         - packit-service
@@ -138,6 +142,25 @@
       tags:
         - always
       when: deployment == "stg"
+
+    - name: Deploy postgres
+      k8s:
+        namespace: "{{ project }}"
+        src: ../openshift/postgres.yml
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+
+    - name: Deploy redis
+      k8s:
+        namespace: "{{ project }}"
+        src: ../openshift/redis.yml
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+        apply: yes
+      tags:
+        - redis
 
     - name: Deploy packit-service
       k8s:
@@ -180,25 +203,6 @@
       when: with_dashboard
       tags:
         - dashboard
-
-    - name: Deploy postgres
-      k8s:
-        namespace: "{{ project }}"
-        src: ../openshift/postgres.yml
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-
-    - name: Deploy redis
-      k8s:
-        namespace: "{{ project }}"
-        src: ../openshift/redis.yml
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        apply: yes
-      tags:
-        - redis
 
     - name: Create redis-commander secrets
       k8s:
