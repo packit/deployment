@@ -27,7 +27,8 @@
     # feel free to override these in vars/
     validate_certs: no
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
-    sandbox_namespace: "packit-{{ deployment }}-sandbox"
+    sandbox_namespace: packit-{{ deployment }}-sandbox
+    queue_name_prefix: packit-{{ deployment }}-
     with_fedmsg: true
     with_centosmsg: true
     with_redis_commander: false
@@ -36,14 +37,14 @@
     with_beat: true
     push_dev_images: false
     with_pushgateway: true
-    image: "docker.io/usercont/packit-service:{{ deployment }}"
-    image_worker: "docker.io/usercont/packit-service-worker:{{ deployment }}"
-    image_fedmsg: "docker.io/usercont/packit-service-fedmsg:{{ deployment }}"
-    image_centosmsg: "docker.io/usercont/packit-service-centosmsg:{{ deployment }}"
-    image_dashboard: "docker.io/usercont/packit-dashboard:{{ deployment }}"
-    image_tokman: "docker.io/usercont/tokman:{{ deployment }}"
+    image: docker.io/usercont/packit-service:{{ deployment }}
+    image_worker: docker.io/usercont/packit-service-worker:{{ deployment }}
+    image_fedmsg: docker.io/usercont/packit-service-fedmsg:{{ deployment }}
+    image_centosmsg: docker.io/usercont/packit-service-centosmsg:{{ deployment }}
+    image_dashboard: docker.io/usercont/packit-dashboard:{{ deployment }}
+    image_tokman: docker.io/usercont/tokman:{{ deployment }}
     worker_replicas: 1
-    path_to_secrets: "../secrets"
+    path_to_secrets: ../secrets
     # to be used in Image streams as importPolicy:scheduled value
     auto_import_images: "{{(deployment != 'prod')}}"
     # used in dev/zuul deployment to tag & push images to cluster

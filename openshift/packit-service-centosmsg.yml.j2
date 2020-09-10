@@ -63,6 +63,8 @@ spec:
                 secretKeyRef:
                   name: aws
                   key: secret-access-key
+            - name: QUEUE_NAME_PREFIX
+              value: {{ queue_name_prefix }}
             - name: SENTRY_SECRET
               valueFrom:
                 secretKeyRef:
