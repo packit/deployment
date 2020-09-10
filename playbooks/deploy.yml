@@ -27,7 +27,8 @@
     # feel free to override these in vars/
     validate_certs: no
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
-    sandbox_namespace: "packit-{{ deployment }}-sandbox"
+    sandbox_namespace: packit-{{ deployment }}-sandbox
+    queue_name_prefix: packit-{{ deployment }}-
     with_fedmsg: true
     with_centosmsg: true
     with_redis_commander: false
@@ -36,14 +37,14 @@
     with_beat: true
     push_dev_images: false
     with_pushgateway: true
-    image: "docker.io/usercont/packit-service:{{ deployment }}"
-    image_worker: "docker.io/usercont/packit-service-worker:{{ deployment }}"
-    image_fedmsg: "docker.io/usercont/packit-service-fedmsg:{{ deployment }}"
-    image_centosmsg: "docker.io/usercont/packit-service-centosmsg:{{ deployment }}"
-    image_dashboard: "docker.io/usercont/packit-dashboard:{{ deployment }}"
-    image_tokman: "docker.io/usercont/tokman:{{ deployment }}"
+    image: docker.io/usercont/packit-service:{{ deployment }}
+    image_worker: docker.io/usercont/packit-service-worker:{{ deployment }}
+    image_fedmsg: docker.io/usercont/packit-service-fedmsg:{{ deployment }}
+    image_centosmsg: docker.io/usercont/packit-service-centosmsg:{{ deployment }}
+    image_dashboard: docker.io/usercont/packit-dashboard:{{ deployment }}
+    image_tokman: docker.io/usercont/tokman:{{ deployment }}
     worker_replicas: 1
-    path_to_secrets: "../secrets"
+    path_to_secrets: ../secrets
     # to be used in Image streams as importPolicy:scheduled value
     auto_import_images: "{{(deployment != 'prod')}}"
     # used in dev/zuul deployment to tag & push images to cluster
@@ -99,6 +100,10 @@
         - command: "{{ container_engine }} inspect {{ image_worker }}"
         - command: "{{ container_engine }} tag {{ image_worker }} 172.30.1.1:5000/myproject/packit-worker:dev"
         - command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-worker:dev {{ tls_verify_false }}"
+      #        - command: "{{ container_engine }} tag {{ image_fedmsg }} 172.30.1.1:5000/myproject/packit-service-fedmsg:dev"
+      #        - command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-service-fedmsg:dev {{ tls_verify_false }}"
+      #        - command: "{{ container_engine }} tag {{ image_centosmsg }} 172.30.1.1:5000/myproject/packit-service-centosmsg:dev"
+      #        - command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-service-centosmsg:dev {{ tls_verify_false }}"
       when: push_dev_images
       tags:
         - packit-service
@@ -120,12 +125,12 @@
         - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') }}"
+        - "{{ lookup('template', '../openshift/secret-aws.yml.j2') }}"
         - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') }}"
       tags:
         - always
 
     - name: Deploy templates only to stg
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ item }}"
@@ -138,57 +143,10 @@
         - always
       when: deployment == "stg"
 
-    - name: Deploy packit-service
-      # https://docs.ansible.com/k8s_module.html
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/packit-service.yml.j2')  }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-      tags:
-        - packit-service
-
-    - name: Deploy packit-service-worker
-      # https://docs.ansible.com/k8s_module.html
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/packit-service-worker.yml.j2')  }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-      tags:
-        - packit-service-worker
-
-    - name: Deploy packit-service-beat
-      # https://docs.ansible.com/k8s_module.html
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/packit-service-beat.yml.j2')  }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-      when: with_beat
-      tags:
-        - packit-service-beat
-
-    - name: Deploy dashboard
-      # https://docs.ansible.com/k8s_module.html
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/dashboard.yml.j2')  }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-      when: with_dashboard
-      tags:
-        - dashboard
-
     - name: Deploy postgres
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
-        src: ../openshift/pg.yml
+        src: ../openshift/postgres.yml
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -203,6 +161,48 @@
         apply: yes
       tags:
         - redis
+
+    - name: Deploy packit-service
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '../openshift/packit-service.yml.j2')  }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      tags:
+        - packit-service
+
+    - name: Deploy packit-service-worker
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '../openshift/packit-service-worker.yml.j2')  }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      tags:
+        - packit-service-worker
+
+    - name: Deploy packit-service-beat
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '../openshift/packit-service-beat.yml.j2')  }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      when: with_beat
+      tags:
+        - packit-service-beat
+
+    - name: Deploy dashboard
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '../openshift/dashboard.yml.j2')  }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      when: with_dashboard
+      tags:
+        - dashboard
 
     - name: Create redis-commander secrets
       k8s:
@@ -258,7 +258,6 @@
       register: flower
 
     - name: Deploy packit-service-fedmsg
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/packit-service-fedmsg.yml.j2')  }}"
@@ -270,7 +269,6 @@
       when: with_fedmsg
 
     - name: Deploy packit-service-centosmsg
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/packit-service-centosmsg.yml.j2')  }}"
@@ -282,7 +280,6 @@
       when: with_centosmsg
 
     - name: Deploy GitHub App Private Key
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/github-app-private-key.yml.j2')  }}"
@@ -293,7 +290,6 @@
         - tokman
 
     - name: Deploy tokman
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/tokman.yml.j2')  }}"
@@ -305,7 +301,6 @@
       register: tokman
 
     - name: Deploy prometheus pushgateway
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/pushgateway.yml.j2')  }}"
@@ -317,7 +312,6 @@
       when: with_pushgateway
 
     - name: Deploy nginx to reverse proxy the pushgateway
-      # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/nginx.yml.j2')  }}"

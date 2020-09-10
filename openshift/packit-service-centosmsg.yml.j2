@@ -53,6 +53,18 @@ spec:
               value: pull-request
             - name: LOG_LEVEL
               value: INFO
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws
+                  key: secret-access-key
+            - name: QUEUE_NAME_PREFIX
+              value: {{ queue_name_prefix }}
             - name: SENTRY_SECRET
               valueFrom:
                 secretKeyRef:
