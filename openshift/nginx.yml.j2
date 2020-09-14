@@ -33,6 +33,10 @@ spec:
           mountPath: /etc/nginx
         - name: packit-secrets
           mountPath: /secrets
+        resources:
+          limits:
+            cpu: "50m"
+            memory: "80Mi"
 
   replicas: 1
   strategy:
