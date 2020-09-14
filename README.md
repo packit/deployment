@@ -130,6 +130,7 @@ because you don't know what's the cause/fix yet, you have to:
 - move `packit-service-centosmsg`'s `stable` branch to a newer commit to trigger `:prod` [centosmsg listener image](https://hub.docker.com/repository/docker/usercont/packit-service-centosmsg) build
 - move `sandcastle`'s `stable` branch to a newer commit to trigger `:prod` [sandcastle image](https://hub.docker.com/repository/docker/usercont/sandcastle) build
 - move `dashboard`'s `stable` branch to a newer commit to trigger `:prod` [dashboard image](https://hub.docker.com/repository/docker/usercont/packit-dashboard) build
+- move `tokman`'s `stable` branch to a newer commit to trigger `:prod` [tokman image](https://hub.docker.com/repository/docker/usercont/tokman) build
 
 2. Import images -> re-deploy
 
