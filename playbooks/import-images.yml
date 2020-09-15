@@ -40,8 +40,14 @@
     - name: check/import newer usercont/packit-service-fedmsg image into image stream
       command: oc import-image is/packit-service-fedmsg:{{ deployment }} -n packit-{{ deployment }}
 
+    - name: check/import newer usercont/packit-service-centosmsg image into image stream
+      command: oc import-image is/packit-service-centosmsg:{{ deployment }} -n packit-{{ deployment }}
+
     - name: check/import newer usercont/packit-service-worker image into image stream
       command: oc import-image is/packit-worker:{{ deployment }} -n packit-{{ deployment }}
 
     - name: check/import newer usercont/packit-dashboard image into image stream
       command: oc import-image is/packit-dashboard:{{ deployment }} -n packit-{{ deployment }}
+
+    - name: check/import newer usercont/tokman image into image stream
+      command: oc import-image is/tokman:{{ deployment }} -n packit-{{ deployment }}
