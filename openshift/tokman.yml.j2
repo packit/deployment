@@ -142,3 +142,16 @@ spec:
   resources:
     requests:
       storage: 1Gi
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: tokman
+spec:
+  port:
+    targetPort: tokman
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: tokman
