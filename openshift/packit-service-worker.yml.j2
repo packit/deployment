@@ -134,24 +134,25 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "800m"
-          readinessProbe:
-            exec:
-              command:
-                - bash
-                - -c
-                # if we don't use AWS SQS (doesn't support this)
-                - 'if (test -z "$AWS_ACCESS_KEY_ID"); then celery -A $APP status | grep $(cat /etc/hostname) | grep OK; else true; fi'
-            initialDelaySeconds: 10
-            periodSeconds: 60
-          livenessProbe:
-            exec:
-              command:
-                - bash
-                - -c
-                # does this worker respond to ping?
-                - 'if (test -z "$AWS_ACCESS_KEY_ID"); then celery -A $APP inspect ping --destination "celery@$(cat /etc/hostname)"; else true; fi'
-            initialDelaySeconds: 10
-            periodSeconds: 30
+          # https://github.com/packit/deployment/pull/142
+          #readinessProbe:
+          #  exec:
+          #    command:
+          #      - bash
+          #      - -c
+          #      # if we don't use AWS SQS (doesn't support this)
+          #      - 'if (test -z "$AWS_ACCESS_KEY_ID"); then celery -A $APP status | grep $(cat /etc/hostname) | grep OK; else true; fi'
+          #  initialDelaySeconds: 10
+          #  periodSeconds: 60
+          #livenessProbe:
+          #  exec:
+          #    command:
+          #      - bash
+          #      - -c
+          #      # does this worker respond to ping?
+          #      - 'if (test -z "$AWS_ACCESS_KEY_ID"); then celery -A $APP inspect ping --destination "celery@$(cat /etc/hostname)"; else true; fi'
+          #  initialDelaySeconds: 10
+          #  periodSeconds: 30
 ---
 # https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#writing-image-stream-definitions
 kind: ImageStream
