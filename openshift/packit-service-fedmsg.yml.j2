@@ -82,12 +82,9 @@ spec:
           command:
             - "listen-to-fedora-messaging"
           resources:
-            requests:
+            limits:
               memory: "80Mi"
               cpu: "100m"
-            limits:
-              memory: "128Mi"
-              cpu: "200m"
   # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/basic_deployment_operations.html#image-change-trigger
   triggers:
     - type: ConfigChange
