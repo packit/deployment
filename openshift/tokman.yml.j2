@@ -53,12 +53,9 @@ spec:
             - name: access-tokens
               mountPath: /access_tokens
           resources:
-            requests:
-              memory: "100Mi"
-              cpu: "100m"
             limits:
-              memory: "200Mi"
-              cpu: "200m"
+              memory: "80Mi"
+              cpu: "100m"
           ports:
             - containerPort: 8000
               protocol: "TCP"
