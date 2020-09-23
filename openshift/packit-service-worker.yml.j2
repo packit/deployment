@@ -128,12 +128,9 @@ spec:
           command:
             - "/usr/bin/run_worker.sh"
           resources:
-            requests:
-              memory: "256Mi"
-              cpu: "400m"
             limits:
-              memory: "512Mi"
-              cpu: "800m"
+              memory: "384Mi"
+              cpu: "400m"
           # https://github.com/packit/deployment/pull/142
           #readinessProbe:
           #  exec:
