@@ -300,7 +300,7 @@
         - tokman
       register: tokman
 
-    - name: Deploy prometheus pushgateway
+    - name: Deploy aggregating pushgateway
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '../openshift/pushgateway.yml.j2')  }}"
