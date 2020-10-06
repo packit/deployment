@@ -1,0 +1,22 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- name: Getting {{ item }} pod
+  k8s_info:
+    namespace: "{{ project }}"
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    validate_certs: "{{ validate_certs }}"
+    kind: Pod
+    #    field_selectors:
+    #      - status.phase=Running
+    label_selectors:
+      - name={{ item }}
+  register: pods
+- name: Checking resources
+  assert:
+    that:
+      - "pods.resources|length > 0"
+      - "pods.resources[0].status.phase == 'Running'"
+    fail_msg: "{{ item }} is {{ pods.resources[0].status.phase }}"

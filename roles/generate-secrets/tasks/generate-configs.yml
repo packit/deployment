@@ -1,0 +1,14 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- name: Generate config files
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ path_to_secrets }}/{{ item }}"
+  loop:
+    - packit-service.yaml
+    - extra-vars.yml
+    - fedora.toml
+    - copr
+    - ssh_config

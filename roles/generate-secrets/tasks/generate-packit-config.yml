@@ -1,5 +1,0 @@
----
-- name: Generate packit-service.yaml file
-  template:
-    src: packit-service.yaml.j2
-    dest: "{{ path_to_secrets }}/packit-service.yaml"

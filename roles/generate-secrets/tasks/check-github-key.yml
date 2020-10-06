@@ -1,9 +1,0 @@
----
-- name: Check if github app private key is placed
-  stat:
-    path: "{{ path_to_secrets }}/private-key.pem"
-  register: stat_result
-- name: Throw error if github app private key is not placed
-  fail:
-    msg: "Please, place GitHub app private key to {{ path_to_secrets }}/private-key.pem"
-  when: stat_result.stat.exists == False
