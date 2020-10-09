@@ -7,9 +7,9 @@
       - postgres
       - redis
       - packit-service
-      - tokman
 - set_fact:
     optional_DCs:
+      tokman: "{{ with_tokman }}"
       packit-service-fedmsg: "{{ with_fedmsg }}"
       packit-service-centosmsg: "{{ with_centosmsg }}"
       packit-service-beat: "{{ with_beat }}"
