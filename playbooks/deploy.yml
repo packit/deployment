@@ -347,7 +347,8 @@
         wait_timeout: 600 # 10 minutes to pull the image and run the container
 
     - name: Wait for DCs rollouts to complete
-      command: oc rollout status -w dc/{{ item }}
+      # timeout 10min to not wait indefinitely in case of a problem
+      command: timeout 10m oc rollout status -w dc/{{ item }}
       register: oc_rollout_status
       failed_when: '"successfully rolled out" not in oc_rollout_status.stdout'
       loop: "{{ DCs }}"
