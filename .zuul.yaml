@@ -3,6 +3,20 @@
     check:
       jobs:
         - pre-commit
+        - deployment-tests
     gate:
       jobs:
         - pre-commit
+
+- job:
+    name: deployment-tests
+    parent: oc-cluster-up
+    description: Deploy and check
+    extra-vars:
+      deployment: dev
+      # for tokman
+      github_app_id: 123456
+    pre-run:
+      - playbooks/generate-local-secrets.yml
+      - playbooks/zuul-deploy.yml
+    run: playbooks/zuul-check.yml

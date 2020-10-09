@@ -33,8 +33,9 @@ host: https://127.0.0.1:8443
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
 api_key: ""
+
 # To work-around 'SSL: CERTIFICATE_VERIFY_FAILED'
-# validate_certs: no
+validate_certs: no
 
 # if you want to deploy fedmsg, please make sure to
 # edit the queue name in secrets/*/fedora.toml

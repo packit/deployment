@@ -12,9 +12,17 @@ github_app_id: "<github_app_id>"
 command_handler: local
 server_hostname: localhost
 server_port: "8443"
-path_to_secrets: ../secrets/dev
-path_to_templates: ./
+project_dir: "{{ playbook_dir }}/.."
+path_to_secrets: "{{ project_dir }}/secrets/dev"
 
 # Get from https://copr.fedorainfracloud.org/api/
 copr_login: <copr_login>
 copr_token: <copr_token>
+
+postgres_host: <host>
+postgres_user: <user>
+postgres_password: <passwd>
+postgres_database_name: <db name>
+redis_commander_user: <user>
+redis_commander_password: <passwd>
+flower_basic_auth: <user>:<passwd>[,<user>:<passwd>]

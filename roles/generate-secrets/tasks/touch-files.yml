@@ -1,0 +1,11 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- name: Create empty files
+  file:
+    path: "{{ path_to_secrets }}/{{ item }}"
+    state: touch
+  loop:
+    - fedora.keytab
+    - sentry_key

@@ -1,0 +1,21 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- set_fact:
+    mandatory_DCs:
+      - postgres
+      - redis
+      - packit-service
+      - tokman
+- set_fact:
+    optional_DCs:
+      packit-service-fedmsg: "{{ with_fedmsg }}"
+      packit-service-centosmsg: "{{ with_centosmsg }}"
+      packit-service-beat: "{{ with_beat }}"
+      packit-dashboard: "{{ with_dashboard }}"
+      pushgateway: "{{ with_pushgateway }}"
+      nginx: "{{ with_pushgateway }}"
+- set_fact:
+    # To know what DCs rollouts to wait for and also to check in tests
+    DCs: '{{ mandatory_DCs + optional_DCs|dict2items|selectattr("value", "equalto", true)|list|map(attribute="key")|flatten }}'

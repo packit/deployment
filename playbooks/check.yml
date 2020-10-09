@@ -1,0 +1,20 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- name: Check a deployment
+  hosts: all
+  vars:
+    # Zuul base job redefines project_dir
+    project_dir: "{{ playbook_dir }}/.."
+    deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
+  tasks:
+    - name: include variables
+      include_vars: "{{ project_dir }}/vars/{{ deployment }}.yml"
+
+    - name: Getting DCs
+      include_tasks: tasks/set-facts.yml
+
+    - name: Checking running pods of {{ DCs }}
+      include_tasks: tasks/check-pod-running.yml
+      loop: "{{ DCs + ['packit-worker'] }}"

@@ -44,3 +44,7 @@ deploy-validation:
 # needs be configure only once
 deploy-rebuild-base-image:
 	DEPLOYMENT=stg $(AP) playbooks/rebuild-base-image.yml
+
+# Check whether everything has been deployed OK with 'make deploy'
+check:
+	$(AP) playbooks/check.yml

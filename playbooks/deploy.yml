@@ -24,6 +24,8 @@
 - name: packit-service deployment
   hosts: all
   vars:
+    # Zuul base job redefines project_dir
+    project_dir: "{{ playbook_dir }}/.."
     # feel free to override these in vars/
     validate_certs: no
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
@@ -35,8 +37,8 @@
     with_flower: false
     with_dashboard: true
     with_beat: true
-    push_dev_images: false
     with_pushgateway: true
+    push_dev_images: false
     image: docker.io/usercont/packit-service:{{ deployment }}
     image_worker: docker.io/usercont/packit-service-worker:{{ deployment }}
     image_fedmsg: docker.io/usercont/packit-service-fedmsg:{{ deployment }}
@@ -44,18 +46,22 @@
     image_dashboard: docker.io/usercont/packit-dashboard:{{ deployment }}
     image_tokman: docker.io/usercont/tokman:{{ deployment }}
     worker_replicas: 1
-    path_to_secrets: ../secrets
+    path_to_secrets: "{{ project_dir }}/secrets"
     # to be used in Image streams as importPolicy:scheduled value
     auto_import_images: "{{(deployment != 'prod')}}"
     # used in dev/zuul deployment to tag & push images to cluster
     container_engine: "{{ lookup('pipe', 'command -v podman 2> /dev/null || echo docker') }}"
   tasks:
     - name: include variables
-      include_vars: ../vars/{{ deployment }}.yml
+      include_vars: "{{ project_dir }}/vars/{{ deployment }}.yml"
       tags:
         - always
 
-    # to be able to read the github_app_id from the configuration file in tokman
+    - name: Getting DCs
+      include_tasks: tasks/set-facts.yml
+
+
+      # to be able to read the github_app_id from the configuration file in tokman
     - name: include packit-service configuration
       include_vars:
         file: "{{ path_to_secrets }}/{{ deployment }}/packit-service.yaml"
@@ -119,14 +125,14 @@
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
       loop:
-        - "{{ lookup('template', '../openshift/secret-packit-ssh.yml.j2') }}"
-        - "{{ lookup('template', '../openshift/secret-packit-secrets.yml.j2') }}"
-        - "{{ lookup('template', '../openshift/secret-centos-secrets.yml.j2') }}"
-        - "{{ lookup('template', '../openshift/secret-packit-config.yml.j2') }}"
-        - "{{ lookup('template', '../openshift/secret-sentry.yml.j2') }}"
-        - "{{ lookup('template', '../openshift/secret-postgres.yml.j2') }}"
-        - "{{ lookup('template', '../openshift/secret-aws.yml.j2') }}"
-        - "{{ lookup('template', '../openshift/sandbox-namespace.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-ssh.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-secrets.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-centos-secrets.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-config.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-sentry.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-postgres.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-aws.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
       tags:
         - always
 
@@ -138,7 +144,7 @@
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
       loop:
-        - "{{ lookup('template', '../openshift/secret-rebuild-base-image.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-rebuild-base-image.yml.j2') }}"
       tags:
         - always
       when: deployment == "stg"
@@ -146,7 +152,7 @@
     - name: Deploy postgres
       k8s:
         namespace: "{{ project }}"
-        src: ../openshift/postgres.yml
+        src: "{{ project_dir }}/openshift/postgres.yml"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -154,7 +160,7 @@
     - name: Deploy redis
       k8s:
         namespace: "{{ project }}"
-        src: ../openshift/redis.yml
+        src: "{{ project_dir }}/openshift/redis.yml"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -165,7 +171,7 @@
     - name: Deploy packit-service
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/packit-service.yml.j2')  }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -175,7 +181,7 @@
     - name: Deploy packit-service-worker
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/packit-service-worker.yml.j2')  }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-worker.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -185,7 +191,7 @@
     - name: Deploy packit-service-beat
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/packit-service-beat.yml.j2')  }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-beat.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -196,7 +202,7 @@
     - name: Deploy dashboard
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/dashboard.yml.j2')  }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/dashboard.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -207,7 +213,7 @@
     - name: Create redis-commander secrets
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/secret-redis-commander.yml.j2') }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/secret-redis-commander.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -221,7 +227,7 @@
     - name: Deploy redis-commander
       k8s:
         namespace: "{{ project }}"
-        src: ../openshift/redis-commander.yml
+        src: "{{ project_dir }}/openshift/redis-commander.yml"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -234,7 +240,7 @@
     - name: Create flower secret
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/secret-flower.yml.j2') }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/secret-flower.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -248,7 +254,7 @@
     - name: Deploy flower
       k8s:
         namespace: "{{ project }}"
-        src: ../openshift/flower.yml
+        src: "{{ project_dir }}/openshift/flower.yml"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -260,7 +266,7 @@
     - name: Deploy packit-service-fedmsg
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/packit-service-fedmsg.yml.j2')  }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-fedmsg.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -271,7 +277,7 @@
     - name: Deploy packit-service-centosmsg
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/packit-service-centosmsg.yml.j2')  }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-centosmsg.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -282,17 +288,19 @@
     - name: Deploy GitHub App Private Key
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/github-app-private-key.yml.j2')  }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/github-app-private-key.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
       tags:
         - tokman
+      notify:
+        - Rollout tokman
 
     - name: Deploy tokman
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/tokman.yml.j2')  }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/tokman.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -303,7 +311,7 @@
     - name: Deploy aggregating pushgateway
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/pushgateway.yml.j2')  }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/pushgateway.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -314,7 +322,7 @@
     - name: Deploy nginx to reverse proxy the pushgateway
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '../openshift/nginx.yml.j2')  }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/nginx.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -337,13 +345,12 @@
         wait_condition:
           type: Ready
         wait_timeout: 600 # 10 minutes to pull the image and run the container
-    # you can't wait for DC nor service, so let's make sure the stuff was rolled out
-    - name: Wait for p-s rollout to complete
-      command: oc rollout status -w dc packit-service
+
+    - name: Wait for DCs rollouts to complete
+      command: oc rollout status -w dc/{{ item }}
       register: oc_rollout_status
-    - name: Check the rollout was successful
-      assert:
-        that: '"successfully rolled out" in oc_rollout_status.stdout'
+      failed_when: '"successfully rolled out" not in oc_rollout_status.stdout'
+      loop: "{{ DCs }}"
 
   handlers:
     - name: Rollout redis-commander

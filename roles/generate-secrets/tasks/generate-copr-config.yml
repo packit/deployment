@@ -1,5 +1,0 @@
----
-- name: Generate copr file
-  template:
-    src: copr.j2
-    dest: "{{ path_to_secrets }}/copr"

@@ -1,4 +1,0 @@
-- name: Copy fedora.toml file
-  template:
-    src: fedora.toml.j2
-    dest: "{{ path_to_secrets }}/fedora.toml"
