@@ -27,6 +27,7 @@
           api_key: {{ kubeconfig_token.stdout }}
           validate_certs: no
           # Whether to deploy and check that pod
+          with_tokman: true
           with_beat: true
           with_fedmsg: true
           # centosmsg actually doesn't work with our generated/dummy certificate

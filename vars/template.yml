@@ -36,8 +36,11 @@ api_key: ""
 # To work-around 'SSL: CERTIFICATE_VERIFY_FAILED'
 # validate_certs: no
 
+# with_tokman: true
+
 # if you want to deploy fedmsg, please make sure to
 # edit the queue name in secrets/*/fedora.toml
+
 # with_fedmsg: true
 
 # with_centosmsg: true

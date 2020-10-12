@@ -31,6 +31,7 @@
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
     sandbox_namespace: packit-{{ deployment }}-sandbox
     queue_name_prefix: packit-{{ deployment }}-
+    with_tokman: true
     with_fedmsg: true
     with_centosmsg: true
     with_redis_commander: false
@@ -296,6 +297,7 @@
         - tokman
       notify:
         - Rollout tokman
+      when: with_tokman
 
     - name: Deploy tokman
       k8s:
@@ -307,6 +309,7 @@
       tags:
         - tokman
       register: tokman
+      when: with_tokman
 
     - name: Deploy aggregating pushgateway
       k8s:

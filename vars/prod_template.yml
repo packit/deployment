@@ -36,6 +36,8 @@ api_key: ""
 
 validate_certs: yes
 
+# with_tokman: true
+
 # if you want to deploy fedmsg, please make sure to
 # edit the queue name in secrets/*/fedora.toml
 # with_fedmsg: true
