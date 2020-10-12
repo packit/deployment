@@ -14,8 +14,6 @@
     description: Deploy and check
     extra-vars:
       deployment: dev
-      # for tokman
-      github_app_id: 123456
     pre-run:
       - playbooks/generate-local-secrets.yml
       - playbooks/zuul-deploy.yml
