@@ -7,7 +7,7 @@ package_api_key: <package_api_key>
 
 # After creating new github app
 # Also generate and place github app key as private-key.pem under secrets
-github_app_id: "<github_app_id>"
+github_app_id: 123456
 
 command_handler: local
 server_hostname: localhost
@@ -19,7 +19,7 @@ path_to_secrets: "{{ project_dir }}/secrets/dev"
 copr_login: <copr_login>
 copr_token: <copr_token>
 
-postgres_host: <host>
+postgres_host: postgres
 postgres_user: <user>
 postgres_password: <passwd>
 postgres_database_name: <db name>
