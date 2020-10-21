@@ -61,7 +61,6 @@
     - name: Getting DCs
       include_tasks: tasks/set-facts.yml
 
-
       # to be able to read the github_app_id from the configuration file in tokman
     - name: include packit-service configuration
       include_vars:
