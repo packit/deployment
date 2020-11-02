@@ -7,4 +7,4 @@ ENV LANG=en_US.UTF-8 \
     ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
     ANSIBLE_STDOUT_CALLBACK=debug
 
-RUN dnf install -y ansible && dnf clean all
+RUN dnf install -y ansible python3-pip && dnf clean all
