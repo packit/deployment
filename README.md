@@ -204,8 +204,10 @@ We are using multi-domain wildcard certificates for following domains:
 - \*.prod.packit.dev
 - \*.stg.packit.dev
 
-In case procedure bellow will not work, previously used http challenge can be used instead [link](https://github.com/packit-service/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot).
-Be aware that http challenge approach is more complex, includes destructive actions and longer downtime.
+In case the procedure bellow does not work,
+[previously used http challenge](https://github.com/packit-service/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot)
+can be used instead.
+Be aware that the http challenge approach is more complex, includes destructive actions and longer downtime.
 
 TL;DR
 
@@ -215,7 +217,7 @@ TL;DR
 4. Update secrets repository.
 5. Re-deploy stg&prod.
 
-_Note: If certbot was excuted against multiple domains you will repeat step 3. for each domain._
+_Note: If certbot is executed against multiple domains, step 3. is repeated for each domain._
 
 ### 1. Prerequisites
 
@@ -223,25 +225,29 @@ Make sure the DNS is all set up:
 
 ```
 $ dig prod.packit.dev
-; <<>> DiG 9.11.5-P4-RedHat-9.11.5-4.P4.fc29 <<>> prod.packit.dev +nostats +nocomments +nocmd
-;; global options: +cmd
-;prod.packit.dev.               IN      A
-prod.packit.dev.        2932    IN      CNAME   elb.e4ff.pro-eu-west-1.openshiftapps.com.
-elb.e4ff.pro-eu-west-1.openshiftapps.com. 2932 IN CNAME pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com.
-pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 60 IN A 52.30.203.240
-pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 60 IN A 52.50.44.252
+; <<>> DiG 9.11.24-RedHat-9.11.24-2.fc33 <<>> prod.packit.dev
+;; QUESTION SECTION:
+;prod.packit.dev.		IN	A
+;; ANSWER SECTION:
+prod.packit.dev.	3600	IN	CNAME	elb.e4ff.pro-eu-west-1.openshiftapps.com.
+elb.e4ff.pro-eu-west-1.openshiftapps.com. 3599 IN CNAME	pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com.
+pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 59 IN A 54.170.98.95
+pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 59 IN A 99.80.116.118
 ```
 
-Check if you have access to packit.dev domain in [Google Domains](https://domains.google.com/m/registrar/packit.dev).
+Check if you have access to packit.dev domain in
+[Google Domains](https://domains.google.com/m/registrar/packit.dev).
 
-Check/install [certbot](https://certbot.eff.org/all-instructions) locally.
+Check/install certbot locally. You can either follow
+[instructions for Apache on Fedora](https://certbot.eff.org/lets-encrypt/fedora-apache.html)
+or simply `dnf install certbot` on your machine (the instructions tell you to do that on server).
 
 ### 2. Run certbot to obtain the challenges.
 
 Run certbot:
 
 ```
-certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email user-cont-team@redhat.com -d *.packit.dev -d *.prod.packit.dev -d *.stg.packit.dev
+$ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email user-cont-team@redhat.com -d *.packit.dev -d *.prod.packit.dev -d *.stg.packit.dev
 ```
 
 You will be asked to set TXT record for every domain requested:
@@ -249,7 +255,7 @@ You will be asked to set TXT record for every domain requested:
 ```
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Please deploy a DNS TXT record under the name
-_acme-challenge.prod.packit.dev with the following value:
+_acme-challenge.packit.dev with the following value:
 
 123456abcdef
 
@@ -260,43 +266,43 @@ Press Enter to Continue
 
 ### 3. Update DNS record
 
-Go to [Google Domains](https://domains.google.com/m/registrar/packit.dev/dns) and create/set the corresponding value: TXT record called \_acme-challenge/\_acme-challenge.prod/\_acme-challenge.stg
+Go to [Google Domains](https://domains.google.com/m/registrar/packit.dev/dns)
+and create/set the corresponding value:
+TXT record called `_acme-challenge`
+(or `_acme-challenge.prod` or `acme-challenge.stg` per instructions).
+If those records already exist (from previous run),
+you have to remove them first before you can add a new one.
 
-Wait till is distributed - in another terminal check with:
+Wait till it's distributed - in another terminal watch nslookup
+and once it returns the configured value
 
 ```
-nslookup -q=TXT _acme-challenge.prod.packit.dev
-```
-
-once it returns the configured value
-
-```
-[~/]$ nslookup -q=TXT _acme-challenge.packit.dev
-Server:         213.46.172.37
-Address:        213.46.172.37#53
+[~/]$ watch -d nslookup -q=TXT _acme-challenge.packit.dev
+Server:         127.0.0.53
+Address:        127.0.0.53#53
 
 Non-authoritative answer:
 _acme-challenge.packit.dev      text = "123456abcdef"
 
 Authoritative answers can be found from:
 
-[~/]$ ping dashboard.packit.dev
+Ctrl+c
 ```
 
 Go to the terminal with certbot command waiting for your action and hit Enter.
 
 Repeat this for all requested domains.
 
-Once finished copy certificates to secrets repository (prod&stg)
+### 4. Update secrets repository
+
+Copy certificates to secrets repository (prod & stg)
 
 ```
-cp /var/tmp/live/packit.dev/{fullchain,privkey}.pem _path_to_prod_secrets_
-cp /var/tmp/live/packit.dev/{fullchain,privkey}.pem _path_to_stg_secrets_
+cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/prod/
+cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/stg/
 ```
 
-### 4. Update secret repository
-
-- push new branch and merge.
+Push, create merge request and merge.
 
 ### 5.Re-deploy stg and prod environment:
 
@@ -309,7 +315,8 @@ Docs: https://certbot.eff.org/docs/using.html#manual
 
 ### How to test the TLS deployment
 
-If you want to inspect local certificates, you can use `certtool` (`gnutls-utils` package) to view the cert's metadata:
+If you want to inspect local certificates, you can use `certtool` (`gnutls-utils` package)
+to view the cert's metadata:
 
 ```
 $ certtool -i <fullchain.pem
