@@ -33,12 +33,12 @@ def cli() -> None:
 
 @cli.command(short_help="Creates a directory with all the repositories")
 def init() -> None:
-    os.makedirs("repositories", exist_ok=True)
+    os.makedirs("move_stable_repositories", exist_ok=True)
 
     for repository in REPOSITORIES:
         subprocess.run(
             ["git", "clone", f"github.com:{NAMESPACE}/{repository}.git"],
-            cwd=f"{os.curdir}/repositories",
+            cwd=f"{os.curdir}/move_stable_repositories",
         )
 
 
@@ -48,7 +48,7 @@ def move_all() -> None:
 
     for repository in REPOSITORIES:
         click.secho(f"==> Moving {repository}", fg="yellow")
-        path_to_repository = f"{os.curdir}/repositories/{repository}"
+        path_to_repository = f"{os.curdir}/move_stable_repositories/{repository}"
 
         fetch_all(path_to_repository)
 

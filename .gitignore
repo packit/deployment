@@ -12,4 +12,4 @@ secrets/dev
 secrets/secrets.yaml
 
 # used in move_stable script
-scripts/repositories
+move_stable_repositories
