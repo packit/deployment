@@ -37,7 +37,7 @@ def init() -> None:
 
     for repository in REPOSITORIES:
         subprocess.run(
-            ["git", "clone", f"github.com:{NAMESPACE}/{repository}.git"],
+            ["git", "clone", f"git@github.com:{NAMESPACE}/{repository}.git"],
             cwd=f"{os.curdir}/move_stable_repositories",
         )
 
@@ -52,8 +52,8 @@ def move_all() -> None:
 
         fetch_all(path_to_repository)
 
-        main_hash = get_reference(path_to_repository, remote, ROLLING_BRANCH)
-        stable_hash = get_reference(path_to_repository, remote, STABLE_BRANCH)
+        main_hash = get_reference(path_to_repository, remote, ROLLING_BRANCH)[:7]
+        stable_hash = get_reference(path_to_repository, remote, STABLE_BRANCH)[:7]
 
         if main_hash == stable_hash:
             click.echo(
@@ -116,8 +116,8 @@ def get_git_log(
     path_to_repository: str, remote: str, hash_from: str, hash_to: str
 ) -> None:
     click.echo(
-        f"===> Commits since {STABLE_BRANCH} ({hash_from[:7]}) till "
-        f"HEAD of {ROLLING_BRANCH} ({hash_to[:7]})\n"
+        f"===> Commits since {STABLE_BRANCH} ({hash_from}) till "
+        f"HEAD of {ROLLING_BRANCH} ({hash_to})\n"
     )
     subprocess.run(
         ["git", "--no-pager", "log", "--oneline", "--graph", f"{hash_from}..{hash_to}"],
