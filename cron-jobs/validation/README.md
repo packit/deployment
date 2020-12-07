@@ -8,7 +8,7 @@ For the validation of the packit-service we run a validation script every night.
 
 [packit-service-validation.py](./packit-service-validation.py) - script in the image
 
-The script verifies building Copr builds and running Testing farm for pull requests in `packit/hello-world` repo:
+The script verifies that Copr builds and Testing farm runs are processed correctly for pull requests in `packit/hello-world` repo:
 
 - comment trigger (each PR with title beginning `Basic test case:` is taken
   and commented with `/packit build`)

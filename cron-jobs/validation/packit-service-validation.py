@@ -41,9 +41,9 @@ class Testcase:
         Get the name of Copr project from id of the PR.
         :return:
         """
-        if not self._copr_project_name:
+        if self.pr and not self._copr_project_name:
             self._copr_project_name = (
-                f"packit-hello-world-{self.pr.id}" if self.pr else None
+                f"packit-hello-world-{self.pr.id}"
             )
         return self._copr_project_name
 
@@ -136,7 +136,8 @@ class Testcase:
 
     def check_statuses_set_to_pending(self):
         """
-        Check whether the commit statuses are set to pending.
+        Check whether some commit status is set to pending (they are updated in loop
+        so it is enough).
         :return:
         """
         statuses = [
@@ -146,13 +147,25 @@ class Testcase:
         ]
 
         watch_end = datetime.now() + timedelta(seconds=60)
+        failure_message = (
+            "Github statuses were not set "
+            "to pending in time 1 minute.\n"
+        )
+
+        # when a new PR is opened
+        while len(statuses) == 0:
+            if datetime.now() > watch_end:
+                self.failure_msg += failure_message
+                return
+            statuses = [
+                status.context
+                for status in self.get_statuses()
+                if "packit-stg" not in status.context
+            ]
 
         while True:
             if datetime.now() > watch_end:
-                self.failure_msg += (
-                    f"Github statuses {statuses} were not set "
-                    f"to pending in time 1 minute.\n"
-                )
+                self.failure_msg += failure_message
                 return
 
             new_statuses = [
@@ -162,10 +175,8 @@ class Testcase:
             ]
             for name, state in new_statuses:
                 if state == "pending":
-                    statuses.remove(name)
+                    return
 
-            if len(statuses) == 0:
-                return
             time.sleep(5)
 
     def check_build_submitted(self):
