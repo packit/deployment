@@ -1,42 +1,124 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+import enum
 import sentry_sdk
 import time
-# MIT License
-#
-# Copyright (c) 2018-2019 Red Hat, Inc.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 
 from copr.v3 import Client
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from os import getenv
+
+from github import InputGitAuthor
 from ogr.services.github import GithubService
+from ogr.abstract import PullRequest
 
 
 copr = Client.create_from_config_file()
 service = GithubService(token=getenv("GITHUB_TOKEN"))
 project = service.get_project(repo="hello-world", namespace="packit")
+user = InputGitAuthor(
+    name="Release Bot", email="user-cont-team+release-bot@redhat.com"
+)
+
+
+class Trigger(str, enum.Enum):
+    comment = "comment"
+    pr_opened = "pr_opened"
+    push = "push"
 
 
 class Testcase:
-    def __init__(self, pr_id: int):
-        self.pr_id = pr_id
+    def __init__(self, pr: PullRequest = None, trigger: Trigger = Trigger.pr_opened):
+        self.pr = pr
         self.failure_msg = ""
+        self.trigger = trigger
+        self._copr_project_name = None
+
+    @property
+    def copr_project_name(self):
+        """
+        Get the name of Copr project from id of the PR.
+        :return:
+        """
+        if self.pr and not self._copr_project_name:
+            self._copr_project_name = (
+                f"packit-hello-world-{self.pr.id}"
+            )
+        return self._copr_project_name
+
+    def run_test(self):
+        """
+        Run all checks, if there is any failure message, send it to Sentry and in case of
+        opening PR close it.
+        :return:
+        """
+        self.run_checks()
+        if self.failure_msg:
+            sentry_sdk.capture_message(
+                f"{self.pr.title} ({self.pr.url}) failed: {self.failure_msg}"
+            )
+        if self.trigger == Trigger.pr_opened:
+            self.pr.close()
+
+    def trigger_build(self):
+        """
+        Trigger the build (by commenting/pushing to the PR/opening a new PR).
+        :return:
+        """
+        if self.trigger == Trigger.comment:
+            project.pr_comment(self.pr.id, "/packit build")
+        elif self.trigger == Trigger.push:
+            self.push_to_pr()
+        else:
+            self.create_pr()
+
+    def push_to_pr(self):
+        """
+        Push a new commit to the PR.
+        :return:
+        """
+        contents = project.github_repo.get_contents(
+            "test.txt", ref=self.pr.source_branch
+        )
+        # https://pygithub.readthedocs.io/en/latest/examples/Repository.html#update-a-file-in-the-repository
+        # allows empty commit (always the same content of file)
+        project.github_repo.update_file(
+            path=contents.path,
+            message=f"Commit build trigger ({date.today().strftime('%d/%m/%y')})",
+            content="Testing the push trigger.",
+            sha=contents.sha,
+            branch=self.pr.source_branch,
+            committer=user,
+            author=user,
+        )
+
+    def create_pr(self):
+        """
+        Create a new PR, if the source branch 'test_case_opened_pr' does not exist,
+        create one and commit some changes before it.
+        :return:
+        """
+        source_branch = "test_case_opened_pr"
+        if source_branch not in project.get_branches():
+            # if the source branch does not exist, create one
+            # and create a commit
+            commit = project.github_repo.get_commit("HEAD")
+            project.github_repo.create_git_ref(f"refs/heads/{source_branch}", commit.sha)
+            project.github_repo.create_file(
+                path="test.txt",
+                message="Opened PR trigger",
+                content="Testing the opened PR trigger.",
+                branch=source_branch,
+                committer=user,
+                author=user
+            )
+        self.pr = project.create_pr(
+            title="Basic test case - opened PR trigger",
+            body="This test case is triggered automatically by our validation script.",
+            target_branch="master",
+            source_branch=source_branch,
+        )
 
     def run_checks(self):
         """
@@ -54,7 +136,8 @@ class Testcase:
 
     def check_statuses_set_to_pending(self):
         """
-        Check whether the commit statuses are set to pending.
+        Check whether some commit status is set to pending (they are updated in loop
+        so it is enough).
         :return:
         """
         statuses = [
@@ -64,11 +147,25 @@ class Testcase:
         ]
 
         watch_end = datetime.now() + timedelta(seconds=60)
+        failure_message = (
+            "Github statuses were not set "
+            "to pending in time 1 minute.\n"
+        )
+
+        # when a new PR is opened
+        while len(statuses) == 0:
+            if datetime.now() > watch_end:
+                self.failure_msg += failure_message
+                return
+            statuses = [
+                status.context
+                for status in self.get_statuses()
+                if "packit-stg" not in status.context
+            ]
 
         while True:
             if datetime.now() > watch_end:
-                self.failure_msg += f"Github statuses {statuses} were not set " \
-                                    f"to pending in time 1 minute.\n"
+                self.failure_msg += failure_message
                 return
 
             new_statuses = [
@@ -78,10 +175,8 @@ class Testcase:
             ]
             for name, state in new_statuses:
                 if state == "pending":
-                    statuses.remove(name)
+                    return
 
-            if len(statuses) == 0:
-                return
             time.sleep(5)
 
     def check_build_submitted(self):
@@ -89,27 +184,35 @@ class Testcase:
         Check whether the build was submitted in Copr in time 30 minutes.
         :return:
         """
-        project_name = f"packit-hello-world-{self.pr_id}"
+        if self.pr:
+            try:
+                old_build_len = len(
+                    copr.build_proxy.get_list("packit", self.copr_project_name)
+                )
+            except Exception:
+                old_build_len = 0
 
-        try:
-            old_build_len = len(copr.build_proxy.get_list("packit", project_name))
-        except Exception:
+            old_comment_len = len(project.get_pr_comments(self.pr.id))
+        else:
+            # the PR is not created yet
             old_build_len = 0
+            old_comment_len = 0
 
-        old_comment_len = len(project.get_pr_comments(self.pr_id))
+        self.trigger_build()
 
-        project.pr_comment(self.pr_id, "/packit build")
         watch_end = datetime.now() + timedelta(seconds=60 * 30)
 
         self.check_statuses_set_to_pending()
 
         while True:
             if datetime.now() > watch_end:
-                self.failure_msg += "The build was not submitted in Copr in time 30 minutes.\n"
+                self.failure_msg += (
+                    "The build was not submitted in Copr in time 30 minutes.\n"
+                )
                 return None
 
             try:
-                new_builds = copr.build_proxy.get_list("packit", project_name)
+                new_builds = copr.build_proxy.get_list("packit", self.copr_project_name)
             except Exception:
                 # project does not exist yet
                 continue
@@ -117,7 +220,7 @@ class Testcase:
             if len(new_builds) >= old_build_len + 1:
                 return new_builds[0]
 
-            new_comments = project.get_pr_comments(self.pr_id, reverse=True)
+            new_comments = project.get_pr_comments(self.pr.id, reverse=True)
             new_comments = new_comments[: (len(new_comments) - old_comment_len)]
 
             if len(new_comments) > 1:
@@ -128,12 +231,16 @@ class Testcase:
                 ]
                 if len(comment) > 0:
                     if "error" in comment[0] or "whitelist" in comment[0]:
-                        self.failure_msg += f"The build was not submitted in Copr, " \
-                                            f"Github comment from p-s: {comment[0]}\n"
+                        self.failure_msg += (
+                            f"The build was not submitted in Copr, "
+                            f"Github comment from p-s: {comment[0]}\n"
+                        )
                         return None
                     else:
-                        self.failure_msg += f"New github comment from p-s while " \
-                                            f"submitting Copr build: {comment[0]}\n"
+                        self.failure_msg += (
+                            f"New github comment from p-s while "
+                            f"submitting Copr build: {comment[0]}\n"
+                        )
 
             time.sleep(30)
 
@@ -167,8 +274,10 @@ class Testcase:
             ]:
 
                 if state_reported != "succeeded":
-                    self.failure_msg += f"The build in Copr was not successful. " \
-                                        f"Copr state: {state_reported}.\n"
+                    self.failure_msg += (
+                        f"The build in Copr was not successful. "
+                        f"Copr state: {state_reported}.\n"
+                    )
                 return
 
             time.sleep(30)
@@ -193,8 +302,10 @@ class Testcase:
                 break
 
             if datetime.now() > watch_end:
-                self.failure_msg += "These statuses were set to pending 20 minutes " \
-                                    "after Copr build had been built:\n"
+                self.failure_msg += (
+                    "These statuses were set to pending 20 minutes "
+                    "after Copr build had been built:\n"
+                )
                 for status in statuses:
                     if "packit-stg" not in status.context and status.state == "pending":
                         self.failure_msg += f"{status.context}\n"
@@ -222,7 +333,7 @@ class Testcase:
 
     def check_comment(self):
         """
-        Check whether p-s has commented correctly about the Copr build result.
+        Check whether p-s has commented correctly when the Copr build was not successful.
         :return:
         """
         failure = "The build in Copr was not successful." in self.failure_msg
@@ -230,7 +341,7 @@ class Testcase:
         if failure:
             build_comment = [
                 comment
-                for comment in project.get_pr_comments(self.pr_id, reverse=True)
+                for comment in project.get_pr_comments(self.pr.id, reverse=True)
                 if comment.author == "packit-as-a-service[bot]"
             ][0]
             if build_comment.comment.startswith("Congratulations!"):
@@ -239,26 +350,12 @@ class Testcase:
                 )
                 return
 
-        else:
-            build_comment = [
-                comment
-                for comment in project.get_pr_comments(self.pr_id, reverse=True)
-                if comment.author.startswith("packit-as-a-service")
-            ][0]
-            if (
-                build_comment.author == "packit-as-a-service[bot]"
-                and not build_comment.comment.startswith("Congratulations!")
-            ):
-                self.failure_msg += "Copr build succeeded and last Github comment " \
-                                    "about unsuccessful copr build found.\n"
-                return
-
     def get_statuses(self):
         """
         Get commit statuses from the most recent commit.
         :return: [CommitStatus]
         """
-        commit_sha = project.get_all_pr_commits(self.pr_id)[-1]
+        commit_sha = project.get_all_pr_commits(self.pr.id)[-1]
         commit = project.github_repo.get_commit(commit_sha)
         return commit.get_combined_status().statuses
 
@@ -266,12 +363,21 @@ class Testcase:
 if __name__ == "__main__":
     sentry_sdk.init(getenv("SENTRY_SECRET"))
 
-    prs = [
+    # run testcases where the build is triggered by a '/packit build' comment
+    prs_for_comment = [
         pr for pr in project.get_pr_list() if pr.title.startswith("Basic test case:")
     ]
+    for pr in prs_for_comment:
+        Testcase(pr=pr, trigger=Trigger.comment).run_test()
 
-    for pr in prs:
-        testcase = Testcase(pr_id=pr.id)
-        testcase.run_checks()
-        if testcase.failure_msg:
-            sentry_sdk.capture_message(f"{pr.title} ({pr.url}) failed: {testcase.failure_msg}")
+    # run testcase where the build is triggered by push
+    pr_for_push = [
+        pr
+        for pr in project.get_pr_list()
+        if pr.title.startswith("Basic test case - push trigger")
+    ]
+    if pr_for_push:
+        Testcase(pr=pr_for_push[0], trigger=Trigger.push).run_test()
+
+    # run testcase where the build is triggered by opening a new PR
+    Testcase().run_test()
