@@ -18,3 +18,7 @@
       - playbooks/generate-local-secrets.yml
       - playbooks/zuul-deploy.yml
     run: playbooks/zuul-check.yml
+    nodeset:
+      nodes:
+        - name: test-node
+          label: cloud-fedora-32
