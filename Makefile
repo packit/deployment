@@ -43,7 +43,7 @@ deploy-validation:
 # DEPLOYMENT is always stg because this cronjob is not related to specific deployment stage a
 # needs be configure only once
 deploy-rebuild-base-image:
-	DEPLOYMENT=stg $(AP) playbooks/rebuild-base-image.yml
+	$(AP) playbooks/rebuild-base-image.yml
 
 # Check whether everything has been deployed OK with 'make deploy'
 check:
