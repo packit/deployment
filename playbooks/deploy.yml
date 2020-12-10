@@ -76,14 +76,6 @@
       tags:
         - always
 
-    - name: secrets not related specific deployment stage
-      include_vars: "{{ path_to_secrets }}/secrets.yaml"
-      # deployed only to stg as here are hosted stage-independent infrastructure components
-      # e.g. rebuild-base-image cronjob
-      when: deployment  == "stg"
-      tags:
-        - always
-
     - name: Get k8s token and check it.
       block:
         - name: get kubeconfig token
@@ -137,19 +129,6 @@
         - "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
       tags:
         - always
-
-    - name: Deploy templates only to stg
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ item }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-      loop:
-        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-rebuild-base-image.yml.j2') }}"
-      tags:
-        - always
-      when: deployment == "stg"
 
     - name: Deploy postgres
       k8s:
