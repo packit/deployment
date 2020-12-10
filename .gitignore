@@ -10,3 +10,6 @@ secrets/stg
 secrets/dev
 
 secrets/secrets.yaml
+
+# used in move_stable script
+move_stable_repositories
