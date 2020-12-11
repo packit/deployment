@@ -1,4 +1,4 @@
-.PHONY: send-release-event deploy tags cleanup zuul-secrets get-certs
+.PHONY: send-release-event deploy tags cleanup zuul-secrets get-certs move-stable
 
 ANSIBLE_PYTHON := /usr/bin/python3
 CONT_HOME := /opt/app-root/src
@@ -48,3 +48,7 @@ deploy-rebuild-base-image:
 # Check whether everything has been deployed OK with 'make deploy'
 check:
 	$(AP) playbooks/check.yml
+
+move-stable:
+	[[ -d move_stable_repositories ]] || scripts/move_stable.py init
+	scripts/move_stable.py move-all
