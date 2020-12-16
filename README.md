@@ -152,7 +152,24 @@ Create `secrets/dev/` (steal them from our secret repo).
 `cd vars; cp dev_template.yml dev.yml` and in `dev.yml` set `api_key` to the output of `oc whoami -t`.
 
 Run `DEPLOYMENT=dev make deploy`.
-That will also push locally built images (`:dev`) into the cluster's registry.
+That will also push locally built images (`:dev`) into the cluster's registry
+(make sure you have `push_dev_images: true` in `vars/dev.yml`).
+
+#### minishift
+
+Similar to above 'oc cluster up' you can run [minishift](https://www.okd.io/minishift/) to get
+a local OpenShift cluster.
+In addition to the above, you need to use `docker` and `oc`
+from the minishift environment after you start minishift:
+
+```
+$ eval $(minishift docker-env)
+$ eval $(minishift oc-env)
+$ oc config use-context minishift
+```
+
+and then build worker & service images (`make worker; make service` in `packit-service` repo)
+with Docker, before you run `DEPLOYMENT=dev make deploy`.
 
 #### Staging (quick & reliable & but don't break it)
 
