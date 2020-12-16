@@ -158,7 +158,7 @@ That will also push locally built images (`:dev`) into the cluster's registry
 #### minishift
 
 Similar to above 'oc cluster up' you can run [minishift](https://www.okd.io/minishift/) to get
-local Openshift cluster.
+a local OpenShift cluster.
 In addition to the above, you need to use `docker` and `oc`
 from the minishift environment after you start minishift:
 
@@ -169,7 +169,7 @@ $ oc config use-context minishift
 ```
 
 and then build worker & service images (`make worker; make service` in `packit-service` repo)
-before you run `DEPLOYMENT=dev make deploy`.
+with Docker, before you run `DEPLOYMENT=dev make deploy`.
 
 #### Staging (quick & reliable & but don't break it)
 
