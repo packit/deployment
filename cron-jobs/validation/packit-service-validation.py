@@ -100,6 +100,8 @@ class Testcase:
         :return:
         """
         source_branch = "test_case_opened_pr"
+        pr_title = "Basic test case - opened PR trigger"
+
         if source_branch not in project.get_branches():
             # if the source branch does not exist, create one
             # and create a commit
@@ -113,8 +115,13 @@ class Testcase:
                 committer=user,
                 author=user
             )
+
+        existing_pr = [pr for pr in project.get_pr_list() if pr.title == pr_title]
+        if len(existing_pr) == 1:
+            existing_pr[0].close()
+
         self.pr = project.create_pr(
-            title="Basic test case - opened PR trigger",
+            title=pr_title,
             body="This test case is triggered automatically by our validation script.",
             target_branch="master",
             source_branch=source_branch,
@@ -333,22 +340,21 @@ class Testcase:
 
     def check_comment(self):
         """
-        Check whether p-s has commented correctly when the Copr build was not successful.
+        Check whether p-s has commented when the Copr build was not successful.
         :return:
         """
         failure = "The build in Copr was not successful." in self.failure_msg
 
         if failure:
-            build_comment = [
+            packit_comments = [
                 comment
                 for comment in project.get_pr_comments(self.pr.id, reverse=True)
                 if comment.author == "packit-as-a-service[bot]"
-            ][0]
-            if build_comment.comment.startswith("Congratulations!"):
+            ]
+            if not packit_comments:
                 self.failure_msg += (
                     "No comment from p-s about unsuccessful last copr build found.\n"
                 )
-                return
 
     def get_statuses(self):
         """
