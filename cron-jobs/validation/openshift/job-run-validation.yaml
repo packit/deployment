@@ -27,9 +27,11 @@ metadata:
 spec:
   # runs every day at 4 a.m.
   schedule: "0 4 * * *"
-  backoffLimit: 3
   jobTemplate:
     spec:
+      # https://docs.openshift.com/container-platform/3.11/dev_guide/jobs.html#jobs-setting-maximum-duration
+      # set maximum duration to 4 hours
+      activeDeadlineSeconds: 14400
       template:
         spec:
           volumes:
