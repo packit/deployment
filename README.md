@@ -23,7 +23,7 @@
 We build separate images for
 
 - [service / web server](https://hub.docker.com/r/usercont/packit-service) - accepts webhooks and tasks workers
-- [workers](https://hub.docker.com/r/usercont/packit-service-worker) - do the actual work
+- [workers](https://hub.docker.com/r/usercont/packit-worker) - do the actual work
 - [fedora messaging consumer](https://hub.docker.com/r/usercont/packit-service-fedmsg) - listens on fedora messaging for events from Copr and tasks workers
 - [CentOS messaging consumer](https://hub.docker.com/r/usercont/packit-service-centosmsg) - listens on the CentOS MQTT message bus for events from git.centos.org
 - [Sandcastle](https://hub.docker.com/r/usercont/sandcastle) - sandboxing
@@ -118,14 +118,14 @@ So when you happen to deploy broken worker and you want to revert/undo it
 because you don't know what's the cause/fix yet, you have to:
 
 1. `oc describe is/packit-worker` - select older image
-2. `oc tag --source=docker usercont/packit-service-worker@sha256:<older-hash> myproject/packit-worker:<deployment>`
+2. `oc tag --source=docker usercont/packit-worker@sha256:<older-hash> myproject/packit-worker:<deployment>`
    And see the `packit-worker-x` pods being re-deployed from the older image.
 
 ### Prod re-deployment
 
 1. Trigger `:prod` images builds
 
-- move `packit`'s and `packit-service`'s `stable` branches to a newer commit to trigger `:prod` [service image](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker image](https://hub.docker.com/repository/docker/usercont/packit-service-worker) images builds
+- move `packit`'s and `packit-service`'s `stable` branches to a newer commit to trigger `:prod` [service image](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker image](https://hub.docker.com/repository/docker/usercont/packit-worker) images builds
 - move `packit-service-fedmsg`'s `stable` branch to a newer commit to trigger `:prod` [fedmsg listener image](https://hub.docker.com/repository/docker/usercont/packit-service-fedmsg) build
 - move `packit-service-centosmsg`'s `stable` branch to a newer commit to trigger `:prod` [centosmsg listener image](https://hub.docker.com/repository/docker/usercont/packit-service-centosmsg) build
 - move `sandcastle`'s `stable` branch to a newer commit to trigger `:prod` [sandcastle image](https://hub.docker.com/repository/docker/usercont/sandcastle) build
@@ -174,13 +174,13 @@ with Docker, before you run `DEPLOYMENT=dev make deploy`.
 #### Staging (quick & reliable & but don't break it)
 
 If you're lazy and you're sure your changes won't do any harm, you can temporarily get hold of staging instance for that.
-Just build & push `packit-service-worker` and you can play.
+Just build & push `packit-worker` and you can play.
 
 - in packit: `make image`
 - in packit-service:
   - `make worker`
-  - `docker tag docker.io/usercont/packit-service-worker:dev docker.io/usercont/packit-service-worker:stg`
-  - `docker push docker.io/usercont/packit-service-worker:stg`
+  - `docker tag docker.io/usercont/packit-worker:dev docker.io/usercont/packit-worker:stg`
+  - `docker push docker.io/usercont/packit-worker:stg`
 - in deployment: `DEPLOYMENT=stg make import-images`
 
 Once you're done you should [revert to older image](#reverting-to-older-deploymentrevisionimage).
