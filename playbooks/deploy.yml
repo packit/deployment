@@ -41,7 +41,7 @@
     with_pushgateway: true
     push_dev_images: false
     image: docker.io/usercont/packit-service:{{ deployment }}
-    image_worker: docker.io/usercont/packit-service-worker:{{ deployment }}
+    image_worker: docker.io/usercont/packit-worker:{{ deployment }}
     image_fedmsg: docker.io/usercont/packit-service-fedmsg:{{ deployment }}
     image_centosmsg: docker.io/usercont/packit-service-centosmsg:{{ deployment }}
     image_dashboard: docker.io/usercont/packit-dashboard:{{ deployment }}
@@ -107,7 +107,7 @@
       when: push_dev_images
       tags:
         - packit-service
-        - packit-service-worker
+        - packit-worker
         - packit-service-beat
 
     - name: Deploy templates
@@ -159,15 +159,15 @@
       tags:
         - packit-service
 
-    - name: Deploy packit-service-worker
+    - name: Deploy packit-worker
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-worker.yml.j2') }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
       tags:
-        - packit-service-worker
+        - packit-worker
 
     - name: Deploy packit-service-beat
       k8s:

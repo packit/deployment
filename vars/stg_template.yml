@@ -60,7 +60,7 @@ validate_certs: yes
 # image: docker.io/usercont/packit-service:{{ deployment }}
 
 # image to use for worker
-# image_worker: docker.io/usercont/packit-service-worker:{{ deployment }}
+# image_worker: docker.io/usercont/packit-worker:{{ deployment }}
 
 # image to use for fedora messaging consumer
 # image_fedmsg: docker.io/usercont/packit-service-fedmsg:{{ deployment }}

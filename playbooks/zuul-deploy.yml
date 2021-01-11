@@ -39,7 +39,7 @@
           with_pushgateway: false
           # Use stg images
           image: docker.io/usercont/packit-service:stg
-          image_worker: docker.io/usercont/packit-service-worker:stg
+          image_worker: docker.io/usercont/packit-worker:stg
           image_fedmsg: docker.io/usercont/packit-service-fedmsg:stg
           image_centosmsg: docker.io/usercont/packit-service-centosmsg:stg
           image_dashboard: docker.io/usercont/packit-dashboard:stg
