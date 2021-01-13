@@ -2,6 +2,8 @@
 
 For the validation of the packit-service we run a validation script every night.
 
+Currently this is deployed in [Open PaaS](https://open.paas.redhat.com/console/project/packit-service-validation/overview).
+
 [Cron job](./openshift/job-run-validation.yaml) - job for running of the validation script
 
 [Dockerfile](./Dockerfile) - image used by the job
