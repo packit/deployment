@@ -199,7 +199,7 @@ class Testcase:
             except Exception:
                 old_build_len = 0
 
-            old_comment_len = len(project.get_pr_comments(self.pr.id))
+            old_comment_len = len(self.pr.get_comments())
         else:
             # the PR is not created yet
             old_build_len = 0
@@ -227,7 +227,7 @@ class Testcase:
             if len(new_builds) >= old_build_len + 1:
                 return new_builds[0]
 
-            new_comments = project.get_pr_comments(self.pr.id, reverse=True)
+            new_comments = self.pr.get_comments(reverse=True)
             new_comments = new_comments[: (len(new_comments) - old_comment_len)]
 
             if len(new_comments) > 1:
@@ -348,7 +348,7 @@ class Testcase:
         if failure:
             packit_comments = [
                 comment
-                for comment in project.get_pr_comments(self.pr.id, reverse=True)
+                for comment in self.pr.get_comments(reverse=True)
                 if comment.author == "packit-as-a-service[bot]"
             ]
             if not packit_comments:
@@ -358,11 +358,10 @@ class Testcase:
 
     def get_statuses(self):
         """
-        Get commit statuses from the most recent commit.
+        Get commit statuses from the head commit of the PR.
         :return: [CommitStatus]
         """
-        commit_sha = project.get_all_pr_commits(self.pr.id)[-1]
-        commit = project.github_repo.get_commit(commit_sha)
+        commit = project.github_repo.get_commit(self.pr.head_commit)
         return commit.get_combined_status().statuses
 
 
