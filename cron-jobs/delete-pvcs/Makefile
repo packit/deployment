@@ -10,4 +10,5 @@ push:
 
 # first: 'oc login', 'oc project packit-${DEPLOYMENT}-sandbox'
 deploy:
+	oc delete --ignore-not-found -f job-delete-pvcs.yaml
 	oc create -f job-delete-pvcs.yaml
