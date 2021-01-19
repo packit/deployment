@@ -12,7 +12,7 @@ spec:
         spec:
           containers:
             - name: delete-pvcs
-              image: usercont/delete-pvcs
+              image: quay.io/packit/delete-pvcs
               env:
                 - name: KUBECONFIG
                   value: /tmp/.kube/config
