@@ -1,4 +1,4 @@
-IMAGE=docker.io/usercont/delete-pvcs
+IMAGE=quay.io/packit/delete-pvcs
 
 # https://github.com/packit/deployment/issues/112#issuecomment-673343049
 # CONTAINER_ENGINE ?= $(shell command -v podman 2> /dev/null || echo docker)
