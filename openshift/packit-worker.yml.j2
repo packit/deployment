@@ -129,7 +129,9 @@ spec:
             - "/usr/bin/run_worker.sh"
           resources:
             limits:
-              memory: "512Mi"
+              # cloning repos is memory intensive: glibc needs 300M+, kernel 600M+
+              # during cloning, we need to account for git and celery worker processes
+              memory: "896Mi"
               cpu: "400m"
           # https://github.com/packit/deployment/pull/142
           #readinessProbe:
