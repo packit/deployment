@@ -7,10 +7,6 @@ AP := ansible-playbook -vv -c local -i localhost, -e ansible_python_interpreter=
 # https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html#special-tags
 TAGS ?= all
 
-# use route when doing this on a remote openshift cluster
-send-release-event:
-	curl -d "@test_data/release_event.json" -H "Content-Type: application/json" -X POST http://$(shell oc get svc packit-service -o json | jq -r .spec.clusterIP)/webhooks/github/release
-
 deploy:
 	$(AP) playbooks/deploy.yml --tags $(TAGS)
 
