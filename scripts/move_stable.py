@@ -23,7 +23,7 @@ REPOSITORIES: List[str] = [
 ]
 # TESTING_REPOSITORY: str = "hello-world"
 STABLE_BRANCH: str = "stable"
-ROLLING_BRANCH: str = "master"
+ROLLING_BRANCH: str = "main"
 
 
 @click.group()
