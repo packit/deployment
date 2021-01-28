@@ -31,7 +31,7 @@ We build separate images for
 #### Production vs. Staging images
 
 Separate images are built for staging and production deployment.
-Staging images are `:stg` tagged and built from `master` of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
+Staging images are `:stg` tagged and built from `main` of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
 Production images are `:prod` tagged and built from `stable` branch of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
 To move `stable` branch to a newer 'stable' commit:
 
@@ -46,7 +46,7 @@ Image builds are triggered by new commits on Docker Hub.
 In packit-service we use a custom build hook to be able to inject ENV variables
 provided by the build process. ([docs](https://docs.docker.com/docker-hub/builds/advanced/))
 
-For more details about local builds see [packit-service/CONTRIBUTING.md](https://github.com/packit/packit-service/blob/master/CONTRIBUTING.md#building-images-locally)
+For more details about local builds see [packit-service/CONTRIBUTING.md](https://github.com/packit/packit-service/blob/main/CONTRIBUTING.md#building-images-locally)
 
 ### Continuous Deployment
 
@@ -60,15 +60,15 @@ We use [ImageStreams](https://docs.openshift.com/container-platform/3.11/archite
 
 `Image registry` -> [1] -> `ImageStream` -> [2] -> `DeploymentConfig`/`StatefulSet`
 
-[1] set to automatic ([here](https://github.com/packit-service/deployment/blob/master/openshift/imagestream.yml.j2#L36)), however OpenShift Online has this turned off.
-We run a [CronJob](https://github.com/packit-service/deployment/blob/master/cron-jobs/job-import-images.yaml) to work-around this.
+[1] set to automatic ([here](https://github.com/packit-service/deployment/blob/main/openshift/imagestream.yml.j2#L36)), however OpenShift Online has this turned off.
+We run a [CronJob](https://github.com/packit-service/deployment/blob/main/cron-jobs/job-import-images.yaml) to work-around this.
 More info [here](./cron-jobs/README.md).
 It runs (i.e. imports newer images and re-deploys them)
 
 - STG: Once every hour (at minute 0)
 - PROD: At 2AM on Monday
 
-[2] automatic, [example](https://github.com/packit-service/deployment/blob/master/openshift/deployment.yml.j2#L98)
+[2] automatic, [example](https://github.com/packit-service/deployment/blob/main/openshift/deployment.yml.j2#L98)
 
 ### Manually import a newer image
 
@@ -140,8 +140,8 @@ because you don't know what's the cause/fix yet, you have to:
 
 #### docker-compose (quick & dirty)
 
-There's a [docker-compose.yml in packit-service](https://github.com/packit-service/packit-service/blob/master/docker-compose.yml).
-See [Running packit-service locally](https://github.com/packit-service/packit-service/blob/master/CONTRIBUTING.md#running-packit-service-locally) for how to make that work.
+There's a [docker-compose.yml in packit-service](https://github.com/packit-service/packit-service/blob/main/docker-compose.yml).
+See [Running packit-service locally](https://github.com/packit-service/packit-service/blob/main/CONTRIBUTING.md#running-packit-service-locally) for how to make that work.
 
 #### oc cluster up (slow & better)
 
