@@ -123,7 +123,7 @@ class Testcase:
         self.pr = project.create_pr(
             title=pr_title,
             body="This test case is triggered automatically by our validation script.",
-            target_branch="master",
+            target_branch=project.default_branch,
             source_branch=source_branch,
         )
 
