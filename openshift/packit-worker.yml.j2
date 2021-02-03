@@ -116,6 +116,10 @@ spec:
                 secretKeyRef:
                   key: database-name
                   name: postgres-secret
+            - name: CELERY_RETRY_LIMIT
+              value: "{{ celery_retry_limit }}"
+            - name: CELERY_RETRY_BACKOFF
+              value: "{{ celery_retry_backoff }}"
           volumeMounts:
             - name: packit-ssh
               mountPath: /packit-ssh
