@@ -54,6 +54,8 @@
     # https://github.com/packit/deployment/issues/112#issuecomment-673343049
     # container_engine: "{{ lookup('pipe', 'command -v podman 2> /dev/null || echo docker') }}"
     container_engine: docker
+    celery_retry_limit: 2
+    celery_retry_backoff: 3
   tasks:
     - name: include variables
       include_vars: "{{ project_dir }}/vars/{{ deployment }}.yml"

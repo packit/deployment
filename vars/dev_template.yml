@@ -87,4 +87,7 @@ with_pushgateway: false
 # If you still want to use docker even when podman is installed, set:
 # container_engine: "docker"
 
+# celery_retry_limit: 2
+# celery_retry_backoff: 3
+
 push_dev_images: true
