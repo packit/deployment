@@ -287,8 +287,8 @@ Go to [Google Domains](https://domains.google.com/m/registrar/packit.dev/dns)
 and create/set the corresponding value:
 TXT record called `_acme-challenge`
 (or `_acme-challenge.prod` or `acme-challenge.stg` per instructions).
-If those records already exist (from previous run),
-you have to remove them first before you can add a new one.
+If those records already exist (from previous run), don't create new records,
+just edit current ones (or first delete the old ones and then create new ones).
 
 Wait till it's distributed - in another terminal watch nslookup
 and once it returns the configured value
