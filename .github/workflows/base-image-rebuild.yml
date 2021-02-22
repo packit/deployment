@@ -1,0 +1,33 @@
+name: Rebuild & push base image
+on:
+  schedule:
+    # At 00:00 on Monday.
+    - cron: "0 0 * * 1"
+
+jobs:
+  build:
+    # To not run in forks
+    if: github.repository == 'packit/deployment'
+
+    name: Build and push image
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          dockerfiles: containers/Dockerfile.base
+          image: base
+          oci: true
+
+      - name: Push To Quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/packit
+          username: ${{ secrets.QUAY_BASE_IMAGE_BUILDER_USERNAME }}
+          password: ${{ secrets.QUAY_BASE_IMAGE_BUILDER_TOKEN }}
