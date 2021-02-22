@@ -33,11 +33,6 @@ get-certs-dashboard:
 generate-local-secrets:
 	$(AP) playbooks/generate-local-secrets.yml
 
-# DEPLOYMENT is always stg because this cronjob is not related to specific deployment stage a
-# needs be configure only once
-deploy-rebuild-base-image:
-	$(AP) playbooks/rebuild-base-image.yml
-
 # Check whether everything has been deployed OK with 'make deploy'
 check:
 	$(AP) playbooks/check.yml
