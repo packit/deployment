@@ -21,7 +21,7 @@ spec:
                 secretName: copr-config
           containers:
             - name: run-validation
-              image: usercont/packit-service-validation
+              image: quay.io/packit/packit-service-validation
               env:
                 - name: GITHUB_TOKEN
                   valueFrom:
