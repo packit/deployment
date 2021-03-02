@@ -1,8 +1,8 @@
-FROM fedora:32
+FROM fedora:33
 
 RUN dnf install -y python3-ogr python3-copr python3-pip && dnf clean all
 
-RUN pip install --upgrade sentry-sdk==0.14.2
+RUN pip3 install --upgrade sentry-sdk && pip3 check
 
 COPY packit-service-validation.py /usr/bin/
 
