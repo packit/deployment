@@ -14,7 +14,7 @@ spec:
         spec:
           containers:
             - name: import-images
-              image: docker.io/usercont/import-images
+              image: quay.io/packit/import-images
               env:
                 - name: KUBECONFIG
                   value: /tmp/.kube/config
