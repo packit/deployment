@@ -6,6 +6,7 @@
   template:
     src: "{{ item }}.j2"
     dest: "{{ path_to_secrets }}/{{ item }}"
+    mode: 0644
   loop:
     - packit-service.yaml
     - extra-vars.yml

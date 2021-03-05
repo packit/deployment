@@ -17,6 +17,7 @@
       command: oc whoami -t
       register: kubeconfig_token
       become: true
+      changed_when: false
 
     - name: Create dev.yml
       copy:
@@ -45,6 +46,7 @@
           image_dashboard: quay.io/packit/dashboard:stg
           image_tokman: quay.io/packit/tokman:stg
         dest: "{{ project_dir }}/vars/dev.yml"
+        mode: 0644
 
     - name: Actually deploy
       command: make deploy
@@ -54,3 +56,4 @@
       args:
         chdir: "{{ project_dir }}"
       become: true
+      changed_when: true
