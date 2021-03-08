@@ -78,9 +78,7 @@ Long story:
 If you need to import (and deploy) newer image(s) before the CronJob does
 (see above), you can [do that manually](https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#importing-tag-and-image-metadata):
 
-```
-$ oc import-image is/packit-{service|service-fedmsg|worker|dashboard|service-centosmsg}:<deployment>
-```
+    $ oc import-image is/packit-{service|service-fedmsg|worker|dashboard|service-centosmsg}:<deployment>
 
 once a new image is pushed/built in registry.
 
@@ -93,9 +91,7 @@ partial deployment, you can set the `TAGS` environment variable before calling
 `make`. For example, to run only the tasks to deploy Redis and Redis
 Commander, run:
 
-```
-$ DEPLOYMENT=dev TAGS="redis,redis-commander" make deploy
-```
+    $ DEPLOYMENT=dev TAGS="redis,redis-commander" make deploy
 
 Use `make tags` to list the currently available tags.
 
@@ -103,10 +99,8 @@ Use `make tags` to list the currently available tags.
 
 `DeploymentConfig`s (i.e. service & service-fedmsg) can be reverted with `oc rollout undo`:
 
-```
-$ oc rollout undo dc/packit-service [--to-revision=X]
-$ oc rollout undo dc/packit-service-fedmsg [--to-revision=X]
-```
+    $ oc rollout undo dc/packit-service [--to-revision=X]
+    $ oc rollout undo dc/packit-service-fedmsg [--to-revision=X]
 
 where `X` is revision number.
 See also `oc rollout history dc/packit-service [--revision=X]`.
@@ -134,7 +128,8 @@ because you don't know what's the cause/fix yet, you have to:
 
 2. Import images -> re-deploy
 
-- If you don't want to wait for [it to be done automatically](#continuous-deployment) you can [do that manually](#manually-import-a-newer-image) once the images are built.
+- If you don't want to wait for [it to be done automatically](#continuous-deployment) you can
+  [do that manually](#manually-import-a-newer-image) once the images are built (check Actions in each repo).
 
 ### How do I test my changes?
 
@@ -162,11 +157,9 @@ a local OpenShift cluster.
 In addition to the above, you need to use `docker` and `oc`
 from the minishift environment after you start minishift:
 
-```
-$ eval $(minishift docker-env)
-$ eval $(minishift oc-env)
-$ oc config use-context minishift
-```
+    $ eval $(minishift docker-env)
+    $ eval $(minishift oc-env)
+    $ oc config use-context minishift
 
 and then build worker & service images (`make worker; make service` in `packit-service` repo)
 with Docker, before you run `DEPLOYMENT=dev make deploy`.
@@ -199,11 +192,10 @@ Then, copy the `secrets` directory to your `packit-service` directory
 
 ## Zuul
 
-We have to encrypt the secrets, because we are using them in Zuul CI. This repository provides helpful playbook to do this with one command:
+We have to encrypt the secrets, because we are using them in Zuul CI.
+This repository provides helpful playbook to do this with one command:
 
-```
-DEPLOYMENT=stg make zuul-secrets
-```
+    DEPLOYMENT=stg make zuul-secrets
 
 ### How are the secrets encrypted?
 
@@ -240,17 +232,15 @@ _Note: If certbot is executed against multiple domains, step 3. is repeated for 
 
 Make sure the DNS is all set up:
 
-```
-$ dig prod.packit.dev
-; <<>> DiG 9.11.24-RedHat-9.11.24-2.fc33 <<>> prod.packit.dev
-;; QUESTION SECTION:
-;prod.packit.dev.		IN	A
-;; ANSWER SECTION:
-prod.packit.dev.	3600	IN	CNAME	elb.e4ff.pro-eu-west-1.openshiftapps.com.
-elb.e4ff.pro-eu-west-1.openshiftapps.com. 3599 IN CNAME	pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com.
-pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 59 IN A 54.170.98.95
-pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 59 IN A 99.80.116.118
-```
+    $ dig prod.packit.dev
+    ; <<>> DiG 9.11.28-RedHat-9.11.28-1.fc33 <<>> prod.packit.dev
+    ;; QUESTION SECTION:
+    ;prod.packit.dev.		IN	A
+    ;; ANSWER SECTION:
+    prod.packit.dev.	282	IN	CNAME	elb.e4ff.pro-eu-west-1.openshiftapps.com.
+    elb.e4ff.pro-eu-west-1.openshiftapps.com. 3599 IN CNAME	pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com.
+    pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 59 IN A 52.208.12.108
+    pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 59 IN A 52.209.166.166
 
 Check if you have access to packit.dev domain in
 [Google Domains](https://domains.google.com/m/registrar/packit.dev).
@@ -263,23 +253,19 @@ or simply `dnf install certbot` on your machine (the instructions tell you to do
 
 Run certbot:
 
-```
-$ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email user-cont-team@redhat.com -d *.packit.dev -d *.prod.packit.dev -d *.stg.packit.dev
-```
+    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email user-cont-team@redhat.com -d *.packit.dev -d *.prod.packit.dev -d *.stg.packit.dev
 
 You will be asked to set TXT record for every domain requested:
 
-```
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Please deploy a DNS TXT record under the name
-_acme-challenge.packit.dev with the following value:
+    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    Please deploy a DNS TXT record under the name
+    _acme-challenge.packit.dev with the following value:
 
-123456abcdef
+    123456abcdef
 
-Before continuing, verify the record is deployed.
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Press Enter to Continue
-```
+    Before continuing, verify the record is deployed.
+    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    Press Enter to Continue
 
 ### 3. Update DNS record
 
@@ -293,18 +279,16 @@ just edit current ones (or first delete the old ones and then create new ones).
 Wait till it's distributed - in another terminal watch nslookup
 and once it returns the configured value
 
-```
-[~/]$ watch -d nslookup -q=TXT _acme-challenge.packit.dev
-Server:         127.0.0.53
-Address:        127.0.0.53#53
+    [~/]$ watch -d nslookup -q=TXT _acme-challenge.packit.dev
+    Server:         127.0.0.53
+    Address:        127.0.0.53#53
 
-Non-authoritative answer:
-_acme-challenge.packit.dev      text = "123456abcdef"
+    Non-authoritative answer:
+    _acme-challenge.packit.dev      text = "123456abcdef"
 
-Authoritative answers can be found from:
+    Authoritative answers can be found from:
 
-Ctrl+c
-```
+    Ctrl+c
 
 Go to the terminal with certbot command waiting for your action and hit Enter.
 
@@ -314,19 +298,15 @@ Repeat this for all requested domains.
 
 Copy certificates to secrets repository (prod & stg)
 
-```
-cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/prod/
-cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/stg/
-```
+    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/prod/
+    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/stg/
 
 Push, create merge request and merge.
 
 ### 5.Re-deploy stg and prod environment:
 
-```
-DEPLOYMENT=stg make deploy
-DEPLOYMENT=prod make deploy
-```
+    DEPLOYMENT=stg make deploy
+    DEPLOYMENT=prod make deploy
 
 Docs: https://certbot.eff.org/docs/using.html#manual
 
@@ -335,16 +315,13 @@ Docs: https://certbot.eff.org/docs/using.html#manual
 If you want to inspect local certificates, you can use `certtool` (`gnutls-utils` package)
 to view the cert's metadata:
 
-```
-$ certtool -i <fullchain.pem
-X.509 Certificate Information:
+    X.509 Certificate Information:
         Version: 3
-        Serial Number (hex): 04388dc3bcaaf649c1e891d130dfaf2aeedd
-        Issuer: CN=Let's Encrypt Authority X3,O=Let's Encrypt,C=US
+        Serial Number (hex): 04f4864b597f9c0859260d88e04cfabfeeac
+        Issuer: CN=R3,O=Let's Encrypt,C=US
         Validity:
-                Not Before: Thu Jul 11 07:13:42 UTC 2019
-                Not After: Wed Oct 09 07:13:42 UTC 2019
-```
+            Not Before: Wed Feb 17 14:46:25 UTC 2021
+            Not After: Tue May 18 14:46:25 UTC 2021
 
 ## Monitoring of packit-service
 
