@@ -22,17 +22,17 @@
 
 We build separate images for
 
-- [service / web server](https://hub.docker.com/r/usercont/packit-service) - accepts webhooks and tasks workers
-- [workers](https://hub.docker.com/r/usercont/packit-worker) - do the actual work
-- [fedora messaging consumer](https://hub.docker.com/r/usercont/packit-service-fedmsg) - listens on fedora messaging for events from Copr and tasks workers
-- [CentOS messaging consumer](https://hub.docker.com/r/usercont/packit-service-centosmsg) - listens on the CentOS MQTT message bus for events from git.centos.org
-- [Sandcastle](https://hub.docker.com/r/usercont/sandcastle) - sandboxing
+- [service / web server](https://quay.io/repository/packit/packit-service) - accepts webhooks and tasks workers
+- [workers](https://quay.io/repository/packit/packit-worker) - do the actual work
+- [fedora messaging consumer](https://quay.io/repository/packit/packit-service-fedmsg) - listens on fedora messaging for events from Copr and tasks workers
+- [CentOS messaging consumer](https://quay.io/repository/packit/packit-service-centosmsg) - listens on the CentOS MQTT message bus for events from git.centos.org
+- [Sandcastle](https://quay.io/repository/packit/sandcastle) - sandboxing
 
 #### Production vs. Staging images
 
 Separate images are built for staging and production deployment.
-Staging images are `:stg` tagged and built from `main` of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
-Production images are `:prod` tagged and built from `stable` branch of `packit`, `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
+Staging images are `:stg` tagged and built from `main` of `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
+Production images are `:prod` tagged and built from `stable` branch of `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
 To move `stable` branch to a newer 'stable' commit:
 
 - git branch -f stable commit-hash
@@ -40,11 +40,13 @@ To move `stable` branch to a newer 'stable' commit:
 
 #### Image build process
 
-Image builds are triggered by new commits on Docker Hub.
-([Autobuild docs](https://docs.docker.com/docker-hub/builds/))
+Images are automatically built and pushed to [Quay.io](https://quay.io/organization/packit)
+by a Github workflow whenever a new commit is pushed to `main` or `stable` branch.
 
-In packit-service we use a custom build hook to be able to inject ENV variables
-provided by the build process. ([docs](https://docs.docker.com/docker-hub/builds/advanced/))
+In each repo (which builds images) see
+
+- `Actions` tab
+- .github/workflows/\*.yml for configuration of the Action/workflow
 
 For more details about local builds see [packit-service/CONTRIBUTING.md](https://github.com/packit/packit-service/blob/main/CONTRIBUTING.md#building-images-locally)
 
@@ -119,12 +121,7 @@ because you don't know what's the cause/fix yet, you have to:
 
 1. Trigger `:prod` images builds
 
-- move `packit`'s and `packit-service`'s `stable` branches to a newer commit to trigger `:prod` [service image](https://hub.docker.com/repository/docker/usercont/packit-service) and [worker image](https://hub.docker.com/repository/docker/usercont/packit-worker) images builds
-- move `packit-service-fedmsg`'s `stable` branch to a newer commit to trigger `:prod` [fedmsg listener image](https://hub.docker.com/repository/docker/usercont/packit-service-fedmsg) build
-- move `packit-service-centosmsg`'s `stable` branch to a newer commit to trigger `:prod` [centosmsg listener image](https://hub.docker.com/repository/docker/usercont/packit-service-centosmsg) build
-- move `sandcastle`'s `stable` branch to a newer commit to trigger `:prod` [sandcastle image](https://hub.docker.com/repository/docker/usercont/sandcastle) build
-- move `dashboard`'s `stable` branch to a newer commit to trigger `:prod` [dashboard image](https://hub.docker.com/repository/docker/usercont/packit-dashboard) build
-- move `tokman`'s `stable` branch to a newer commit to trigger `:prod` [tokman image](https://hub.docker.com/repository/docker/usercont/tokman) build
+- Run [scripts/move_stable.py](scripts/move_stable.py) to move `stable` branches to a newer commit.
 
 2. Import images -> re-deploy
 
@@ -169,11 +166,10 @@ with Docker, before you run `DEPLOYMENT=dev make deploy`.
 If you're lazy and you're sure your changes won't do any harm, you can temporarily get hold of staging instance for that.
 Just build & push `packit-worker` and you can play.
 
-- in packit: `make image`
-- in packit-service:
+- in packit-service repo:
   - `make worker`
-  - `docker tag docker.io/usercont/packit-worker:dev docker.io/usercont/packit-worker:stg`
-  - `docker push docker.io/usercont/packit-worker:stg`
+  - `podman tag quay.io/packit/packit-worker:dev quay.io/packit/packit-worker:stg`
+  - `podman push quay.io/packit/packit-worker:stg`
 - in deployment: `DEPLOYMENT=stg make import-images`
 
 Once you're done you should [revert to older image](#reverting-to-older-deploymentrevisionimage).

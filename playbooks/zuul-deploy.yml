@@ -38,12 +38,12 @@
           with_dashboard: false
           with_pushgateway: false
           # Use stg images
-          image: docker.io/usercont/packit-service:stg
-          image_worker: docker.io/usercont/packit-worker:stg
-          image_fedmsg: docker.io/usercont/packit-service-fedmsg:stg
-          image_centosmsg: docker.io/usercont/packit-service-centosmsg:stg
-          image_dashboard: docker.io/usercont/packit-dashboard:stg
-          image_tokman: docker.io/usercont/tokman:stg
+          image: quay.io/packit/packit-service:stg
+          image_worker: quay.io/packit/packit-worker:stg
+          image_fedmsg: quay.io/packit/packit-service-fedmsg:stg
+          image_centosmsg: quay.io/packit/packit-service-centosmsg:stg
+          image_dashboard: quay.io/packit/dashboard:stg
+          image_tokman: quay.io/packit/tokman:stg
         dest: "{{ project_dir }}/vars/dev.yml"
 
     - name: Actually deploy

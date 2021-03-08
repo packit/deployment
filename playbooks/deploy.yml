@@ -40,12 +40,12 @@
     with_beat: true
     with_pushgateway: true
     push_dev_images: false
-    image: docker.io/usercont/packit-service:{{ deployment }}
-    image_worker: docker.io/usercont/packit-worker:{{ deployment }}
-    image_fedmsg: docker.io/usercont/packit-service-fedmsg:{{ deployment }}
-    image_centosmsg: docker.io/usercont/packit-service-centosmsg:{{ deployment }}
-    image_dashboard: docker.io/usercont/packit-dashboard:{{ deployment }}
-    image_tokman: docker.io/usercont/tokman:{{ deployment }}
+    image: quay.io/packit/packit-service:{{ deployment }}
+    image_worker: quay.io/packit/packit-worker:{{ deployment }}
+    image_fedmsg: quay.io/packit/packit-service-fedmsg:{{ deployment }}
+    image_centosmsg: quay.io/packit/packit-service-centosmsg:{{ deployment }}
+    image_dashboard: quay.io/packit/dashboard:{{ deployment }}
+    image_tokman: quay.io/packit/tokman:{{ deployment }}
     worker_replicas: 1
     path_to_secrets: "{{ project_dir }}/secrets"
     # to be used in Image streams as importPolicy:scheduled value

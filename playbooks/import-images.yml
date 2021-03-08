@@ -34,20 +34,20 @@
       # it doesn't change anything, so don't report 'changed'
       changed_when: false
 
-    - name: check/import newer usercont/packit-service image into image stream
+    - name: check/import newer packit-service image into image stream
       command: oc import-image is/packit-service:{{ deployment }} -n packit-{{ deployment }}
 
-    - name: check/import newer usercont/packit-service-fedmsg image into image stream
+    - name: check/import newer packit-service-fedmsg image into image stream
       command: oc import-image is/packit-service-fedmsg:{{ deployment }} -n packit-{{ deployment }}
 
-    - name: check/import newer usercont/packit-service-centosmsg image into image stream
+    - name: check/import newer packit-service-centosmsg image into image stream
       command: oc import-image is/packit-service-centosmsg:{{ deployment }} -n packit-{{ deployment }}
 
-    - name: check/import newer usercont/packit-worker image into image stream
+    - name: check/import newer packit-worker image into image stream
       command: oc import-image is/packit-worker:{{ deployment }} -n packit-{{ deployment }}
 
-    - name: check/import newer usercont/packit-dashboard image into image stream
+    - name: check/import newer dashboard image into image stream
       command: oc import-image is/packit-dashboard:{{ deployment }} -n packit-{{ deployment }}
 
-    - name: check/import newer usercont/tokman image into image stream
+    - name: check/import newer tokman image into image stream
       command: oc import-image is/tokman:{{ deployment }} -n packit-{{ deployment }}
