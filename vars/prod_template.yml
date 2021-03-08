@@ -58,22 +58,22 @@ validate_certs: yes
 # sandbox_namespace: "packit-prod-sandbox"
 
 # image to use for service
-# image: docker.io/usercont/packit-service:{{ deployment }}
+# image: quay.io/packit/packit-service:{{ deployment }}
 
 # image to use for worker
-# image_worker: docker.io/usercont/packit-worker:{{ deployment }}
+# image_worker: quay.io/packit/packit-worker:{{ deployment }}
 
 # image to use for fedora messaging consumer
-# image_fedmsg: docker.io/usercont/packit-service-fedmsg:{{ deployment }}
+# image_fedmsg: quay.io/packit/packit-service-fedmsg:{{ deployment }}
 
 # image to use for centos messaging consumer
-# image_centosmsg: docker.io/usercont/packit-service-centosmsg:{{ deployment }}
+# image_centosmsg: quay.io/packit/packit-service-centosmsg:{{ deployment }}
 
 # image to use for dashboard
-# image_dashboard: "docker.io/usercont/packit-dashboard:{{ deployment }}"
+# image_dashboard: "quay.io/packit/dashboard:{{ deployment }}"
 
 # image to use for tokman
-# image_tokman: "docker.io/usercont/tokman:{{ deployment }}"
+# image_tokman: "quay.io/packit/tokman:{{ deployment }}"
 
 # Number of worker pods to be deployed
 worker_replicas: 2
