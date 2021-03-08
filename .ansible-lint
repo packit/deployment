@@ -1,0 +1,5 @@
+# https://ansible-lint.readthedocs.io/en/latest/configuring.html
+
+skip_list:
+  - yaml  # clashes with prettier
+  - role-name  # we're not going to publish the roles

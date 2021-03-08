@@ -6,6 +6,7 @@
   file:
     path: "{{ path_to_secrets }}/{{ item }}"
     state: touch
+    mode: 0644
   loop:
     - fedora.keytab
     - sentry_key

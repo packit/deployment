@@ -5,10 +5,12 @@
 - name: Check deployment
   hosts: all
   tasks:
-    - command: make check
+    - name: Run 'make check'
+      command: make check
       environment:
         DEPLOYMENT: dev
         ANSIBLE_STDOUT_CALLBACK: debug
       args:
         chdir: "{{ project_dir }}"
       become: true
+      changed_when: false
