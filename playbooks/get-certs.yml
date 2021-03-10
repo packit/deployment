@@ -32,7 +32,8 @@
         that: deployment|length > 0
     - name: include variables
       include_vars: ../vars/{{ deployment }}.yml
-    - debug:
+    - name: Status message
+      debug:
         msg: "Deploying certbot pod for {{ domain }}"
     - name: Deploy cert tools
       # https://docs.ansible.com/k8s_module.html
