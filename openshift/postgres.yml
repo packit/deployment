@@ -53,7 +53,7 @@ spec:
                 secretKeyRef:
                   key: database-name
                   name: postgres-secret
-          image: registry.access.redhat.com/rhscl/postgresql-10-rhel7
+          image: registry.redhat.io/rhel8/postgresql-10
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
