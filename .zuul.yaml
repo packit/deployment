@@ -11,7 +11,7 @@
 - job:
     name: deployment-tests
     parent: oc-cluster-up
-    description: Deploy and check
+    description: Deploy and check dnm test
     extra-vars:
       deployment: dev
     pre-run:
