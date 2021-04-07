@@ -1,6 +1,6 @@
-## Periodically deleting old persistentvolumeclaims (PVCs)
+## Periodically deleting old Persistent Volume Claims (PVCs)
 
-[It happens from time to time](https://github.com/packit-service/packit-service/issues/409) that leftover PVCs in a sandbox namespace consume all storage quota.
+[It happens from time to time](https://github.com/packit/packit-service/issues/409) that leftover PVCs in a sandbox namespace consume all storage quota.
 
 As a work-around, here's a CronJob to periodically delete old PVCs.
 See CronJob definition [job-delete-pvcs.yaml](./job-delete-pvcs.yaml) or `oc describe cronjob/delete-pvcs`.
