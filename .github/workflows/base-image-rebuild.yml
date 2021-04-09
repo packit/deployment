@@ -15,9 +15,7 @@ jobs:
     if: github.repository_owner == 'packit'
 
     name: Build and push image
-    # https://github.com/redhat-actions/buildah-build/issues/45
-    #    runs-on: ubuntu-latest
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
