@@ -42,14 +42,15 @@ import configparser
 
 def normalize_name(name: str) -> str:
     """https://www.python.org/dev/peps/pep-0503/#normalized-names"""
-    return re.sub(r'[-_.]+', '-', name).lower()
+    return re.sub(r"[-_.]+", "-", name).lower()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Parse rpm requirements from setup.cfg from section '
-                    '[options], key install_requires')
-    parser.add_argument('path', type=str, help='Path to setup.cfg')
+        description="Parse rpm requirements from setup.cfg from section "
+        "[options], key install_requires"
+    )
+    parser.add_argument("path", type=str, help="Path to setup.cfg")
 
     args = parser.parse_args()
     setupcfg_path = pathlib.Path(args.path)
@@ -59,6 +60,8 @@ if __name__ == "__main__":
         config.read_file(f)
         python_packages = config["options"]["install_requires"].strip().splitlines()
 
-    result = [f"python3dist({normalize_name(pkg_name)})" for pkg_name in python_packages]
+    result = [
+        f"python3dist({normalize_name(pkg_name)})" for pkg_name in python_packages
+    ]
 
     print(os.linesep.join(result))
