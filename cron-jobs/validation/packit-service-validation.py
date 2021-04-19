@@ -17,9 +17,7 @@ from ogr.abstract import PullRequest
 copr = Client.create_from_config_file()
 service = GithubService(token=getenv("GITHUB_TOKEN"))
 project = service.get_project(repo="hello-world", namespace="packit")
-user = InputGitAuthor(
-    name="Release Bot", email="user-cont-team+release-bot@redhat.com"
-)
+user = InputGitAuthor(name="Release Bot", email="user-cont-team+release-bot@redhat.com")
 
 
 class Trigger(str, enum.Enum):
@@ -42,9 +40,7 @@ class Testcase:
         :return:
         """
         if self.pr and not self._copr_project_name:
-            self._copr_project_name = (
-                f"packit-hello-world-{self.pr.id}"
-            )
+            self._copr_project_name = f"packit-hello-world-{self.pr.id}"
         return self._copr_project_name
 
     def run_test(self):
@@ -106,14 +102,16 @@ class Testcase:
             # if the source branch does not exist, create one
             # and create a commit
             commit = project.github_repo.get_commit("HEAD")
-            project.github_repo.create_git_ref(f"refs/heads/{source_branch}", commit.sha)
+            project.github_repo.create_git_ref(
+                f"refs/heads/{source_branch}", commit.sha
+            )
             project.github_repo.create_file(
                 path="test.txt",
                 message="Opened PR trigger",
                 content="Testing the opened PR trigger.",
                 branch=source_branch,
                 committer=user,
-                author=user
+                author=user,
             )
 
         existing_pr = [pr for pr in project.get_pr_list() if pr.title == pr_title]
@@ -155,8 +153,7 @@ class Testcase:
 
         watch_end = datetime.now() + timedelta(seconds=60)
         failure_message = (
-            "Github statuses were not set "
-            "to pending in time 1 minute.\n"
+            "Github statuses were not set " "to pending in time 1 minute.\n"
         )
 
         # when a new PR is opened
