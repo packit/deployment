@@ -24,7 +24,7 @@
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: packit-worker
+  name: {{ name }}
   annotations:
     # Setting triggers to StatefulSet is tricky (they also don't appear in GUI).
     # I run the following and then checked how the resulting yaml looks like.
@@ -35,9 +35,9 @@ spec:
   selector:
     matchLabels:
       # has to match .spec.template.metadata.labels
-      name: packit-worker
+      name: {{ name }}
       app: packit
-  serviceName: "packit-worker"
+  serviceName: "{{ name }}"
   replicas: {{ worker_replicas }}
   volumeClaimTemplates:
     - metadata:
@@ -52,7 +52,7 @@ spec:
   template:
     metadata:
       labels:
-        name: packit-worker
+        name: {{ name }}
         app: packit
       # https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#using-is-with-k8s
       annotations:
@@ -122,6 +122,8 @@ spec:
               value: "{{ celery_retry_limit }}"
             - name: CELERY_RETRY_BACKOFF
               value: "{{ celery_retry_backoff }}"
+            - name: QUEUES
+              value: "{{ queues }}"
           volumeMounts:
             - name: packit-ssh
               mountPath: /packit-ssh
