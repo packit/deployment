@@ -74,9 +74,6 @@ validate_certs: true
 # image to use for tokman
 # image_tokman: "quay.io/packit/tokman:{{ deployment }}"
 
-# Number of worker pods to be deployed
-# worker_replicas : 1
-
 # Path to secrets (in case you don't have it in the root of this project)
 # path_to_secrets: ../secrets
 
@@ -85,5 +82,11 @@ validate_certs: true
 # If you still want to use docker even when podman is installed, set:
 # container_engine: "docker"
 
+# Celery retry parameters
 # celery_retry_limit: 2
 # celery_retry_backoff: 3
+
+# Number of worker pods to be deployed to serve the queues
+# workers_all_tasks: 1
+# workers_short_running: 0
+# workers_long_running: 0

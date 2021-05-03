@@ -46,7 +46,6 @@
     image_centosmsg: quay.io/packit/packit-service-centosmsg:{{ deployment }}
     image_dashboard: quay.io/packit/dashboard:{{ deployment }}
     image_tokman: quay.io/packit/tokman:{{ deployment }}
-    worker_replicas: 1
     path_to_secrets: "{{ project_dir }}/secrets"
     # to be used in Image streams as importPolicy:scheduled value
     auto_import_images: "{{(deployment != 'prod')}}"
@@ -56,6 +55,9 @@
     container_engine: docker
     celery_retry_limit: 2
     celery_retry_backoff: 3
+    workers_all_tasks: 1
+    workers_short_running: 0
+    workers_long_running: 0
   tasks:
     - name: include variables
       include_vars: "{{ project_dir }}/vars/{{ deployment }}.yml"
@@ -169,7 +171,11 @@
       tags:
         - packit-service
 
-    - name: Deploy packit-worker
+    - name: Deploy packit-worker to serve both queues
+      vars:
+        name: packit-worker
+        queues: "short-running,long-running"
+        worker_replicas: "{{ workers_all_tasks }}"
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
@@ -178,6 +184,37 @@
         validate_certs: "{{ validate_certs }}"
       tags:
         - packit-worker
+      when: workers_all_tasks > 0
+
+    - name: Deploy packit-worker to serve short-running queue
+      vars:
+        name: packit-worker-short-running
+        queues: "short-running"
+        worker_replicas: "{{ workers_short_running }}"
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      tags:
+        - packit-worker
+      when: workers_short_running > 0
+
+    - name: Deploy packit-worker to serve long-running queue
+      vars:
+        name: packit-worker-long-running
+        queues: "long-running"
+        worker_replicas: "{{ workers_long_running }}"
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      tags:
+        - packit-worker
+      when: workers_long_running > 0
 
     - name: Deploy packit-service-beat
       k8s:
@@ -340,6 +377,35 @@
         wait_condition:
           type: Ready
         wait_timeout: 600 # 10 minutes to pull the image and run the container
+      when: workers_all_tasks > 0
+
+    - name: Wait for worker-short-running-0 to be running
+      k8s:
+        namespace: "{{ project }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+        name: packit-worker-short-running-0
+        kind: Pod
+        wait: true
+        wait_condition:
+          type: Ready
+        wait_timeout: 600 # 10 minutes to pull the image and run the container
+      when: workers_short_running > 0
+
+    - name: Wait for worker-long-running-0 to be running
+      k8s:
+        namespace: "{{ project }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+        name: packit-worker-long-running-0
+        kind: Pod
+        wait: true
+        wait_condition:
+          type: Ready
+        wait_timeout: 600 # 10 minutes to pull the image and run the container
+      when: workers_long_running > 0
 
     - name: Wait for DCs rollouts to complete
       # timeout 10min to not wait indefinitely in case of a problem
