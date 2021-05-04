@@ -70,6 +70,8 @@ spec:
                 secretKeyRef:
                   name: packit-sentry
                   key: sentry
+            - name: CELERY_DEFAULT_QUEUE
+              value: short-running
           volumeMounts:
             - name: centos-secrets
               mountPath: /secrets
