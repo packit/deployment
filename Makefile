@@ -7,6 +7,8 @@ AP := ansible-playbook -vv -c local -i localhost, -e ansible_python_interpreter=
 # https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html#special-tags
 TAGS ?= all
 
+# Consider running 'make import-images' to avoid possible 'Error: ImagePullBackOff'
+# in case of newer, not-yet-imported images.
 deploy:
 	$(AP) playbooks/deploy.yml --tags $(TAGS)
 

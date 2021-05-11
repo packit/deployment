@@ -55,7 +55,9 @@ For more details about local builds see [packit-service/CONTRIBUTING.md](https:/
 tl;dr: Newer images in registry are automatically imported and re-deployed.
 
 Long story:
-We use [ImageStreams](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-streams) as intermediary between an image registry (Docker Hub) and a Deployment/StatefulSet. It has several significant benefits:
+We use [ImageStreams](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-streams)
+as intermediary between an image registry (Quay.io) and a Deployment/StatefulSet.
+It has several significant benefits:
 
 - We can automatically trigger Deployment when a new image is pushed to the registry.
 - We can rollback/revert/undo the Deployment (previously we had to use image digests to achieve this).
