@@ -28,3 +28,7 @@ repos:
     rev: 21.5b1
     hooks:
       - id: black
+
+ci:
+  # The project is too huge for pre-commit.ci
+  skip: [ansible-lint]
