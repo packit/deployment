@@ -47,6 +47,16 @@ spec:
         resources:
           requests:
             storage: 2Gi
+    - metadata:
+        name: packit-worker-repository-cache
+      spec:
+        # The only option on OpenShift Online is AWS EBS provisioning
+        # supporting only `ReadWriteOnce` access:
+        # https://docs.openshift.com/online/pro/architecture/additional_concepts/storage.html#pv-restrictions
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 16Gi
   updateStrategy.type: RollingUpdate
   podManagementPolicy: OrderedReady
   template:
@@ -133,6 +143,8 @@ spec:
               mountPath: /home/packit/.config
             - name: packit-worker-vol
               mountPath: /sandcastle
+            - name: packit-worker-repository-cache
+              mountPath: /repository-cache
           command:
             - "/usr/bin/run_worker.sh"
           resources:
