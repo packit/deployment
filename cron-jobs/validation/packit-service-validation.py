@@ -88,6 +88,8 @@ class Testcase:
             committer=user,
             author=user,
         )
+        # udpate the PR object so that the head commit is up to date
+        self.pr = project.get_pr(self.pr.id)
 
     def create_pr(self):
         """
