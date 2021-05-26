@@ -10,6 +10,8 @@ from datetime import datetime, timedelta, date
 from os import getenv
 
 from github import InputGitAuthor
+from github.Commit import Commit
+
 from ogr.services.github import GithubService
 from ogr.abstract import PullRequest
 
@@ -31,6 +33,7 @@ class Testcase:
         self.pr = pr
         self.failure_msg = ""
         self.trigger = trigger
+        self.head_commit = pr.head_commit
         self._copr_project_name = None
 
     @property
@@ -79,7 +82,7 @@ class Testcase:
         )
         # https://pygithub.readthedocs.io/en/latest/examples/Repository.html#update-a-file-in-the-repository
         # allows empty commit (always the same content of file)
-        project.github_repo.update_file(
+        commit: Commit = project.github_repo.update_file(
             path=contents.path,
             message=f"Commit build trigger ({date.today().strftime('%d/%m/%y')})",
             content="Testing the push trigger.",
@@ -87,9 +90,8 @@ class Testcase:
             branch=self.pr.source_branch,
             committer=user,
             author=user,
-        )
-        # udpate the PR object so that the head commit is up to date
-        self.pr = project.get_pr(self.pr.id)
+        )["commit"]
+        self.head_commit = commit.sha
 
     def create_pr(self):
         """
@@ -360,7 +362,7 @@ class Testcase:
         Get commit statuses from the head commit of the PR.
         :return: [CommitStatus]
         """
-        commit = project.github_repo.get_commit(self.pr.head_commit)
+        commit = project.github_repo.get_commit(self.head_commit)
         return commit.get_combined_status().statuses
 
 
