@@ -25,7 +25,7 @@ repos:
       - id: ansible-lint
         files: \.(yaml|yml)$
   - repo: https://github.com/psf/black
-    rev: 21.5b1
+    rev: 21.5b2
     hooks:
       - id: black
 
