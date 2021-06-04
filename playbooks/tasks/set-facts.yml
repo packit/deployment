@@ -5,7 +5,7 @@
 - name: Set mandatory_DCs fact
   set_fact:
     mandatory_DCs:
-      - postgres
+      - postgres-12
       - redis
       - packit-service
 - name: Set optional_DCs fact
