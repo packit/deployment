@@ -33,7 +33,7 @@ class Testcase:
         self.pr = pr
         self.failure_msg = ""
         self.trigger = trigger
-        self.head_commit = pr.head_commit
+        self.head_commit = pr.head_commit if pr else None
         self._copr_project_name = None
 
     @property
@@ -128,6 +128,7 @@ class Testcase:
             target_branch=project.default_branch,
             source_branch=source_branch,
         )
+        self.head_commit = self.pr.head_commit
 
     def run_checks(self):
         """
