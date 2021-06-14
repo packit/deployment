@@ -1,0 +1,60 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+# -------------------------------------------------------------------
+# Variables needed by Ansible playbooks in playbooks/
+# -------------------------------------------------------------------
+
+# Openshift project/namespace name
+project: myproject
+
+# Openshift cluster url (example: https://console.pro-eu-west-1.openshift.com)
+host: https://127.0.0.1:8443
+
+# oc login <the above host value>, oc whoami -t
+# OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
+api_key: ""
+
+# To work-around 'SSL: CERTIFICATE_VERIFY_FAILED'
+validate_certs: false
+
+with_tokman: false
+
+with_fedmsg: true
+
+with_centosmsg: false
+
+# with_redis_commander: false
+
+# with_flower: false
+
+with_beat: false
+
+with_dashboard: false
+
+with_pushgateway: false
+
+# you can set the sandbox namespace name explicitly like this
+# sandbox_namespace: stream-dev-sandbox
+
+# image to use for service
+# image: quay.io/packit/packit-service:{{ deployment }}
+
+# image to use for worker
+image_worker: quay.io/packit/hardly:{{ deployment }}
+# Path to secrets (in case you don't have it in the root of this project)
+# path_to_secrets: ../secrets
+
+# Used in dev/Zuul deployment to tag & push images to cluster.
+# It's set to "/usr/bin/podman" if there's podman installed, or to 'docker' otherwise.
+# If you still want to use docker even when podman is installed, set:
+# container_engine: "docker"
+
+# Celery retry parameters
+# celery_retry_limit: 2
+# celery_retry_backoff: 3
+
+# Number of worker pods to be deployed to serve the queues
+# workers_all_tasks: 1
+# workers_short_running: 0
+# workers_long_running: 0
