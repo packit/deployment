@@ -8,7 +8,7 @@
   vars:
     # Zuul base job redefines project_dir
     project_dir: "{{ playbook_dir }}/.."
-    validate_certs: false
+    validate_certs: true
     service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
     sandbox_namespace: "{{ service }}-{{ deployment }}-sandbox"

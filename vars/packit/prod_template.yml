@@ -15,7 +15,7 @@ host: https://console.pro-eu-west-1.openshift.com
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
 api_key: ""
 
-validate_certs: true
+# validate_certs: true
 
 # with_tokman: true
 
