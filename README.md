@@ -3,7 +3,7 @@
 ## tl;dr How to deploy
 
 1. Obtain all the necessary [secrets](/secrets/README.md).
-2. in [vars](vars/) copy `{deployment}_template.yml` to `{deployment}.yml` where `{deployment}` is one of `prod`, `stg` or `dev` and fill in values
+2. in [vars/packit](vars/packit/) copy `{deployment}_template.yml` to `{deployment}.yml` where `{deployment}` is one of `prod`, `stg` or `dev` and fill in values
 3. `dnf install ansible origin-clients python3-openshift`
 4. `DEPLOYMENT={deployment} make deploy`
 
@@ -143,11 +143,12 @@ Because we run the service in OpenShift the more reliable way to test it
 is to run an Openshift cluster locally and deploy the service there.
 `oc cluster up` spawns the Openshift cluster.
 Create `secrets/dev/` (steal them from our secret repo).
-`cd vars; cp dev_template.yml dev.yml` and in `dev.yml` set `api_key` to the output of `oc whoami -t`.
+`cd vars/packit; cp dev_template.yml dev.yml` and
+in `dev.yml` set `api_key` to the output of `oc whoami -t`.
 
 Run `DEPLOYMENT=dev make deploy`.
 That will also push locally built images (`:dev`) into the cluster's registry
-(make sure you have `push_dev_images: true` in `vars/dev.yml`).
+(make sure you have `push_dev_images: true` in `vars/packit/dev.yml`).
 
 #### minishift
 

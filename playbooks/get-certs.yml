@@ -24,6 +24,7 @@
 - name: get certs
   hosts: all
   vars:
+    service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
     domain: "{{ deployment }}.packit.dev"
   tasks:
@@ -31,7 +32,7 @@
       assert:
         that: deployment|length > 0
     - name: include variables
-      include_vars: ../vars/{{ deployment }}.yml
+      include_vars: ../vars/{{ service }}/{{ deployment }}.yml
     - name: Status message
       debug:
         msg: "Deploying certbot pod for {{ domain }}"

@@ -168,8 +168,8 @@ spec:
 # for local deployment (dev) creates default route for testing.
 # e.g https://packit-service-myproject.127.0.0.1.nip.io/
 # For dev/prod creates host {dev,prod}.packit.dev
-{% if 'dev' != deployment %}
-  host: "{{ deployment }}.packit.dev"
+{% if deployment != 'dev' %}
+  host: "{{ deployment }}.{{ service+'.' if service != 'packit' else '' }}packit.dev"
 {% endif %}
 
   port:
