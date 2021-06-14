@@ -19,6 +19,7 @@ REPOSITORIES: List[str] = [
     "dashboard",
     "tokman",
     "packit-service",
+    "hardly",
 ]
 STABLE_BRANCH: str = "stable"
 ROLLING_BRANCH: str = "main"
