@@ -13,7 +13,7 @@ oc get pod -n "${NAMESPACE}" | grep "^${POD_NAME_STARTSWITH}" |
 # for each pod
 while IFS= read -r line; do
   pod_status=$(echo "${line}" | awk '{print $3}')
-  if [ "${pod_status}" == "Completed" ];
+  if [[ "${pod_status}" == "Completed" || "${pod_status}" == "OOMKilled" ]];
   then
     pod_name=$(echo "${line}" | awk '{print $1}')
     pod_age=$(echo "${line}" | awk '{print $5}')
@@ -23,7 +23,7 @@ while IFS= read -r line; do
     echo "Deleting pvc ${pvc_name}"
     oc delete pvc "${pvc_name}" -n "${NAMESPACE}"
 
-    if [ "${pod_age: -1}" == "d" ]; # days
+    if [[ "${pod_age: -1}" == "d" ]]; # days
     then
       echo "Deleting pod ${pod_name}"
       oc delete pod "${pod_name}" -n "${NAMESPACE}"
