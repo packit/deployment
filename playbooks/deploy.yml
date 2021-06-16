@@ -106,7 +106,7 @@
         - packit-worker
         - packit-service-beat
 
-    - name: Deploy templates
+    - name: Deploy secrets
       # https://docs.ansible.com/k8s_module.html
       k8s:
         namespace: "{{ project }}"
@@ -117,7 +117,6 @@
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-ssh.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-secrets.yml.j2') }}"
-        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-centos-secrets.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-config.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-postgres.yml.j2') }}"
@@ -286,6 +285,19 @@
         - fedmsg
       when: with_fedmsg
 
+    - name: Deploy centosmsg secrets
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/secret-centos-secrets.yml.j2') }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      tags:
+        - centosmsg
+      notify:
+        - Rollout centosmsg
+      when: with_centosmsg
+
     - name: Deploy packit-service-centosmsg
       k8s:
         namespace: "{{ project }}"
@@ -295,6 +307,7 @@
         validate_certs: "{{ validate_certs }}"
       tags:
         - centosmsg
+      register: centosmsg
       when: with_centosmsg
 
     - name: Deploy GitHub App Private Key
@@ -417,3 +430,9 @@
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not flower.changed
+
+    - name: Rollout centosmsg
+      command: oc rollout latest dc/packit-service-centosmsg
+      # Run this rollout only if the DeploymentConfig above didn't change,
+      # and so it wasn't rolled out yet.
+      when: not centosmsg.changed
