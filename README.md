@@ -1,11 +1,11 @@
-# Ansible playbooks and scripts for deploying packit-service to Openshift
+# Deploying Packit service or Stream service to Openshift
 
 ## tl;dr How to deploy
 
 1. Obtain all the necessary [secrets](/secrets/README.md).
-2. in [vars/packit](vars/packit/) copy `{deployment}_template.yml` to `{deployment}.yml` where `{deployment}` is one of `prod`, `stg` or `dev` and fill in values
+2. Create a deployment config from a template as described in [vars/README](vars/README.md).
 3. `dnf install ansible origin-clients python3-openshift`
-4. `DEPLOYMENT={deployment} make deploy`
+4. `[SERVICE={service}] DEPLOYMENT={deployment} make deploy` (see [vars/README](vars/README.md)).
 
 ## What's in here
 

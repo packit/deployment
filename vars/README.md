@@ -14,7 +14,7 @@ and fill in missing values.
 The `{service}/{deployment}.yml` files are `.gitignore`d so you can't
 push them to the git repo by mistake.
 
-The Ansible playbook then includes one of the variable files depending on the
+The Ansible playbooks then include one of the variable files depending on the
 value of `SERVICE` (optional, defaults to `packit`) and `DEPLOYMENT`
 environment variables and processes all the templates with
 variables defined in the file.
