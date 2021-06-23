@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2018-2019 Red Hat, Inc.
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 # -------------------------------------------------------------------
 # Variables needed by Ansible playbooks in playbooks/
@@ -33,8 +14,8 @@ host: https://console.pro-eu-west-1.openshift.com
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
 api_key: ""
+# validate_certs: true
 
-validate_certs: true
 # with_tokman: true
 
 # if you want to deploy fedmsg, please make sure to
@@ -54,7 +35,7 @@ validate_certs: true
 # with_pushgateway: true
 
 # you can set the sandbox namespace name explicitly like this
-# sandbox_namespace: "packit-stg-sandbox"
+# sandbox_namespace: packit-stg-sandbox
 
 # image to use for service
 # image: quay.io/packit/packit-service:{{ deployment }}
@@ -80,7 +61,7 @@ validate_certs: true
 # Used in dev/Zuul deployment to tag & push images to cluster.
 # It's set to "/usr/bin/podman" if there's podman installed, or to 'docker' otherwise.
 # If you still want to use docker even when podman is installed, set:
-# container_engine: "docker"
+# container_engine: docker
 
 # Celery retry parameters
 # celery_retry_limit: 2

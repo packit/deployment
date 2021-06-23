@@ -24,10 +24,11 @@
 - name: Import newer images metadata from registry into image streams
   hosts: all
   vars:
+    service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
   tasks:
     - name: include variables
-      include_vars: ../vars/{{ deployment }}.yml
+      include_vars: ../vars/{{ service }}/{{ deployment }}.yml
 
     - name: oc login
       command: oc login {{ host }} --token={{ api_key }} --insecure-skip-tls-verify

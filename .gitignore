@@ -1,6 +1,5 @@
-vars/*.yml
-!vars/*template.yml
-!vars/README.md
+vars/**/*.yml
+!vars/**/*template.yml
 
 .idea/
 .DS_Store

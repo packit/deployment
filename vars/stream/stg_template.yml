@@ -6,24 +6,22 @@
 # -------------------------------------------------------------------
 
 # Openshift project/namespace name
-project: myproject
+project: stream-stg
 
-# Openshift cluster url (example: https://console.pro-eu-west-1.openshift.com)
-host: https://your-openshift-cluster-url
+# Openshift cluster url
+host: https://console.pro-eu-west-1.openshift.com
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
 api_key: ""
+
 # validate_certs: true
 
-# with_tokman: true
+with_tokman: false
 
-# if you want to deploy fedmsg, please make sure to
-# edit the queue name in secrets/*/fedora.toml
+with_fedmsg: true
 
-# with_fedmsg: true
-
-# with_centosmsg: true
+with_centosmsg: false
 
 # with_redis_commander: false
 
@@ -31,31 +29,18 @@ api_key: ""
 
 # with_beat: true
 
-# with_dashboard: true
+with_dashboard: false
 
-# with_pushgateway: true
+with_pushgateway: false
 
 # you can set the sandbox namespace name explicitly like this
-# sandbox_namespace: packit-prod-sandbox
+# sandbox_namespace: stream-stg-sandbox
 
 # image to use for service
 # image: quay.io/packit/packit-service:{{ deployment }}
 
 # image to use for worker
-# image_worker: quay.io/packit/packit-worker:{{ deployment }}
-
-# image to use for fedora messaging consumer
-# image_fedmsg: quay.io/packit/packit-service-fedmsg:{{ deployment }}
-
-# image to use for centos messaging consumer
-# image_centosmsg: quay.io/packit/packit-service-centosmsg:{{ deployment }}
-
-# image to use for dashboard
-# image_dashboard: "quay.io/packit/dashboard:{{ deployment }}"
-
-# image to use for tokman
-# image_tokman: "quay.io/packit/tokman:{{ deployment }}"
-
+image_worker: quay.io/packit/hardly:{{ deployment }}
 # Path to secrets (in case you don't have it in the root of this project)
 # path_to_secrets: ../secrets
 

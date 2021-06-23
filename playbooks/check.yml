@@ -7,10 +7,11 @@
   vars:
     # Zuul base job redefines project_dir
     project_dir: "{{ playbook_dir }}/.."
+    service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
   tasks:
     - name: include variables
-      include_vars: "{{ project_dir }}/vars/{{ deployment }}.yml"
+      include_vars: "{{ project_dir }}/vars/{{ service }}/{{ deployment }}.yml"
 
     - name: Getting DCs
       include_tasks: tasks/set-facts.yml
