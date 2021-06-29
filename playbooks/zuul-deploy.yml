@@ -45,7 +45,7 @@
           image_centosmsg: quay.io/packit/packit-service-centosmsg:stg
           image_dashboard: quay.io/packit/dashboard:stg
           image_tokman: quay.io/packit/tokman:stg
-        dest: "{{ project_dir }}/vars/packit/dev.yml"
+        dest: "{{ zuul.project.src_dir }}/vars/packit/dev.yml"
         mode: 0644
 
     - name: Actually deploy
@@ -54,6 +54,6 @@
         DEPLOYMENT: dev
         ANSIBLE_STDOUT_CALLBACK: debug
       args:
-        chdir: "{{ project_dir }}"
+        chdir: "{{ zuul.project.src_dir }}"
       become: true
       changed_when: true

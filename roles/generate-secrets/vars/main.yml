@@ -12,7 +12,7 @@ github_app_id: 123456
 command_handler: local
 server_hostname: localhost
 server_port: "8443"
-project_dir: "{{ playbook_dir }}/.."
+
 path_to_secrets: "{{ project_dir }}/secrets/packit/dev"
 
 # Get from https://copr.fedorainfracloud.org/api/

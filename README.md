@@ -142,7 +142,7 @@ See [Running packit-service locally](https://github.com/packit-service/packit-se
 Because we run the service in OpenShift the more reliable way to test it
 is to run an Openshift cluster locally and deploy the service there.
 `oc cluster up` spawns the Openshift cluster.
-Create `secrets/dev/` (steal them from our secret repo).
+Create `secrets/packit/dev/` (steal them from our secret repo).
 `cd vars/packit; cp dev_template.yml dev.yml` and
 in `dev.yml` set `api_key` to the output of `oc whoami -t`.
 
