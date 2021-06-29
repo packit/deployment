@@ -6,8 +6,6 @@
   hosts: all
   # feel free to override these in vars/
   vars:
-    # Zuul base job redefines project_dir
-    project_dir: "{{ playbook_dir }}/.."
     validate_certs: true
     service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
@@ -28,6 +26,7 @@
     image_centosmsg: quay.io/packit/packit-service-centosmsg:{{ deployment }}
     image_dashboard: quay.io/packit/dashboard:{{ deployment }}
     image_tokman: quay.io/packit/tokman:{{ deployment }}
+    # project_dir is set in tasks/project-dir.yml
     path_to_secrets: "{{ project_dir }}/secrets/{{ service }}"
     # to be used in Image streams as importPolicy:scheduled value
     auto_import_images: "{{(deployment != 'prod')}}"
@@ -41,6 +40,8 @@
     workers_short_running: 0
     workers_long_running: 0
   tasks:
+    - include_tasks: tasks/project-dir.yml
+
     - name: include variables
       include_vars: "{{ project_dir }}/vars/{{ service }}/{{ deployment }}.yml"
       tags:

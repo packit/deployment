@@ -11,6 +11,6 @@
         DEPLOYMENT: dev
         ANSIBLE_STDOUT_CALLBACK: debug
       args:
-        chdir: "{{ project_dir }}"
+        chdir: "{{ zuul.project.src_dir }}"
       become: true
       changed_when: false
