@@ -14,7 +14,7 @@ from github.Commit import Commit
 
 from ogr.services.github import GithubService
 from ogr.abstract import PullRequest
-
+from ogr.services.github.check_run import GithubCheckRunStatus, GithubCheckRunResult
 
 copr = Client.create_from_config_file()
 service = GithubService(token=getenv("GITHUB_TOKEN"))
@@ -141,35 +141,33 @@ class Testcase:
             return
 
         self.check_build(build.id)
-        self.check_statuses()
+        self.check_completed_check_runs()
         self.check_comment()
 
-    def check_statuses_set_to_pending(self):
+    def check_pending_check_runs(self):
         """
-        Check whether some commit status is set to pending (they are updated in loop
+        Check whether some check run is set to queued (they are updated in loop
         so it is enough).
         :return:
         """
-        statuses = [
-            status.context
-            for status in self.get_statuses()
-            if "packit-stg" not in status.context
+        check_runs = [
+            check_run.name
+            for check_run in project.get_check_runs(commit_sha=self.head_commit)
+            if "packit-stg" not in check_run.name
         ]
 
         watch_end = datetime.now() + timedelta(seconds=60)
-        failure_message = (
-            "Github statuses were not set " "to pending in time 1 minute.\n"
-        )
+        failure_message = "Github check runs were not set to queued in time 1 minute.\n"
 
         # when a new PR is opened
-        while len(statuses) == 0:
+        while len(check_runs) == 0:
             if datetime.now() > watch_end:
                 self.failure_msg += failure_message
                 return
-            statuses = [
-                status.context
-                for status in self.get_statuses()
-                if "packit-stg" not in status.context
+            check_runs = [
+                check_run.name
+                for check_run in project.get_check_runs(commit_sha=self.head_commit)
+                if "packit-stg" not in check_run.name
             ]
 
         while True:
@@ -177,20 +175,22 @@ class Testcase:
                 self.failure_msg += failure_message
                 return
 
-            new_statuses = [
-                (status.context, status.state)
-                for status in self.get_statuses()
-                if status.context in statuses
+            new_check_runs = [
+                (check_run.name, check_run.status)
+                for check_run in project.get_check_runs(commit_sha=self.head_commit)
+                if check_run.name in check_runs
             ]
-            for name, state in new_statuses:
-                if state == "pending":
+            for name, state in new_check_runs:
+                # check run can be in a short period time changed from queued (Task was accepted)
+                # to in_progress, so check only that it doesn't have completed status
+                if state != GithubCheckRunStatus.completed:
                     return
 
             time.sleep(5)
 
     def check_build_submitted(self):
         """
-        Check whether the build was submitted in Copr in time 30 minutes.
+        Check whether the build was submitted in Copr in time 15 minutes.
         :return:
         """
         if self.pr:
@@ -209,14 +209,14 @@ class Testcase:
 
         self.trigger_build()
 
-        watch_end = datetime.now() + timedelta(seconds=60 * 30)
+        watch_end = datetime.now() + timedelta(seconds=60 * 15)
 
-        self.check_statuses_set_to_pending()
+        self.check_pending_check_runs()
 
         while True:
             if datetime.now() > watch_end:
                 self.failure_msg += (
-                    "The build was not submitted in Copr in time 30 minutes.\n"
+                    "The build was not submitted in Copr in time 15 minutes.\n"
                 )
                 return None
 
@@ -255,16 +255,16 @@ class Testcase:
 
     def check_build(self, build_id):
         """
-        Check whether the build was successful in Copr in time 30 minutes.
+        Check whether the build was successful in Copr in time 15 minutes.
         :param build_id: ID of the build
         :return:
         """
-        watch_end = datetime.now() + timedelta(seconds=60 * 30)
+        watch_end = datetime.now() + timedelta(seconds=60 * 15)
         state_reported = ""
 
         while True:
             if datetime.now() > watch_end:
-                self.failure_msg += "The build did not finish in time 30 minutes.\n"
+                self.failure_msg += "The build did not finish in time 15 minutes.\n"
                 return
 
             build = copr.build_proxy.get(build_id)
@@ -291,53 +291,59 @@ class Testcase:
 
             time.sleep(30)
 
-    def watch_statuses(self):
+    def watch_check_runs(self):
         """
-        Watch the statuses 20 minutes, if there is no pending commit status, return the statuses.
-        :return: [CommitStatus]
+        Watch the check runs 20 minutes, if all the check runs have completed status, return the check runs.
+        :return: [CheckRun]
         """
         watch_end = datetime.now() + timedelta(seconds=60 * 20)
 
         while True:
-            statuses = self.get_statuses()
+            check_runs = project.get_check_runs(commit_sha=self.head_commit)
 
             states = [
-                status.state
-                for status in statuses
-                if "packit-stg" not in status.context
+                check_run.status
+                for check_run in check_runs
+                if "packit-stg" not in check_run.name
             ]
 
-            if "pending" not in states:
+            if all([state == GithubCheckRunStatus.completed for state in states]):
                 break
 
             if datetime.now() > watch_end:
                 self.failure_msg += (
-                    "These statuses were set to pending 20 minutes "
+                    "These check runs were not completed 20 minutes "
                     "after Copr build had been built:\n"
                 )
-                for status in statuses:
-                    if "packit-stg" not in status.context and status.state == "pending":
-                        self.failure_msg += f"{status.context}\n"
+                for check_run in check_runs:
+                    if (
+                        "packit-stg" not in check_run.name
+                        and check_run.status != GithubCheckRunStatus.completed
+                    ):
+                        self.failure_msg += f"{check_run.name}\n"
                 return []
 
             time.sleep(20)
 
-        return statuses
+        return check_runs
 
-    def check_statuses(self):
+    def check_completed_check_runs(self):
         """
-        Check whether all statuses are set to success.
+        Check whether all check runs are set to success.
         :return:
         """
         if "The build in Copr was not successful." in self.failure_msg:
             return
 
-        statuses = self.watch_statuses()
-        for status in statuses:
-            if "packit-stg" not in status.context and status.state == "failed":
+        check_runs = self.watch_check_runs()
+        for check_run in check_runs:
+            if (
+                "packit-stg" not in check_run.name
+                and check_run.conclusion == GithubCheckRunResult.failure
+            ):
                 self.failure_msg += (
-                    f"Status {status.context} was set to failure although the build in "
-                    f"Copr was successful, message: {status.description}.\n"
+                    f"Check run {check_run.name} was set to failure although the build in "
+                    f"Copr was successful, message: {check_run.output.title}.\n"
                 )
 
     def check_comment(self):
@@ -357,14 +363,6 @@ class Testcase:
                 self.failure_msg += (
                     "No comment from p-s about unsuccessful last copr build found.\n"
                 )
-
-    def get_statuses(self):
-        """
-        Get commit statuses from the head commit of the PR.
-        :return: [CommitStatus]
-        """
-        commit = project.github_repo.get_commit(self.head_commit)
-        return commit.get_combined_status().statuses
 
 
 if __name__ == "__main__":
