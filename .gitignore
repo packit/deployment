@@ -4,10 +4,8 @@ vars/**/*.yml
 .idea/
 .DS_Store
 
-secrets/prod
-secrets/stg
-secrets/dev
-
+secrets/packit/
+secrets/stream/
 secrets/secrets.yaml
 
 # used in move_stable script
