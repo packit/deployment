@@ -155,6 +155,18 @@
       tags:
         - packit-service
 
+    - name: Deploy repository cache PVCs for packit-workers that serves both queues
+      vars:
+        name: "packit-worker-{{ item }}"
+      k8s:
+        namespace: "{{ sandbox_namespace }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandcastle-volumes-for-cache.yml.j2') }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      loop: "{{ range(0, workers_all_tasks)|list }}"
+      when: workers_all_tasks > 0
+
     - name: Deploy packit-worker to serve both queues
       vars:
         name: packit-worker
@@ -170,6 +182,18 @@
         - packit-worker
       when: workers_all_tasks > 0
 
+    - name: Deploy repository cache PVCs for packit-workers that serves short-running queue
+      vars:
+        name: "packit-worker-short-running-{{ item }}"
+      k8s:
+        namespace: "{{ sandbox_namespace }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandcastle-volumes-for-cache.yml.j2') }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      loop: "{{ range(0, workers_short_running)|list }}"
+      when: workers_short_running > 0
+
     - name: Deploy packit-worker to serve short-running queue
       vars:
         name: packit-worker-short-running
@@ -184,6 +208,18 @@
       tags:
         - packit-worker
       when: workers_short_running > 0
+
+    - name: Deploy repository cache PVCs for packit-workers that serves long-running queue
+      vars:
+        name: "packit-worker-long-running-{{ item }}"
+      k8s:
+        namespace: "{{ sandbox_namespace }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandcastle-volumes-for-cache.yml.j2') }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
+      loop: "{{ range(0, workers_long_running)|list }}"
+      when: workers_long_running > 0
 
     - name: Deploy packit-worker to serve long-running queue
       vars:

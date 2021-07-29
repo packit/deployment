@@ -1,0 +1,12 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: "sandcastle-repository-cache-{{ name }}"
+spec:
+  # The only option on OpenShift Online is AWS EBS provisioning
+  # supporting only `ReadWriteOnce` access:
+  # https://docs.openshift.com/online/pro/architecture/additional_concepts/storage.html#pv-restrictions
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 16Gi

@@ -25,6 +25,14 @@ command_handler: {{ command_handler }}
 command_handler_work_dir: /sandcastle
 command_handler_image_reference: quay.io/packit/sandcastle
 command_handler_k8s_namespace: packit-dev-sandbox
+command_handler_pvc_volume_specs:
+  - path: /repository-cache
+    pvc_from_env: SANDCASTLE_REPOSITORY_CACHE_VOLUME
+
+repository_cache: /repository-cache
+# The maintenance of the cache (adding, updating) is done externally,
+# not in the packit/packit-service code.
+add_repositories_to_repository_cache: false
 
 server_name: "{{ server_hostname }}:{{ server_port }}"
 dashboard_url: "https://{{ server_hostname }}:{{ server_port }}"
