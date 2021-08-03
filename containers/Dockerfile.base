@@ -3,22 +3,7 @@
 
 FROM fedora:33
 
-# do NOT change the locale unless you verify first it is available in the container image:
-#   >>> import locale
-#   >>> locale.setlocale(locale.LC_ALL, "")
-#   'C.UTF-8'
-#   >>> locale.setlocale(locale.LC_ALL, "C")
-#   'C'
-#   >>> locale.setlocale(locale.LC_ALL, "C.UTF-8")
-#   'C.UTF-8'
-#   >>> locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
-#   Traceback (most recent call last):
-#     File "<stdin>", line 1, in <module>
-#     File "/usr/lib64/python3.9/locale.py", line 610, in setlocale
-#       return _setlocale(category, locale)
-#   locale.Error: unsupported locale setting
-ENV LANG=C.UTF-8 \
-    ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
+ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
     ANSIBLE_STDOUT_CALLBACK=debug
 
 RUN dnf update -y && \
