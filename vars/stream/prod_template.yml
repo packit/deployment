@@ -57,3 +57,6 @@ image_worker: quay.io/packit/hardly:{{ deployment }}
 # workers_all_tasks: 1
 # workers_short_running: 0
 # workers_long_running: 0
+
+distgit_url: https://gitlab.com/
+distgit_namespace: redhat/centos-stream/rpms

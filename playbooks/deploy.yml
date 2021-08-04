@@ -39,6 +39,8 @@
     workers_all_tasks: 1
     workers_short_running: 0
     workers_long_running: 0
+    distgit_url: https://src.fedoraproject.org/
+    distgit_namespace: rpms
   tasks:
     - include_tasks: tasks/project-dir.yml
 
