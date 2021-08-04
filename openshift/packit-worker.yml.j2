@@ -90,7 +90,7 @@ spec:
             - name: DISTGIT_NAMESPACE
               value: {{ distgit_namespace }}
             - name: APP
-              value: packit_service.worker.tasks
+              value: {{ celery_app }}
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
