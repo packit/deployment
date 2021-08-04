@@ -33,6 +33,8 @@ with_dashboard: false
 
 with_pushgateway: false
 
+with_repository_cache: false
+
 # you can set the sandbox namespace name explicitly like this
 # sandbox_namespace: stream-stg-sandbox
 
