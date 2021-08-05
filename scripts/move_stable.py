@@ -5,6 +5,7 @@
 
 import click
 
+from datetime import date, datetime, timedelta
 from pathlib import Path
 import subprocess
 from typing import List
@@ -160,6 +161,40 @@ def move_all(ctx, remote, repo_store: str) -> None:
         ctx.invoke(
             move_repository, repository=repository, remote=remote, repo_store=repo_store
         )
+
+
+@cli.command(
+    short_help="Prints an URL GitHub query for pull requests that has release notes."
+)
+@click.option(
+    "--till",
+    default=str(date.today()),
+    show_default=True,
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="Last day when PR could have been merged, by default day of moving the stable branches.",
+)
+def github_query(till: datetime) -> None:
+    since = till - timedelta(days=7)
+
+    click.echo(
+        f"PRs merged since:\t{since.strftime('%Y-%m-%d')}\t"
+        + click.style("(may overlap with the latest blog, exactly on Friday)", fg="red")
+    )
+    click.echo(f"PRs merged till:\t{till.strftime('%Y-%m-%d')}")
+    click.echo(
+        (
+            "Link with filter: https://github.com/pulls?q=org%3A{org}+"
+            "is%3Apr+"
+            "merged%3A{since}..{till}+"
+            "sort%3Aupdated-asc+"
+            "label%3A{label}"
+        ).format(
+            org="packit",
+            since=since.strftime("%Y-%m-%d"),
+            till=till.strftime("%Y-%m-%d"),
+            label="has-release-notes",
+        )
+    )
 
 
 def get_reference(path_to_repository: Path, remote: str, branch: str) -> str:
