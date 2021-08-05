@@ -33,6 +33,8 @@ with_dashboard: false
 
 with_pushgateway: false
 
+with_repository_cache: false
+
 # you can set the sandbox namespace name explicitly like this
 # sandbox_namespace: stream-prod-sandbox
 
@@ -49,6 +51,8 @@ image_worker: quay.io/packit/hardly:{{ deployment }}
 # If you still want to use docker even when podman is installed, set:
 # container_engine: docker
 
+celery_app: hardly.tasks
+
 # Celery retry parameters
 # celery_retry_limit: 2
 # celery_retry_backoff: 3
@@ -57,3 +61,6 @@ image_worker: quay.io/packit/hardly:{{ deployment }}
 # workers_all_tasks: 1
 # workers_short_running: 0
 # workers_long_running: 0
+
+distgit_url: https://gitlab.com/
+distgit_namespace: redhat/centos-stream/rpms

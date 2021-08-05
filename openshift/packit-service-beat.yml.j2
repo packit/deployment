@@ -51,7 +51,7 @@ spec:
             - name: DEPLOYMENT
               value: {{ deployment }}
             - name: APP
-              value: packit_service.worker.tasks
+              value: {{ celery_app }}
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
