@@ -26,6 +26,10 @@
   vars:
     service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
+    with_fedmsg: true
+    with_centosmsg: true
+    with_dashboard: true
+    with_tokman: true
   tasks:
     - name: include variables
       include_vars: ../vars/{{ service }}/{{ deployment }}.yml
