@@ -45,6 +45,8 @@
     distgit_namespace: rpms
   tasks:
     - include_tasks: tasks/project-dir.yml
+      tags:
+        - always
 
     - name: include variables
       include_vars: "{{ project_dir }}/vars/{{ service }}/{{ deployment }}.yml"
