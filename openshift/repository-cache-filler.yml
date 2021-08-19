@@ -1,0 +1,23 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+# https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html
+kind: Pod
+apiVersion: v1
+metadata:
+  name: repository-cache-filler
+spec:
+  containers:
+    - name: repository-cache-filler
+      imagePullPolicy: IfNotPresent
+      image: quay.io/packit/sandcastle
+      volumeMounts:
+        - name: sandcastle-repository-cache-packit-worker-0
+          mountPath: /repository-cache
+      command:
+        - /usr/bin/sleep
+        - "360000"
+  volumes:
+    - name: sandcastle-repository-cache-packit-worker-0
+      persistentVolumeClaim:
+        claimName: sandcastle-repository-cache-packit-worker-0
