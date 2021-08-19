@@ -19,7 +19,7 @@ api_key: ""
 
 with_tokman: false
 
-with_fedmsg: true
+with_fedmsg: false
 
 with_centosmsg: false
 
@@ -27,7 +27,7 @@ with_centosmsg: false
 
 # with_flower: false
 
-# with_beat: true
+with_beat: false
 
 with_dashboard: false
 

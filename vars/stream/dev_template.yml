@@ -20,7 +20,7 @@ validate_certs: false
 
 with_tokman: false
 
-with_fedmsg: true
+with_fedmsg: false
 
 with_centosmsg: false
 

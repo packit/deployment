@@ -8,6 +8,8 @@
       - postgres-12
       - redis
       - packit-service
+  tags:
+    - always
 - name: Set optional_DCs fact
   set_fact:
     optional_DCs:
@@ -18,7 +20,11 @@
       packit-dashboard: "{{ with_dashboard }}"
       pushgateway: "{{ with_pushgateway }}"
       nginx: "{{ with_pushgateway }}"
+  tags:
+    - always
 - name: Set DCs fact
   set_fact:
     # To know what DCs rollouts to wait for and also to check in tests
     DCs: '{{ mandatory_DCs + optional_DCs|dict2items|selectattr("value", "equalto", true)|list|map(attribute="key")|flatten }}'
+  tags:
+    - always
