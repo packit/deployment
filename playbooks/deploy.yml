@@ -20,6 +20,7 @@
     with_beat: true
     with_pushgateway: true
     with_repository_cache: true
+    with_sandbox: true
     push_dev_images: false
     image: quay.io/packit/packit-service:{{ deployment }}
     image_worker: quay.io/packit/packit-worker:{{ deployment }}
@@ -128,9 +129,23 @@
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-postgres.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-aws.yml.j2') }}"
-        - "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
       tags:
         - always
+
+    - name: Set up sandbox namespace
+      block:
+        - name: Set finalizers to sandbox namespace
+          k8s:
+            namespace: "{{ project }}"
+            definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
+            host: "{{ host }}"
+            api_key: "{{ api_key }}"
+            validate_certs: "{{ validate_certs }}"
+        - name: Add edit role to service account in sandbox namespace
+          command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
+          register: rolebinding
+          changed_when: "'added:' in rolebinding.stdout"
+      when: with_sandbox
 
     - name: Deploy postgres
       k8s:
@@ -399,11 +414,6 @@
       tags:
         - pushgateway
       when: with_pushgateway
-
-    - name: Set up the sandbox namespace
-      command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
-      register: rolebinding
-      changed_when: "'added:' in rolebinding.stdout"
 
     - name: Wait for worker-0 to be running
       k8s:
