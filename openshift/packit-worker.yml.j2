@@ -47,6 +47,7 @@ spec:
         resources:
           requests:
             storage: 2Gi
+{% if with_repository_cache %}
     - metadata:
         name: packit-worker-repository-cache
       spec:
@@ -57,6 +58,7 @@ spec:
         resources:
           requests:
             storage: 16Gi
+{% endif %}
   updateStrategy.type: RollingUpdate
   podManagementPolicy: OrderedReady
   template:
@@ -145,8 +147,10 @@ spec:
               mountPath: /home/packit/.config
             - name: packit-worker-vol
               mountPath: /sandcastle
+{% if with_repository_cache %}
             - name: packit-worker-repository-cache
               mountPath: /repository-cache
+{% endif %}
           command:
             - "/usr/bin/run_worker.sh"
           resources:
