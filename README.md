@@ -70,7 +70,7 @@ More info [here](./cron-jobs/README.md).
 It runs (i.e. imports newer images and re-deploys them)
 
 - STG: Once every hour (at minute 0)
-- PROD: At 2AM on Monday
+- PROD: At 2AM on Tuesday
 
 [2] automatic, [example](https://github.com/packit-service/deployment/blob/main/openshift/deployment.yml.j2#L98)
 
