@@ -6,8 +6,8 @@ spec:
   # https://crontab.guru
   # STG: Once every hour (at minute 0)
   schedule: "0 * * * *"
-  # PROD: At 02:00 on Monday
-  # schedule: "0 2 * * 1"
+  # PROD: At 02:00 on Tuesday
+  # schedule: "0 2 * * 2"
   jobTemplate:
     spec:
       template:
