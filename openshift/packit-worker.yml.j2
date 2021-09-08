@@ -46,7 +46,7 @@ spec:
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:
-            storage: 2Gi
+            storage: 3Gi
 {% if with_repository_cache and 'long-running' in queues %}
     - metadata:
         name: packit-worker-repository-cache
