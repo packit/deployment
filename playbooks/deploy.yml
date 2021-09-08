@@ -203,18 +203,6 @@
         - packit-worker
       when: workers_all_tasks > 0
 
-    - name: Deploy repository cache PVCs for packit-workers that serves short-running queue
-      vars:
-        name: "packit-worker-short-running-{{ item }}"
-      k8s:
-        namespace: "{{ sandbox_namespace }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandcastle-volumes-for-cache.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-      loop: "{{ range(0, workers_short_running)|list }}"
-      when: workers_short_running > 0 and with_repository_cache
-
     - name: Deploy packit-worker to serve short-running queue
       vars:
         name: packit-worker-short-running
