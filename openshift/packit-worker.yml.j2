@@ -57,7 +57,7 @@ spec:
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:
-            storage: 16Gi
+            storage: {{ repository_cache_storage }}
 {% endif %}
   updateStrategy.type: RollingUpdate
   podManagementPolicy: OrderedReady

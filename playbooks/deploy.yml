@@ -20,6 +20,7 @@
     with_beat: true
     with_pushgateway: true
     with_repository_cache: true
+    repository_cache_storage: 16Gi
     with_sandbox: true
     push_dev_images: false
     image: quay.io/packit/packit-service:{{ deployment }}
