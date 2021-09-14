@@ -187,6 +187,8 @@
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
       loop: "{{ range(0, workers_all_tasks)|list }}"
+      tags:
+        - packit-worker
       when: workers_all_tasks > 0 and with_repository_cache
 
     - name: Deploy packit-worker to serve both queues
@@ -235,6 +237,8 @@
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
       loop: "{{ range(0, workers_long_running)|list }}"
+      tags:
+        - packit-worker
       when: workers_long_running > 0 and with_repository_cache
 
     - name: Deploy packit-worker to serve long-running queue
