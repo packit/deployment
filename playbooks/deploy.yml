@@ -216,7 +216,7 @@
         worker_replicas: "{{ workers_short_running }}"
         # Short-running tasks are just ineractions with different services.
         # They should not require a lot of memory.
-        worker_memory: 128Mi
+        worker_memory: 256Mi
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
