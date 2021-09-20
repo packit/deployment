@@ -178,7 +178,10 @@ def github_query(till: datetime) -> None:
 
     click.echo(
         f"PRs merged since:\t{since.strftime('%Y-%m-%d')}\t"
-        + click.style("(may overlap with the latest blog, exactly on Friday)", fg="red")
+        + click.style(
+            f"(may overlap with the latest blog, exactly on {since.strftime('%A')})",
+            fg="red",
+        )
     )
     click.echo(f"PRs merged till:\t{till.strftime('%Y-%m-%d')}")
     click.echo(
