@@ -310,13 +310,13 @@ Push, create merge request and merge.
 
 #### packit service
 
-    DEPLOYMENT=stg make deploy
-    DEPLOYMENT=prod make deploy
+    DEPLOYMENT=stg make deploy TAGS=secrets
+    DEPLOYMENT=prod make deploy TAGS=secrets
 
 #### stream service
 
-    SERVICE=stream DEPLOYMENT=stg make deploy
-    SERVICE=stream DEPLOYMENT=prod make deploy
+    SERVICE=stream DEPLOYMENT=stg make deploy TAGS=secrets
+    SERVICE=stream DEPLOYMENT=prod make deploy TAGS=secrets
 
 Restart (scale down and up) `packit-service`, `packit-dashboard` and `nginx` for them to use the new certs.
 

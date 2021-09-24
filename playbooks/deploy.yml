@@ -131,7 +131,7 @@
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-postgres.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-aws.yml.j2') }}"
       tags:
-        - always
+        - secrets
 
     - name: Set up sandbox namespace
       block:
