@@ -203,14 +203,17 @@ For more information please refer to [official docs](https://ansible.softwarefac
 
 ## Obtaining a Let's Encrypt cert using `certbot`
 
+Certbot manual: https://certbot.eff.org/docs/using.html#manual
+
 Please bear in mind this is the easiest process I was able to figure out: there
 is a ton of places for improvements and ideally make it automated 100%.
 
 We are using multi-domain wildcard certificates for following domains:
 
 - \*.packit.dev
-- \*.prod.packit.dev
+- \*.stream.packit.dev
 - \*.stg.packit.dev
+- \*.stg.stream.packit.dev
 
 In case the procedure bellow does not work,
 [previously used http challenge](https://github.com/packit-service/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot)
@@ -232,14 +235,14 @@ _Note: If certbot is executed against multiple domains, step 3. is repeated for 
 Make sure the DNS is all set up:
 
     $ dig prod.packit.dev
-    ; <<>> DiG 9.11.28-RedHat-9.11.28-1.fc33 <<>> prod.packit.dev
+    ; <<>> DiG 9.16.20-RH <<>> prod.packit.dev
     ;; QUESTION SECTION:
     ;prod.packit.dev.		IN	A
     ;; ANSWER SECTION:
-    prod.packit.dev.	282	IN	CNAME	elb.e4ff.pro-eu-west-1.openshiftapps.com.
-    elb.e4ff.pro-eu-west-1.openshiftapps.com. 3599 IN CNAME	pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com.
-    pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 59 IN A 52.208.12.108
-    pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 59 IN A 52.209.166.166
+    prod.packit.dev.	24	IN	CNAME	elb.e4ff.pro-eu-west-1.openshiftapps.com.
+    elb.e4ff.pro-eu-west-1.openshiftapps.com. 3150 IN CNAME	pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com.
+    pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 60 IN A 18.202.187.210
+    pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 60 IN A 54.72.5.59
 
 Check if you have access to packit.dev domain in
 [Google Domains](https://domains.google.com/m/registrar/packit.dev).
@@ -252,13 +255,13 @@ or simply `dnf install certbot` on your machine (the instructions tell you to do
 
 Run certbot:
 
-    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email user-cont-team@redhat.com -d *.packit.dev -d *.prod.packit.dev -d *.stg.packit.dev
+    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email user-cont-team@redhat.com -d *.packit.dev -d *.stream.packit.dev -d *.stg.packit.dev -d *.stg.stream.packit.dev
 
 You will be asked to set TXT record for every domain requested:
 
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     Please deploy a DNS TXT record under the name
-    _acme-challenge.packit.dev with the following value:
+    _acme-challenge.abcxyz.packit.dev with the following value:
 
     123456abcdef
 
@@ -270,15 +273,14 @@ You will be asked to set TXT record for every domain requested:
 
 Go to [Google Domains](https://domains.google.com/m/registrar/packit.dev/dns)
 and create/set the corresponding value:
-TXT record called `_acme-challenge`
-(or `_acme-challenge.prod` or `acme-challenge.stg` per instructions).
+TXT record called `_acme-challenge.abcxyz.packit.dev`.
 If those records already exist (from previous run), don't create new records,
 just edit current ones (or first delete the old ones and then create new ones).
 
 Wait till it's distributed - in another terminal watch nslookup
 and once it returns the configured value
 
-    [~/]$ watch -d nslookup -q=TXT _acme-challenge.packit.dev
+    [~/]$ watch -d nslookup -q=TXT _acme-challenge.abcxyz.packit.dev
     Server:         127.0.0.53
     Address:        127.0.0.53#53
 
@@ -297,19 +299,28 @@ Repeat this for all requested domains.
 
 Copy certificates to secrets repository (prod & stg)
 
-    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/prod/
-    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/stg/
+    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/packit/prod/
+    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/packit/stg/
+    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/stream/prod/
+    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/stream/stg/
 
 Push, create merge request and merge.
 
 ### 5.Re-deploy stg and prod environment:
 
-    DEPLOYMENT=stg make deploy
-    DEPLOYMENT=prod make deploy
+#### packit service
 
-Docs: https://certbot.eff.org/docs/using.html#manual
+    DEPLOYMENT=stg make deploy TAGS=secrets
+    DEPLOYMENT=prod make deploy TAGS=secrets
 
-### How to test the TLS deployment
+#### stream service
+
+    SERVICE=stream DEPLOYMENT=stg make deploy TAGS=secrets
+    SERVICE=stream DEPLOYMENT=prod make deploy TAGS=secrets
+
+Restart (scale down and up) `packit-service`, `packit-dashboard` and `nginx` for them to use the new certs.
+
+### How to inspect a certificate
 
 If you want to inspect local certificates, you can use `certtool` (`gnutls-utils` package)
 to view the cert's metadata:
