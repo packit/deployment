@@ -76,3 +76,5 @@ push_dev_images: true
 # workers_long_running: 0
 
 distgit_url: https://src.stg.fedoraproject.org/
+
+pushgateway_address: ""

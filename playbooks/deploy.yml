@@ -45,6 +45,7 @@
     workers_long_running: 0
     distgit_url: https://src.fedoraproject.org/
     distgit_namespace: rpms
+    pushgateway_address: http://pushgateway
   tasks:
     - include_tasks: tasks/project-dir.yml
       tags:

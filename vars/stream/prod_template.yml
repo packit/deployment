@@ -66,3 +66,5 @@ celery_app: hardly.tasks
 
 distgit_url: https://gitlab.com/
 distgit_namespace: redhat/centos-stream/rpms
+
+pushgateway_address: ""

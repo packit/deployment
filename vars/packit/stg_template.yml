@@ -76,3 +76,4 @@ api_key: ""
 # workers_long_running: 0
 
 distgit_url: https://src.stg.fedoraproject.org/
+# pushgateway_address: http://pushgateway
