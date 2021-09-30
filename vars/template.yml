@@ -79,3 +79,5 @@ api_key: ""
 
 # distgit_url: https://src.fedoraproject.org/
 # distgit_namespace: rpms
+
+# pushgateway_address: http://pushgateway

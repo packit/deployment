@@ -56,7 +56,7 @@ image_worker: quay.io/packit/hardly:{{ deployment }}
 celery_app: hardly.tasks
 
 # Celery retry parameters
-# celery_retry_limit: 2
+celery_retry_limit: 0
 # celery_retry_backoff: 3
 
 # Number of worker pods to be deployed to serve the queues
@@ -66,3 +66,5 @@ celery_app: hardly.tasks
 
 distgit_url: https://gitlab.com/
 distgit_namespace: redhat/centos-stream/rpms
+
+pushgateway_address: ""

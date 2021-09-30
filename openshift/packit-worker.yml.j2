@@ -120,6 +120,8 @@ spec:
               value: "{{ celery_retry_backoff }}"
             - name: QUEUES
               value: "{{ queues }}"
+            - name: PUSHGATEWAY_ADDRESS
+              value: "{{ pushgateway_address }}"
           volumeMounts:
             - name: packit-ssh
               mountPath: /packit-ssh
