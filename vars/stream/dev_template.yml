@@ -22,8 +22,6 @@ with_tokman: false
 
 with_fedmsg: false
 
-with_centosmsg: false
-
 # with_redis_commander: false
 
 # with_flower: false

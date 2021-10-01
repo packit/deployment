@@ -31,8 +31,6 @@
           with_tokman: true
           with_beat: true
           with_fedmsg: true
-          # centosmsg actually doesn't work with our generated/dummy certificate
-          with_centosmsg: false
           # TODO: why these two (dashboard, pushgateway) don't work in Zuul? Error msg:
           # "The task includes an option with an undefined variable. The error was: the inline
           # if-expression on line 92/95 evaluated to false and no else section was defined."
@@ -42,7 +40,6 @@
           image: quay.io/packit/packit-service:stg
           image_worker: quay.io/packit/packit-worker:stg
           image_fedmsg: quay.io/packit/packit-service-fedmsg:stg
-          image_centosmsg: quay.io/packit/packit-service-centosmsg:stg
           image_dashboard: quay.io/packit/dashboard:stg
           image_tokman: quay.io/packit/tokman:stg
         dest: "{{ zuul.project.src_dir }}/vars/packit/dev.yml"
