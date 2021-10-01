@@ -51,18 +51,6 @@ spec:
           env:
             - name: DEPLOYMENT
               value: {{ deployment }}
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: aws
-                  key: access-key-id
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: aws
-                  key: secret-access-key
-            - name: QUEUE_NAME_PREFIX
-              value: {{ queue_name_prefix }}
             - name: DISTGIT_URL
               value: {{ distgit_url }}
             - name: DISTGIT_NAMESPACE
