@@ -13,7 +13,6 @@
     queue_name_prefix: "{{ service }}-{{ deployment }}-"
     with_tokman: true
     with_fedmsg: true
-    with_centosmsg: true
     with_redis_commander: false
     with_flower: false
     with_dashboard: true
@@ -26,7 +25,6 @@
     image: quay.io/packit/packit-service:{{ deployment }}
     image_worker: quay.io/packit/packit-worker:{{ deployment }}
     image_fedmsg: quay.io/packit/packit-service-fedmsg:{{ deployment }}
-    image_centosmsg: quay.io/packit/packit-service-centosmsg:{{ deployment }}
     image_dashboard: quay.io/packit/dashboard:{{ deployment }}
     image_tokman: quay.io/packit/tokman:{{ deployment }}
     # project_dir is set in tasks/project-dir.yml
@@ -108,8 +106,6 @@
           command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-worker:dev {{ tls_verify_false }}"
       #        - command: "{{ container_engine }} tag {{ image_fedmsg }} 172.30.1.1:5000/myproject/packit-service-fedmsg:dev"
       #        - command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-service-fedmsg:dev {{ tls_verify_false }}"
-      #        - command: "{{ container_engine }} tag {{ image_centosmsg }} 172.30.1.1:5000/myproject/packit-service-centosmsg:dev"
-      #        - command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-service-centosmsg:dev {{ tls_verify_false }}"
       when: push_dev_images
       tags:
         - packit-service
@@ -346,31 +342,6 @@
         - fedmsg
       when: with_fedmsg
 
-    - name: Deploy centosmsg secrets
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/secret-centos-secrets.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-      tags:
-        - centosmsg
-      notify:
-        - Rollout centosmsg
-      when: with_centosmsg
-
-    - name: Deploy packit-service-centosmsg
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-centosmsg.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-      tags:
-        - centosmsg
-      register: centosmsg
-      when: with_centosmsg
-
     - name: Deploy GitHub App Private Key
       k8s:
         namespace: "{{ project }}"
@@ -486,9 +457,3 @@
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not flower.changed
-
-    - name: Rollout centosmsg
-      command: oc rollout latest dc/packit-service-centosmsg
-      # Run this rollout only if the DeploymentConfig above didn't change,
-      # and so it wasn't rolled out yet.
-      when: not centosmsg.changed

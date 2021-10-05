@@ -25,14 +25,13 @@ We build separate images for
 - [service / web server](https://quay.io/repository/packit/packit-service) - accepts webhooks and tasks workers
 - [workers](https://quay.io/repository/packit/packit-worker) - do the actual work
 - [fedora messaging consumer](https://quay.io/repository/packit/packit-service-fedmsg) - listens on fedora messaging for events from Copr and tasks workers
-- [CentOS messaging consumer](https://quay.io/repository/packit/packit-service-centosmsg) - listens on the CentOS MQTT message bus for events from git.centos.org
 - [Sandcastle](https://quay.io/repository/packit/sandcastle) - sandboxing
 
 #### Production vs. Staging images
 
 Separate images are built for staging and production deployment.
-Staging images are `:stg` tagged and built from `main` of `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
-Production images are `:prod` tagged and built from `stable` branch of `packit-service`, `packit-service-fedmsg`, `packit-service-centosmg`, `sandcastle` and `dashboard`.
+Staging images are `:stg` tagged and built from `main` of `packit-service`, `packit-service-fedmsg`, `sandcastle` and `dashboard`.
+Production images are `:prod` tagged and built from `stable` branch of `packit-service`, `packit-service-fedmsg`, `sandcastle` and `dashboard`.
 To move `stable` branch to a newer 'stable' commit:
 
 - git branch -f stable commit-hash
@@ -82,7 +81,7 @@ Long story:
 If you need to import (and deploy) newer image(s) before the CronJob does
 (see above), you can [do that manually](https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#importing-tag-and-image-metadata):
 
-    $ oc import-image is/packit-{service|service-fedmsg|worker|dashboard|service-centosmsg}:<deployment>
+    $ oc import-image is/packit-{service|worker|dashboard|service-fedmsg}:<deployment>
 
 once a new image is pushed/built in registry.
 
