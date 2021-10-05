@@ -14,9 +14,6 @@ repos:
       - id: check-merge-conflict
       #    - id: check-yaml
       - id: detect-private-key
-      - id: detect-aws-credentials
-        args:
-          - --allow-missing-credentials
       - id: end-of-file-fixer
       - id: trailing-whitespace
   - repo: https://github.com/ansible/ansible-lint.git

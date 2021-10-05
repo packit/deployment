@@ -75,18 +75,6 @@ spec:
               value: {{ distgit_namespace }}
             - name: APP
               value: {{ celery_app }}
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: aws
-                  key: access-key-id
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: aws
-                  key: secret-access-key
-            - name: QUEUE_NAME_PREFIX
-              value: {{ queue_name_prefix }}
             - name: REDIS_SERVICE_HOST
               value: redis
             - name: SENTRY_SECRET
@@ -147,8 +135,7 @@ spec:
           #    command:
           #      - bash
           #      - -c
-          #      # if we don't use AWS SQS (doesn't support this)
-          #      - 'if (test -z "$AWS_ACCESS_KEY_ID"); then celery -A $APP status | grep $(cat /etc/hostname) | grep OK; else true; fi'
+          #      - "celery -A $APP status | grep $(cat /etc/hostname) | grep OK"
           #  initialDelaySeconds: 10
           #  periodSeconds: 60
           #livenessProbe:
@@ -157,7 +144,7 @@ spec:
           #      - bash
           #      - -c
           #      # does this worker respond to ping?
-          #      - 'if (test -z "$AWS_ACCESS_KEY_ID"); then celery -A $APP inspect ping --destination "celery@$(cat /etc/hostname)"; else true; fi'
+          #      - 'celery -A $APP inspect ping --destination "celery@$(cat /etc/hostname)"'
           #  initialDelaySeconds: 10
           #  periodSeconds: 30
 ---
