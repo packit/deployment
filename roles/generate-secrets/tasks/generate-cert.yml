@@ -2,6 +2,12 @@
 # SPDX-License-Identifier: MIT
 
 ---
+- name: Install Python cryptography module
+  package:
+    name:
+      - python-cryptography
+  become: true
+
 - name: Generate OpenSSL private keys
   openssl_privatekey:
     path: "{{ path_to_secrets }}/{{ item }}"

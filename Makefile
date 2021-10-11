@@ -1,6 +1,6 @@
 .PHONY: send-release-event deploy tags cleanup zuul-secrets get-certs move-stable
 
-ANSIBLE_PYTHON := /usr/bin/python3
+ANSIBLE_PYTHON ?= $(shell command -v /usr/bin/python3 2> /dev/null || echo /usr/bin/python2)
 CONT_HOME := /opt/app-root/src
 AP := ansible-playbook -vv -c local -i localhost, -e ansible_python_interpreter=$(ANSIBLE_PYTHON)
 # "By default, Ansible runs as if --tags all had been specified."
