@@ -1,0 +1,59 @@
+name: Build & push cron-job images
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - cron-jobs/delete-pvcs/**
+      - cron-jobs/import-images/**
+      - cron-jobs/packit-service-validation/**
+
+jobs:
+  build-and-push:
+    # To not run in forks
+    if: github.repository_owner == 'packit'
+
+    name: Build and push image
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - image: delete-pvcs
+          - image: import-images
+          - image: packit-service-validation
+
+    env:
+      path: cron-jobs/${{ matrix.image }}/
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files in a push
+        shell: bash
+        run: |
+          changed_files=$(git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | tr '\n' ' ')
+          echo "::set-output name=changed_files::${changed_files}"
+        id: changed_files
+
+      - name: Build Image
+        # To build only relevant images
+        if: contains(steps.changed_files.outputs.changed_files, env.path)
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          dockerfiles: ${{ env.path }}/Dockerfile
+          image: ${{ matrix.image }}
+          oci: true
+
+      - name: Push To Quay
+        # To push only relevant images
+        if: contains(steps.changed_files.outputs.changed_files, env.path)
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/packit
+          username: ${{ secrets.QUAY_IMAGE_BUILDER_USERNAME }}
+          password: ${{ secrets.QUAY_IMAGE_BUILDER_TOKEN }}
