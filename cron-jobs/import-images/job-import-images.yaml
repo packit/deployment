@@ -15,6 +15,7 @@ spec:
           containers:
             - name: import-images
               image: quay.io/packit/import-images
+              imagePullPolicy: IfNotPresent
               env:
                 - name: KUBECONFIG
                   value: /tmp/.kube/config

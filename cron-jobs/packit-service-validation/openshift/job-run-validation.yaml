@@ -22,6 +22,7 @@ spec:
           containers:
             - name: run-validation
               image: quay.io/packit/packit-service-validation
+              imagePullPolicy: IfNotPresent
               env:
                 - name: GITHUB_TOKEN
                   valueFrom:
