@@ -45,6 +45,7 @@ jobs:
         with:
           dockerfiles: ${{ env.path }}Dockerfile
           image: ${{ matrix.image }}
+          context: ${{ env.path }}
           oci: true
 
       - name: Push To Quay
