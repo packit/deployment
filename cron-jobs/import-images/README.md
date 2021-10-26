@@ -13,7 +13,7 @@ $ oc create serviceaccount importimager
 $ oc policy add-role-to-user registry-editor -z importimager
 ```
 
-[Dockerfile](./Dockerfile) - image used by the job
+[Containerfile](./Containerfile) - image used by the job
 
 [import-images.sh](./import-images.sh) - script in the image
 

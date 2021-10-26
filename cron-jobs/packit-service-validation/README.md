@@ -6,7 +6,7 @@ Currently this is deployed in [Open PaaS](https://open.paas.redhat.com/console/p
 
 [Cron job](./openshift/job-run-validation.yaml) - job for running of the validation script
 
-[Dockerfile](./Dockerfile) - image used by the job
+[Containerfile](./Containerfile) - image used by the job
 
 [packit-service-validation.py](./packit-service-validation.py) - script in the image
 
