@@ -11,6 +11,7 @@ from os import getenv
 
 from github import InputGitAuthor
 from github.Commit import Commit
+from github.GitRef import GitRef
 
 from ogr.services.github import GithubService
 from ogr.abstract import PullRequest
@@ -31,6 +32,7 @@ class Trigger(str, enum.Enum):
 class Testcase:
     def __init__(self, pr: PullRequest = None, trigger: Trigger = Trigger.pr_opened):
         self.pr = pr
+        self.pr_branch_ref: GitRef = None
         self.failure_msg = ""
         self.trigger = trigger
         self.head_commit = pr.head_commit if pr else None
@@ -59,6 +61,7 @@ class Testcase:
             )
         if self.trigger == Trigger.pr_opened:
             self.pr.close()
+            self.pr_branch_ref.delete()
 
     def trigger_build(self):
         """
@@ -102,21 +105,19 @@ class Testcase:
         source_branch = "test_case_opened_pr"
         pr_title = "Basic test case - opened PR trigger"
 
-        if source_branch not in project.get_branches():
-            # if the source branch does not exist, create one
-            # and create a commit
-            commit = project.github_repo.get_commit("HEAD")
-            project.github_repo.create_git_ref(
-                f"refs/heads/{source_branch}", commit.sha
-            )
-            project.github_repo.create_file(
-                path="test.txt",
-                message="Opened PR trigger",
-                content="Testing the opened PR trigger.",
-                branch=source_branch,
-                committer=user,
-                author=user,
-            )
+        # create a new branch and commit for the PR
+        commit = project.github_repo.get_commit("HEAD")
+        self.pr_branch_ref = project.github_repo.create_git_ref(
+            f"refs/heads/{source_branch}", commit.sha
+        )
+        project.github_repo.create_file(
+            path="test.txt",
+            message="Opened PR trigger",
+            content="Testing the opened PR trigger.",
+            branch=source_branch,
+            committer=user,
+            author=user,
+        )
 
         existing_pr = [pr for pr in project.get_pr_list() if pr.title == pr_title]
         if len(existing_pr) == 1:
