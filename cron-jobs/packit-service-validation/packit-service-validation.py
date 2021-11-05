@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 import enum
-import sentry_sdk
 import time
+import logging
 
 from copr.v3 import Client
 from datetime import datetime, timedelta, date
@@ -21,6 +21,7 @@ copr = Client.create_from_config_file()
 service = GithubService(token=getenv("GITHUB_TOKEN"))
 project = service.get_project(repo="hello-world", namespace="packit")
 user = InputGitAuthor(name="Release Bot", email="user-cont-team+release-bot@redhat.com")
+logging.basicConfig(level=logging.WARNING)
 
 
 class Trigger(str, enum.Enum):
@@ -367,7 +368,13 @@ class Testcase:
 
 
 if __name__ == "__main__":
-    sentry_sdk.init(getenv("SENTRY_SECRET"))
+    sentry_secret = getenv("SENTRY_SECRET")
+    if sentry_secret:
+        import sentry_sdk
+
+        sentry_sdk.init(sentry_secret)
+    else:
+        logging.warning("SENTRY_SECRET was not set!")
 
     # run testcases where the build is triggered by a '/packit build' comment
     prs_for_comment = [
