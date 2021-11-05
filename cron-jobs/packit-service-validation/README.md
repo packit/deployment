@@ -18,7 +18,11 @@ The script verifies that Copr builds and Testing farm runs are processed correct
 - opened PR trigger - new PR is created, the branch `test_case_opened_pr` is used as a source branch,
   after running the test the PR is closed
 
-If you want to run the script on your own, everything you need is to set some env vars - GITHUB_TOKEN
-and optionally SENTRY_SECRET, if you want to send the validation failures to Sentry
-(if not, you can just comment out the 2 Sentry lines and print the failure messages instead of
-sending them to Sentry) and have a copr configuration file in your ~/.config directory.
+If you want to run the script on your own:
+
+- Set a `GITHUB_TOKEN` environment variable holding a [personal access
+  token](https://github.com/settings/tokens) with _public_repo_ scope.
+- Have a [copr configuration file](https://copr.fedorainfracloud.org/api/) at
+  `~/.config/copr`.
+- Optionally, set a `SENTRY_SECRET` environment variable if you want to send
+  the validation failures to Sentry.
