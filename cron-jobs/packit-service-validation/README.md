@@ -22,7 +22,5 @@ If you want to run the script on your own:
 
 - Set a `GITHUB_TOKEN` environment variable holding a [personal access
   token](https://github.com/settings/tokens) with _public_repo_ scope.
-- Have a [copr configuration file](https://copr.fedorainfracloud.org/api/) at
-  `~/.config/copr`.
 - Optionally, set a `SENTRY_SECRET` environment variable if you want to send
   the validation failures to Sentry.

@@ -4,7 +4,7 @@
 - name: Packit-service validation deployment
   hosts: all
   vars:
-    # path with needed secrets (github, sentry, copr)
+    # path with needed secrets (github, sentry)
     path_to_secrets: ""
     project: packit-service-validation
     host: https://open.paas.redhat.com
@@ -23,7 +23,6 @@
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
       loop:
-        - "{{ lookup('template', './openshift/secret-config.yml.j2') }}"
         - "{{ lookup('template', './openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', './openshift/secret-github.yml.j2') }}"
       tags:
