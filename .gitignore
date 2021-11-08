@@ -10,3 +10,6 @@ secrets/secrets.yaml
 
 # used in move_stable script
 move_stable_repositories
+
+# secrets for validation
+cron-jobs/packit-service-validation/secrets
