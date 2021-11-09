@@ -4,7 +4,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: run-validation
+  name: packit-validation
 spec:
   # runs every day at 4 a.m.
   schedule: "0 4 * * *"
@@ -15,10 +15,6 @@ spec:
       activeDeadlineSeconds: 14400
       template:
         spec:
-          volumes:
-            - name: copr-config
-              secret:
-                secretName: copr-config
           containers:
             - name: run-validation
               image: quay.io/packit/packit-service-validation
@@ -27,7 +23,7 @@ spec:
                 - name: GITHUB_TOKEN
                   valueFrom:
                     secretKeyRef:
-                      name: github-token
+                      name: packit-github-token
                       key: token
                 - name: SENTRY_SECRET
                   valueFrom:
@@ -35,9 +31,6 @@ spec:
                       name: packit-sentry
                       key: sentry
               command: ["python3", "/usr/bin/packit-service-validation.py"]
-              volumeMounts:
-                - name: copr-config
-                  mountPath: /.config
               resources:
                 limits:
                   memory: "80Mi"

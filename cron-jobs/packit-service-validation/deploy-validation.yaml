@@ -4,10 +4,10 @@
 - name: Packit-service validation deployment
   hosts: all
   vars:
-    # path with needed secrets (github, sentry, copr)
-    path_to_secrets: ""
-    project: packit-service-validation
-    host: https://open.paas.redhat.com
+    # path with needed secrets (github, sentry)
+    path_to_secrets: "{{ playbook_dir }}/secrets"
+    project: cyborg
+    host: https://api.ocp4.prod.psi.redhat.com:6443
     # oc login <the above host value>, oc whoami -t
     # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
     api_key: ""
@@ -23,7 +23,6 @@
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
       loop:
-        - "{{ lookup('template', './openshift/secret-config.yml.j2') }}"
         - "{{ lookup('template', './openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', './openshift/secret-github.yml.j2') }}"
       tags:
