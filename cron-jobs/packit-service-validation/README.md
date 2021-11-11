@@ -2,7 +2,7 @@
 
 For the validation of the packit-service we run a validation script every night.
 
-Currently this is deployed in [Open PaaS](https://open.paas.redhat.com/console/project/packit-service-validation/overview).
+Currently this is deployed in the cyborg project in PSI.
 
 [Cron job](./openshift/job-run-validation.yaml) - job for running of the validation script
 
