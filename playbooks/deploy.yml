@@ -150,6 +150,8 @@
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
+      tags:
+        - postgres
 
     - name: Deploy redis
       k8s:
