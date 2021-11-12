@@ -17,6 +17,8 @@ from ogr.services.github import GithubService
 from ogr.abstract import PullRequest
 from ogr.services.github.check_run import GithubCheckRunStatus, GithubCheckRunResult
 
+APP_NAME = "Packit-as-a-Service"
+
 copr = Client({"copr_url": "https://copr.fedorainfracloud.org"})
 service = GithubService(token=getenv("GITHUB_TOKEN"))
 project = service.get_project(repo="hello-world", namespace="packit")
@@ -155,7 +157,7 @@ class Testcase:
         check_runs = [
             check_run.name
             for check_run in project.get_check_runs(commit_sha=self.head_commit)
-            if "packit-stg" not in check_run.name
+            if check_run.app.name == APP_NAME
         ]
 
         watch_end = datetime.now() + timedelta(seconds=60)
@@ -169,7 +171,7 @@ class Testcase:
             check_runs = [
                 check_run.name
                 for check_run in project.get_check_runs(commit_sha=self.head_commit)
-                if "packit-stg" not in check_run.name
+                if check_run.app.name == APP_NAME
             ]
 
         while True:
@@ -306,10 +308,10 @@ class Testcase:
             states = [
                 check_run.status
                 for check_run in check_runs
-                if "packit-stg" not in check_run.name
+                if check_run.app.name == APP_NAME
             ]
 
-            if all([state == GithubCheckRunStatus.completed for state in states]):
+            if all(state == GithubCheckRunStatus.completed for state in states):
                 break
 
             if datetime.now() > watch_end:
@@ -319,7 +321,7 @@ class Testcase:
                 )
                 for check_run in check_runs:
                     if (
-                        "packit-stg" not in check_run.name
+                        check_run.app.name == APP_NAME
                         and check_run.status != GithubCheckRunStatus.completed
                     ):
                         self.failure_msg += f"{check_run.name}\n"
@@ -340,7 +342,7 @@ class Testcase:
         check_runs = self.watch_check_runs()
         for check_run in check_runs:
             if (
-                "packit-stg" not in check_run.name
+                check_run.app.name == APP_NAME
                 and check_run.conclusion == GithubCheckRunResult.failure
             ):
                 self.failure_msg += (
