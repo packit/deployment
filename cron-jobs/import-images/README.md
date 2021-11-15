@@ -5,13 +5,7 @@ to ImageStream (even we explicitly [request them](https://docs.openshift.com/con
 
 As a work-around, there's a CronJob to periodically import images metadata into image streams.
 See [job-import-images.yaml](./job-import-images.yaml) and `oc describe cronjob.batch/import-images`.
-The job uses one of these [service accounts](https://docs.openshift.com/container-platform/3.11/dev_guide/service_accounts.html):
-
-- [packit-stg](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-stg/serviceaccounts/importimager)
-- [packit-prod](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/packit-prod/serviceaccounts/importimager)
-- [stream-stg](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/stream-stg/serviceaccounts/importimager)
-- [stream-prod](https://admin-console.pro-eu-west-1.openshift.com/k8s/ns/stream-prod/serviceaccounts/importimager)
-
+The job uses importimager [service account](https://docs.openshift.com/container-platform/3.11/dev_guide/service_accounts.html)
 with `registry-editor` [role](https://docs.openshift.com/container-platform/3.11/admin_guide/manage_rbac.html) role added.
 
 If you ever needed to re-create it, just do:
