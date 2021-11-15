@@ -36,6 +36,11 @@ spec:
                 secretKeyRef:
                   key: database-name
                   name: postgres-secret
+            # https://www.postgresql.org/docs/13/kernel-resources.html#LINUX-MEMORY-OVERCOMMIT
+            - name: PG_OOM_ADJUST_FILE
+              value: "/proc/self/oom_score_adj"
+            - name: POSTGRESQL_MAX_CONNECTIONS
+              value: "20"
           image: quay.io/centos7/postgresql-12-centos7
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -63,11 +68,11 @@ spec:
             timeoutSeconds: 1
           resources:
             requests:
-              memory: "386Mi"
-              cpu: "100m"
+              memory: "{{ '512Mi' if deployment == 'prod' else '256Mi' }}"
+              cpu: "{{ '400m' if deployment == 'prod' else '100m' }}"
             limits:
-              memory: "386Mi"
-              cpu: "100m"
+              memory: "{{ '512Mi' if deployment == 'prod' else '256Mi' }}"
+              cpu: "{{ '400m' if deployment == 'prod' else '100m' }}"
           volumeMounts:
             - mountPath: /var/lib/pgsql/data
               name: postgres-data
@@ -98,4 +103,4 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: "{{ '4Gi' if deployment == 'prod' else '1Gi' }}"
