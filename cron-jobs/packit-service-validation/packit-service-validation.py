@@ -70,7 +70,7 @@ class Testcase:
         :return:
         """
         if self.trigger == Trigger.comment:
-            project.pr_comment(self.pr.id, "/packit build")
+            self.pr.comment("/packit build")
         elif self.trigger == Trigger.push:
             self.push_to_pr()
         else:
