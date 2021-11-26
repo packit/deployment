@@ -4,20 +4,20 @@
 kind: DeploymentConfig
 apiVersion: v1
 metadata:
-  name: postgres-12
+  name: postgres-13
   labels:
-    service: postgres-12
+    service: postgres-13
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
-    service: postgres-12
+    service: postgres-13
   template:
     metadata:
       labels:
-        service: postgres-12
-        name: postgres-12
+        service: postgres-13
+        name: postgres-13
     spec:
       containers:
         - env:
@@ -41,7 +41,7 @@ spec:
               value: "/proc/self/oom_score_adj"
             - name: POSTGRESQL_MAX_CONNECTIONS
               value: "20"
-          image: quay.io/centos7/postgresql-12-centos7
+          image: quay.io/centos7/postgresql-13-centos7
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
@@ -80,7 +80,7 @@ spec:
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
-            claimName: postgres-12
+            claimName: postgres-13
 ---
 apiVersion: v1
 kind: Service
@@ -92,12 +92,12 @@ spec:
       port: 5432
       targetPort: 5432
   selector:
-    service: postgres-12
+    service: postgres-13
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-12
+  name: postgres-13
 spec:
   accessModes:
     - ReadWriteOnce
