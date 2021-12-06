@@ -74,13 +74,41 @@ spec:
               memory: "{{ '512Mi' if deployment == 'prod' else '256Mi' }}"
               cpu: "{{ '400m' if deployment == 'prod' else '100m' }}"
           volumeMounts:
-            - mountPath: /var/lib/pgsql/data
-              name: postgres-data
+            - name: postgres-data
+              mountPath: /var/lib/pgsql/data
+            - name: postgres-config
+              mountPath: /opt/app-root/src/postgresql-cfg
       restartPolicy: Always
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
             claimName: postgres-13
+        - name: postgres-config
+          configMap:
+            name: postgres-config
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: postgres-config
+data:
+  packit.conf: |-
+    # max mem to be used by a query operation (sort/hash table) before writing to temp disk files, default 4MB
+    # work_mem = 4MB
+    # max number of background processes, default 8
+    max_worker_processes = 4
+    # maximum num of autovacuum processes that may be running at any one time, default 3
+    autovacuum_max_workers = 1
+    # default is 4.0. Use 1.1 for SSD storage
+    random_page_cost = 1.1
+    # default is 1. Use hundreds for SSD storage
+    effective_io_concurrency = 200
+    # https://www.postgresql.org/docs/current/wal-configuration.html
+    # wal values based on https://pgtune.leopard.in.ua
+    # wal_buffers = -1
+    min_wal_size = 2GB
+    max_wal_size = 8GB
+    # (shared_buffers, effective_cache_size and max_connections are set by env. vars)
 ---
 apiVersion: v1
 kind: Service
