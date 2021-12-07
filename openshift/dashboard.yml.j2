@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
         - name: packit-dashboard
-          image: quay.io/packit/dashboard:{{ deployment }}
+          image: packit-dashboard:{{ deployment }}
           ports:
             - containerPort: 8443
           volumeMounts:
