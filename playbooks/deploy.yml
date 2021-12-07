@@ -194,6 +194,7 @@
         # cloning repos is memory intensive: glibc needs 300M+, kernel 600M+
         # during cloning, we need to account for git and celery worker processes
         worker_memory: 896Mi
+        worker_cpu: 400m
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
@@ -209,9 +210,10 @@
         name: packit-worker-short-running
         queues: "short-running"
         worker_replicas: "{{ workers_short_running }}"
-        # Short-running tasks are just ineractions with different services.
-        # They should not require a lot of memory.
+        # Short-running tasks are just interactions with different services.
+        # They should not require a lot of memory/cpu.
         worker_memory: 256Mi
+        worker_cpu: 100m
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
@@ -244,6 +246,7 @@
         # cloning repos is memory intensive: glibc needs 300M+, kernel 600M+
         # during cloning, we need to account for git and celery worker processes
         worker_memory: 896Mi
+        worker_cpu: 400m
       k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
