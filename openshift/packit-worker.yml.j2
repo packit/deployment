@@ -117,6 +117,10 @@ spec:
           command:
             - "/usr/bin/run_worker.sh"
           resources:
+            # requests and limits have to be the same to have Guaranteed QoS
+            requests:
+              memory: {{ worker_memory }}
+              cpu: {{ worker_cpu }}
             limits:
               memory: {{ worker_memory }}
               cpu: {{ worker_cpu }}

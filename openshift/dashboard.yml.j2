@@ -48,9 +48,13 @@ spec:
             - name: DEPLOYMENT
               value: {{ deployment }}
           resources:
+            # requests and limits have to be the same to have Guaranteed QoS
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
             limits:
-              memory: 128Mi
-              cpu: 100m
+              memory: "128Mi"
+              cpu: "100m"
       volumes:
         - name: packit-secrets
           secret:

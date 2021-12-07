@@ -52,9 +52,12 @@ spec:
           ports:
             - containerPort: 5555
           resources:
+            requests:
+              memory: "80Mi"
+              cpu: "50m"
             limits:
               memory: "80Mi"
-              cpu: "100m"
+              cpu: "50m"
   replicas: 1
   strategy:
     type: Recreate

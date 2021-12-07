@@ -91,6 +91,10 @@ spec:
           command:
             - "/usr/bin/run_worker.sh"
           resources:
+            # requests and limits have to be the same to have Guaranteed QoS
+            requests:
+              memory: "150Mi"
+              cpu: "80m"
             limits:
               memory: "150Mi"
               cpu: "80m"

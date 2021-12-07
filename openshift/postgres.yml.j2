@@ -67,6 +67,7 @@ spec:
 #            successThreshold: 1
 #            timeoutSeconds: 1
           resources:
+            # requests and limits have to be the same to have Guaranteed QoS
             requests:
               memory: "{{ '512Mi' if deployment == 'prod' else '256Mi' }}"
               cpu: "{{ '400m' if deployment == 'prod' else '100m' }}"
