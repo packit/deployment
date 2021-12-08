@@ -1,24 +1,5 @@
-# MIT License
-#
-# Copyright (c) 2018-2019 Red Hat, Inc.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
 
 # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html
 kind: DeploymentConfig
@@ -90,15 +71,16 @@ spec:
           command:
             - /usr/bin/run_httpd.sh
           resources:
+            # requests and limits have to be the same to have Guaranteed QoS
             requests:
-              memory: "96Mi"
-              cpu: "50m"
+              memory: "196Mi"
+              cpu: "200m"
             limits:
               # run_httpd.sh does 'alembic upgrade head' which might require more memory
               # If you see '/usr/bin/run_httpd.sh: line 16:   Killed     alembic upgrade head'
-              # you have to temporarily increase the limit (last time 196M wasn't enough, 512M was),
-              # re-deploy service and once the alembic upgrade passes, revert
-              memory: "128Mi"
+              # you have to temporarily increase the limit (last time 512M was enough),
+              # and once the alembic upgrade passes, revert.
+              memory: "196Mi"
               cpu: "200m"
           # In TLS world, hostname needs to match whatever is set in the cert
           # in our cause, k8s is doing here something like curl https://172.15.2.4:8443/api/healthz/

@@ -53,6 +53,10 @@ spec:
             - name: access-tokens
               mountPath: /access_tokens
           resources:
+            # requests and limits have to be the same to have Guaranteed QoS
+            requests:
+              memory: "80Mi"
+              cpu: "100m"
             limits:
               memory: "80Mi"
               cpu: "100m"

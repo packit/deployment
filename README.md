@@ -32,10 +32,7 @@ We build separate images for
 Separate images are built for staging and production deployment.
 Staging images are `:stg` tagged and built from `main` of `packit-service`, `packit-service-fedmsg`, `sandcastle` and `dashboard`.
 Production images are `:prod` tagged and built from `stable` branch of `packit-service`, `packit-service-fedmsg`, `sandcastle` and `dashboard`.
-To move `stable` branch to a newer 'stable' commit:
-
-- git branch -f stable commit-hash
-- git push [-u upstream] stable
+To move `stable` branches to a newer 'stable' commit we use [scripts/move_stable.py](scripts/move_stable.py)
 
 #### Image build process
 
@@ -59,19 +56,14 @@ as intermediary between an image registry (Quay.io) and a Deployment/StatefulSet
 It has several significant benefits:
 
 - We can automatically trigger Deployment when a new image is pushed to the registry.
-- We can rollback/revert/undo the Deployment (previously we had to use image digests to achieve this).
+- We can rollback/revert/undo the Deployment.
 
-`Image registry` -> [1] -> `ImageStream` -> [2] -> `DeploymentConfig`/`StatefulSet`
+`Image registry` -> [1] -> `ImageStream` -> `DeploymentConfig`/`StatefulSet`
 
-[1] set to automatic ([here](https://github.com/packit-service/deployment/blob/main/openshift/imagestream.yml.j2#L36)), however OpenShift Online has this turned off.
-We run a [CronJob](https://github.com/packit-service/deployment/blob/main/cron-jobs/job-import-images.yaml) to work-around this.
-More info [here](./cron-jobs/README.md).
-It runs (i.e. imports newer images and re-deploys them)
-
-- STG: Once every hour (at minute 0)
-- PROD: At 2AM on Tuesday
-
-[2] automatic, [example](https://github.com/packit-service/deployment/blob/main/openshift/deployment.yml.j2#L98)
+[1] This is automatic on stg, but not on prod. On prod, where we don't want the images to
+be imported as soon as they're built, we run a
+[CronJob](https://github.com/packit/deployment/blob/main/cron-jobs/import-images/job-import-images.yaml)
+to import them (end hence re-deploy) at the day & time (currently at 2AM on Tuesday) we want.
 
 ### Manually import a newer image
 
@@ -133,8 +125,8 @@ because you don't know what's the cause/fix yet, you have to:
 
 #### docker-compose (quick & dirty)
 
-There's a [docker-compose.yml in packit-service](https://github.com/packit-service/packit-service/blob/main/docker-compose.yml).
-See [Running packit-service locally](https://github.com/packit-service/packit-service/blob/main/CONTRIBUTING.md#running-packit-service-locally) for how to make that work.
+There's a [docker-compose.yml in packit-service](https://github.com/packit/packit-service/blob/main/docker-compose.yml).
+See [Running packit-service locally](https://github.com/packit/packit-service/blob/main/CONTRIBUTING.md#running-packit-service-locally) for how to make that work.
 
 #### oc cluster up (slow & better)
 
@@ -215,7 +207,7 @@ We are using multi-domain wildcard certificates for following domains:
 - \*.stg.stream.packit.dev
 
 In case the procedure bellow does not work,
-[previously used http challenge](https://github.com/packit-service/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot)
+[previously used http challenge](https://github.com/packit/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot)
 can be used instead.
 Be aware that the http challenge approach is more complex, includes destructive actions and longer downtime.
 
@@ -408,7 +400,7 @@ When upgrading the database between major versions, the data can be incompatible
 We run Postgres in an Openshift pod, so the process to migrate the data can be to create a new pod (it is important to also
 use a new PVC in this pod) and then dump the data from the old pod and import them to the new pod:
 
-    $ oc exec old-postgres-pod -- pgdump_all -U postgres > dump
+    $ oc exec old-postgres-pod -- pg_dumpall -U postgres > dump
     $ oc exec -it new-postgres-pod -- psql -U postgres < dump
 
 The `postgres` service then needs to be linked to the new pod and the old pod and PVC can be deleted.

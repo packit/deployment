@@ -1,0 +1,136 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+kind: DeploymentConfig
+apiVersion: v1
+metadata:
+  name: postgres-13
+  labels:
+    service: postgres-13
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    service: postgres-13
+  template:
+    metadata:
+      labels:
+        service: postgres-13
+        name: postgres-13
+    spec:
+      containers:
+        - env:
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  key: database-user
+                  name: postgres-secret
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: database-password
+                  name: postgres-secret
+            - name: POSTGRESQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: database-name
+                  name: postgres-secret
+            # https://www.postgresql.org/docs/13/kernel-resources.html#LINUX-MEMORY-OVERCOMMIT
+            - name: PG_OOM_ADJUST_FILE
+              value: "/proc/self/oom_score_adj"
+            - name: POSTGRESQL_MAX_CONNECTIONS
+              value: "20"
+          image: quay.io/centos7/postgresql-13-centos7
+          imagePullPolicy: IfNotPresent
+          name: postgres
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+                - --live
+            failureThreshold: 3
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+#          readinessProbe:
+#            exec:
+#              command:
+#                - /usr/libexec/check-container
+#            failureThreshold: 3
+#            initialDelaySeconds: 5
+#            periodSeconds: 10
+#            successThreshold: 1
+#            timeoutSeconds: 1
+          resources:
+            # requests and limits have to be the same to have Guaranteed QoS
+            requests:
+              memory: "{{ '512Mi' if deployment == 'prod' else '256Mi' }}"
+              cpu: "{{ '400m' if deployment == 'prod' else '100m' }}"
+            limits:
+              memory: "{{ '512Mi' if deployment == 'prod' else '256Mi' }}"
+              cpu: "{{ '400m' if deployment == 'prod' else '100m' }}"
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/pgsql/data
+            - name: postgres-config
+              mountPath: /opt/app-root/src/postgresql-cfg
+      restartPolicy: Always
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-13
+        - name: postgres-config
+          configMap:
+            name: postgres-config
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: postgres-config
+data:
+  packit.conf: |-
+    # max mem to be used by a query operation (sort/hash table) before writing to temp disk files, default 4MB
+    # work_mem = 4MB
+    # max number of background processes, default 8
+    max_worker_processes = 4
+    # maximum num of autovacuum processes that may be running at any one time, default 3
+    autovacuum_max_workers = 1
+    # default is 4.0. Use 1.1 for SSD storage
+    random_page_cost = 1.1
+    # default is 1. Use hundreds for SSD storage
+    effective_io_concurrency = 200
+    # https://www.postgresql.org/docs/current/wal-configuration.html
+    # wal values based on https://pgtune.leopard.in.ua
+    # wal_buffers = -1
+    min_wal_size = 2GB
+    max_wal_size = 8GB
+    # (shared_buffers, effective_cache_size and max_connections are set by env. vars)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  ports:
+    - name: postgres-port
+      port: 5432
+      targetPort: 5432
+  selector:
+    service: postgres-13
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-13
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "{{ '4Gi' if deployment == 'prod' else '1Gi' }}"
