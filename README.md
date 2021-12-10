@@ -238,11 +238,9 @@ Make sure the DNS is all set up:
 Check if you have access to packit.dev domain in
 [Google Domains](https://domains.google.com/m/registrar/packit.dev).
 
-Check/install certbot locally. You can either follow
-[instructions for Apache on Fedora](https://certbot.eff.org/lets-encrypt/fedora-apache.html)
-or simply `dnf install certbot` on your machine (the instructions tell you to do that on server).
+Check/install certbot locally: `dnf install certbot`.
 
-### 2. Run certbot to obtain the challenges.
+### 2. Run certbot to obtain the challenges
 
 Run certbot:
 
