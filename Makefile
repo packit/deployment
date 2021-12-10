@@ -1,4 +1,4 @@
-.PHONY: send-release-event deploy tags cleanup zuul-secrets get-certs move-stable
+.PHONY: send-release-event deploy tags cleanup zuul-secrets move-stable
 
 ANSIBLE_PYTHON ?= $(shell command -v /usr/bin/python3 2> /dev/null || echo /usr/bin/python2)
 CONT_HOME := /opt/app-root/src
@@ -23,12 +23,6 @@ import-images:
 
 zuul-secrets:
 	$(AP) playbooks/zuul-secrets.yml
-
-get-certs:
-	$(AP) playbooks/get-certs.yml
-
-get-certs-dashboard:
-	$(AP) -e domain=dashboard.stg.packit.dev playbooks/get-certs.yml
 
 generate-local-secrets:
 	$(AP) playbooks/generate-local-secrets.yml
