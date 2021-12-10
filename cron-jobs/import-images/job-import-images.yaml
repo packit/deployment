@@ -4,9 +4,7 @@ metadata:
   name: import-images
 spec:
   # https://crontab.guru
-  # STG: Once every hour (at minute 0)
-  # schedule: "0 * * * *"
-  # PROD: At 02:00 on Tuesday
+  # At 02:00 on Tuesday
   schedule: "0 2 * * 2"
   jobTemplate:
     spec:
@@ -20,22 +18,18 @@ spec:
                 - name: KUBECONFIG
                   value: /tmp/.kube/config
                 - name: HOST
-                  # value: https://api.pro-eu-west-1.openshift.com
                   value: https://api.auto-prod.gi0n.p1.openshiftapps.com:6443
                 # - name: SERVICE
                 #   value: stream
                 - name: DEPLOYMENT
-                  value: stg
-                # value: prod
+                  value: prod
                 - name: TOKEN
                   valueFrom:
                     secretKeyRef:
                       # packit-prod @ auto
                       name: importimager-token-gjfb6
-                      # stream-stg
-                      # name: importimager-token-9mvsw
-                      # stream-prod
-                      # name: importimager-token-8cm2b
+                      # stream-prod @ auto
+                      # name: importimager-token-lwwsk
                       key: token
               resources:
                 limits:
