@@ -125,6 +125,7 @@
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-config.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-postgres.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-aws.yml.j2') }}"
       tags:
         - secrets
 

@@ -16,6 +16,9 @@ repos:
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: trailing-whitespace
+      - id: detect-aws-credentials
+        args:
+          - --allow-missing-credentials
   - repo: https://github.com/ansible/ansible-lint.git
     rev: v5.2.1
     hooks:
