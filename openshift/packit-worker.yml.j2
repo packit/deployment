@@ -60,6 +60,8 @@ spec:
         - name: packit-worker-1
           image: packit-worker:{{ deployment }}
           env:
+            - name: PROJECT
+              value: {{ project }}
             - name: DEPLOYMENT
               value: {{ deployment }}
             - name: DISTGIT_URL
