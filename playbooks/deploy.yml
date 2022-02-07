@@ -215,7 +215,7 @@
         worker_replicas: "{{ workers_short_running }}"
         # Short-running tasks are just interactions with different services.
         # They should not require a lot of memory/cpu.
-        worker_memory: "256Mi"
+        worker_memory: "320Mi"
         worker_cpu: "100m"
       k8s:
         namespace: "{{ project }}"
