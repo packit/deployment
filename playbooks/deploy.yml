@@ -27,7 +27,7 @@
     image_dashboard: quay.io/packit/dashboard:{{ deployment }}
     image_tokman: quay.io/packit/tokman:{{ deployment }}
     # project_dir is set in tasks/project-dir.yml
-    path_to_secrets: "{{ project_dir }}/secrets/{{ service }}"
+    path_to_secrets: "{{ project_dir }}/secrets/{{ service }}/{{ deployment }}"
     # to be used in Image streams as importPolicy:scheduled value
     auto_import_images: "{{(deployment != 'prod')}}"
     # used in dev/zuul deployment to tag & push images to cluster
@@ -61,13 +61,13 @@
       # to be able to read the github_app_id from the configuration file in tokman
     - name: include packit-service configuration
       include_vars:
-        file: "{{ path_to_secrets }}/{{ deployment }}/packit-service.yaml"
+        file: "{{ path_to_secrets }}/packit-service.yaml"
         name: packit_service_config
       tags:
         - tokman
 
     - name: include extra secret vars
-      include_vars: "{{ path_to_secrets }}/{{ deployment }}/extra-vars.yml"
+      include_vars: "{{ path_to_secrets }}/extra-vars.yml"
       tags:
         - always
 
