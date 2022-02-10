@@ -2,17 +2,17 @@
 # SPDX-License-Identifier: MIT
 
 ---
-- name: Set mandatory_DCs fact
+- name: Set mandatory_deploymentconfigs fact
   set_fact:
-    mandatory_DCs:
+    mandatory_deploymentconfigs:
       - postgres-13
       - redis
       - packit-service
   tags:
     - always
-- name: Set optional_DCs fact
+- name: Set optional_deploymentconfigs fact
   set_fact:
-    optional_DCs:
+    optional_deploymentconfigs:
       tokman: "{{ with_tokman }}"
       packit-service-fedmsg: "{{ with_fedmsg }}"
       packit-service-beat: "{{ with_beat }}"
@@ -21,9 +21,9 @@
       nginx: "{{ with_pushgateway }}"
   tags:
     - always
-- name: Set DCs fact
+- name: Set deploymentconfigs fact
   set_fact:
     # To know what DCs rollouts to wait for and also to check in tests
-    DCs: '{{ mandatory_DCs + optional_DCs|dict2items|selectattr("value", "equalto", true)|list|map(attribute="key")|flatten }}'
+    deploymentconfigs: '{{ mandatory_deploymentconfigs + optional_deploymentconfigs|dict2items|selectattr("value", "equalto", true)|list|map(attribute="key")|flatten }}'
   tags:
     - always

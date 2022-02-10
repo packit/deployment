@@ -43,6 +43,13 @@
     distgit_url: https://src.fedoraproject.org/
     distgit_namespace: rpms
     pushgateway_address: http://pushgateway
+    # Check that the deployment resources are up to date
+    check_up_to_date: true
+    # Check that the current vars file us up to date with the template
+    check_vars_template_diff: true
+    deployment_repo_url: https://github.com/packit/deployment.git
+    # Needs to be defined in vars/
+    secrets_repo_url: ""
   tasks:
     - include_tasks: tasks/project-dir.yml
       tags:
@@ -53,7 +60,11 @@
       tags:
         - always
 
-    - name: Getting DCs
+    - include_tasks: tasks/check-up-to-date.yml
+      tags:
+        - always
+
+    - name: Getting deploymentconfigs
       include_tasks: tasks/set-facts.yml
       tags:
         - always
@@ -435,13 +446,13 @@
         wait_timeout: 600 # 10 minutes to pull the image and run the container
       when: workers_long_running > 0
 
-    - name: Wait for DCs rollouts to complete
+    - name: Wait for deploymentconfig rollouts to complete
       # timeout 10min to not wait indefinitely in case of a problem
       command: timeout 10m oc rollout status -w dc/{{ item }}
       register: oc_rollout_status
       changed_when: false
       failed_when: '"successfully rolled out" not in oc_rollout_status.stdout'
-      loop: "{{ DCs }}"
+      loop: "{{ deploymentconfigs }}"
 
   handlers:
     - name: Rollout redis-commander
