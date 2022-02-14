@@ -41,9 +41,16 @@ def get_changelog(commits: List[Commit]) -> str:
     In the future, we will have an explicit divider.
     """,
 )
+@click.option(
+    "--git-dir",
+    default=".",
+    type=click.Path(dir_okay=True, file_okay=False),
+    help="Git repository used for getting the changelog. "
+    "Current directory is used by default.",
+)
 @click.argument("ref", type=click.STRING)
-def changelog(ref):
-    print(get_changelog(get_relevant_commits(Repo("."), ref)))
+def changelog(git_dir, ref):
+    print(get_changelog(get_relevant_commits(Repo(git_dir), ref)))
 
 
 if __name__ == "__main__":
