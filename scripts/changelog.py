@@ -11,8 +11,8 @@ from git import Commit, Repo
 NOT_IMPORTANT_VALUES = ["n/a", "none", "none."]
 
 
-def get_relevant_commits(repository: Repo, tag: str) -> List[Commit]:
-    range = f"{tag}..HEAD"
+def get_relevant_commits(repository: Repo, ref: str) -> List[Commit]:
+    range = f"{ref}..HEAD"
     return list(repository.iter_commits(rev=range, merges=True))
 
 
@@ -34,16 +34,16 @@ def get_changelog(commits: List[Commit]) -> str:
     short_help="Get the changelog from the merge commits",
     help="""Get the changelog from the merge commits
 
-    The script goes through the merge commits since the specified TAG
+    The script goes through the merge commits since the specified REF
     and get the changelog entry from the commit message.
     By now, we parse a last paragraph of the pull-request description
     (that is contained in the commit message).
     In the future, we will have an explicit divider.
     """,
 )
-@click.argument("tag", type=click.STRING)
-def changelog(tag):
-    print(get_changelog(get_relevant_commits(Repo("."), tag)))
+@click.argument("ref", type=click.STRING)
+def changelog(ref):
+    print(get_changelog(get_relevant_commits(Repo("."), ref)))
 
 
 if __name__ == "__main__":
