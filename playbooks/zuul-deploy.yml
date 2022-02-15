@@ -36,6 +36,7 @@
           host: https://127.0.0.1:8443
           api_key: {{ kubeconfig_token.stdout }}
           validate_certs: false
+          check_up_to_date: false
           # Whether to deploy and check that pod
           with_tokman: true
           with_beat: true

@@ -3,3 +3,5 @@
 skip_list:
   - yaml  # clashes with prettier
   - role-name  # we're not going to publish the roles
+warn_list:
+  - command-instead-of-module  # sometimes this is desired

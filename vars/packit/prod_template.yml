@@ -18,6 +18,15 @@ api_key: ""
 
 # validate_certs: true
 
+# Check that the deployment resources are up to date
+# check_up_to_date: true
+
+# Check that the current vars file us up to date with the template
+# check_vars_template_diff: true
+
+# Git URL ("Clone with SSH") of the repository where secrets are stored
+secrets_repo_url: ""
+
 # with_tokman: true
 
 # if you want to deploy fedmsg, please make sure to

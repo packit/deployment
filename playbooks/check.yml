@@ -13,9 +13,9 @@
     - name: include variables
       include_vars: "{{ project_dir }}/vars/{{ service }}/{{ deployment }}.yml"
 
-    - name: Getting DCs
+    - name: Getting deploymentconfigs
       include_tasks: tasks/set-facts.yml
 
-    - name: Checking running pods of {{ DCs }}
+    - name: Checking running pods of {{ deploymentconfigs }}
       include_tasks: tasks/check-pod-running.yml
-      loop: "{{ DCs + ['packit-worker'] }}"
+      loop: "{{ deploymentconfigs + ['packit-worker'] }}"
