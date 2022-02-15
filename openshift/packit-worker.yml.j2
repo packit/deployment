@@ -129,13 +129,12 @@ spec:
           command:
             - "/usr/bin/run_worker.sh"
           resources:
-            # requests and limits have to be the same to have Guaranteed QoS
             requests:
-              memory: {{ worker_memory }}
-              cpu: {{ worker_cpu }}
+              memory: {{ worker_requests_memory }}
+              cpu: {{ worker_requests_cpu }}
             limits:
-              memory: {{ worker_memory }}
-              cpu: {{ worker_cpu }}
+              memory: {{ worker_limits_memory }}
+              cpu: {{ worker_limits_cpu }}
           # https://github.com/packit/deployment/pull/142
           #readinessProbe:
           #  exec:
