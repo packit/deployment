@@ -6,10 +6,10 @@
 # -------------------------------------------------------------------
 
 # Openshift project/namespace name
-project: stream-stg
+project: fedora-source-git-prod
 
 # Openshift cluster url
-host: https://api.test-cluster.pxso.p1.openshiftapps.com:6443
+host: https://api.auto-prod.gi0n.p1.openshiftapps.com:6443
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
@@ -17,18 +17,9 @@ api_key: ""
 
 # validate_certs: true
 
-# Check that the deployment resources are up to date
-# check_up_to_date: true
-
-# Check that the current vars file us up to date with the template
-# check_vars_template_diff: true
-
-# Git URL ("Clone with SSH") of the repository where secrets are stored
-secrets_repo_url: ""
-
 with_tokman: false
 
-with_fedmsg: false
+# with_fedmsg: true
 
 # with_redis_commander: false
 
@@ -45,7 +36,7 @@ with_repository_cache: false
 with_sandbox: false
 
 # you can set the sandbox namespace name explicitly like this
-# sandbox_namespace: stream-stg-sandbox
+# sandbox_namespace: fedora-source-git-prod-sandbox
 
 # image to use for service
 # image: quay.io/packit/packit-service:{{ deployment }}
@@ -71,7 +62,7 @@ celery_retry_limit: 0
 # workers_short_running: 0
 # workers_long_running: 0
 
-distgit_url: https://gitlab.com/
-distgit_namespace: packit-service/rpms
+# distgit_url: https://src.fedoraproject.org/
+# distgit_namespace: rpms
 
 pushgateway_address: ""
