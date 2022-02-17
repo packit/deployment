@@ -19,6 +19,16 @@ def get_relevant_commits(repository: Repo, ref: str) -> List[Commit]:
     return list(repository.iter_commits(rev=range, merges=True))
 
 
+def get_pr_data(message: str) -> str:
+    """
+    obtain PR ID and produce a markdown link to it
+    """
+    # Merge pull request #1483 from majamassarini/fix/1357
+    first_line = message.split("\n")[0]
+    fourth_word = first_line.split(" ")[3]
+    return fourth_word
+
+
 def convert_message(message: str) -> Optional[str]:
     """ Extract release note from the commit message,
     return None if there is no release note"""
@@ -43,7 +53,8 @@ def get_changelog(commits: List[Commit]) -> str:
     for commit in commits:
         message = convert_message(commit.message)
         if messsage and message.lower() not in NOT_IMPORTANT_VALUES:
-            changelog += f"- {message}\n"
+            suffix = get_pr_data(commit.message)
+            changelog += f"- {message} ({suffix})\n"
     return changelog
 
 
