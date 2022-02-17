@@ -78,7 +78,8 @@ spec:
             limits:
               # run_httpd.sh does 'alembic upgrade head' which might require more memory
               # If you see '/usr/bin/run_httpd.sh: line 16:   Killed     alembic upgrade head'
-              # you have to temporarily increase the limit (last time 512M was enough),
+              # you have to temporarily increase (in webUI/console) the limit
+              # (2Gi@prod, 512Mi@stg was enough last time),
               # and once the alembic upgrade passes, revert.
               memory: "196Mi"
               cpu: "200m"
