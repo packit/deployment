@@ -30,7 +30,7 @@ def get_pr_data(message: str) -> str:
 
 
 def convert_message(message: str) -> Optional[str]:
-    """ Extract release note from the commit message,
+    """Extract release note from the commit message,
     return None if there is no release note"""
     if RELEASE_NOTES_TAG in message:
         # new
