@@ -52,7 +52,7 @@ def get_changelog(commits: List[Commit]) -> str:
     changelog = ""
     for commit in commits:
         message = convert_message(commit.message)
-        if messsage and message.lower() not in NOT_IMPORTANT_VALUES:
+        if message and message.lower() not in NOT_IMPORTANT_VALUES:
             suffix = get_pr_data(commit.message)
             changelog += f"- {message} ({suffix})\n"
     return changelog
