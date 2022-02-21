@@ -12,6 +12,7 @@ from git import Commit, Repo
 NOT_IMPORTANT_VALUES = ["n/a", "none", "none.", ""]
 RELEASE_NOTES_TAG = "RELEASE NOTES"
 RELEASE_NOTES_RE = f"{RELEASE_NOTES_TAG} BEGIN\n(.+)\n{RELEASE_NOTES_TAG} END"
+PRE_COMMIT_CI_MESSAGE = "pre-commit autoupdate"
 
 
 def get_relevant_commits(repository: Repo, ref: str) -> List[Commit]:
@@ -51,6 +52,8 @@ def convert_message(message: str) -> Optional[str]:
 def get_changelog(commits: List[Commit]) -> str:
     changelog = ""
     for commit in commits:
+        if PRE_COMMIT_CI_MESSAGE in commit.message:
+            continue
         message = convert_message(commit.message)
         if message and message.lower() not in NOT_IMPORTANT_VALUES:
             suffix = get_pr_data(commit.message)
