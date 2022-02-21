@@ -11,7 +11,7 @@ from git import Commit, Repo
 
 NOT_IMPORTANT_VALUES = ["n/a", "none", "none.", ""]
 RELEASE_NOTES_TAG = "RELEASE NOTES"
-RELEASE_NOTES_RE = f"{RELEASE_NOTES_TAG} BEGIN(.+){RELEASE_NOTES_TAG} END"
+RELEASE_NOTES_RE = f"{RELEASE_NOTES_TAG} BEGIN\n(.+)\n{RELEASE_NOTES_TAG} END"
 
 
 def get_relevant_commits(repository: Repo, ref: str) -> List[Commit]:
@@ -34,7 +34,7 @@ def convert_message(message: str) -> Optional[str]:
     return None if there is no release note"""
     if RELEASE_NOTES_TAG in message:
         # new
-        if match := re.findall(RELEASE_NOTES_RE, message):
+        if match := re.findall(RELEASE_NOTES_RE, message, re.DOTALL):
             return match[0]
         else:
             return None
