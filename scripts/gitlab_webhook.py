@@ -31,7 +31,11 @@ def generate_webhook(service_config, namespace, repo_name):
     payload = {"namespace": namespace}
     if repo_name:
         payload["repo_name"] = repo_name
-    print(jwt.encode(payload, gitlab_token_secret, algorithm="HS256").decode("utf-8"))
+    token = jwt.encode(payload, gitlab_token_secret, algorithm="HS256")
+    # https://pyjwt.readthedocs.io/en/latest/changelog.html#jwt-encode-return-type
+    if isinstance(token, bytes):
+        token = token.decode("utf-8")
+    print(token)
 
 
 if __name__ == "__main__":
