@@ -52,6 +52,10 @@
           image_fedmsg: quay.io/packit/packit-service-fedmsg:stg
           image_dashboard: quay.io/packit/dashboard:stg
           image_tokman: quay.io/packit/tokman:stg
+          # Resources are limited in Zuul, deploy only one worker.
+          workers_all_tasks: 1
+          workers_short_running: 0
+          workers_long_running: 0
         dest: "{{ zuul.project.src_dir }}/vars/packit/dev.yml"
         mode: 0644
 
