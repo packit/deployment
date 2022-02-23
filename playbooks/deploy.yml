@@ -411,6 +411,14 @@
         - pushgateway
       when: with_pushgateway
 
+    - name: Wait for deploymentconfig rollouts to complete
+      # timeout 10min to not wait indefinitely in case of a problem
+      command: timeout 10m oc rollout status -w dc/{{ item }}
+      register: oc_rollout_status
+      changed_when: false
+      failed_when: '"successfully rolled out" not in oc_rollout_status.stdout'
+      loop: "{{ deploymentconfigs }}"
+
     - name: Wait for worker-0 to be running
       k8s:
         namespace: "{{ project }}"
@@ -452,14 +460,6 @@
           type: Ready
         wait_timeout: 600 # 10 minutes to pull the image and run the container
       when: workers_long_running > 0
-
-    - name: Wait for deploymentconfig rollouts to complete
-      # timeout 10min to not wait indefinitely in case of a problem
-      command: timeout 10m oc rollout status -w dc/{{ item }}
-      register: oc_rollout_status
-      changed_when: false
-      failed_when: '"successfully rolled out" not in oc_rollout_status.stdout'
-      loop: "{{ deploymentconfigs }}"
 
   handlers:
     - name: Rollout redis-commander
