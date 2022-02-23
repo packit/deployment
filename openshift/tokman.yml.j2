@@ -29,6 +29,7 @@ spec:
       containers:
         - name: tokman
           image: tokman:{{ deployment }}
+          imagePullPolicy: Always
           env:
             - name: DEPLOYMENT
               value: {{ deployment }}

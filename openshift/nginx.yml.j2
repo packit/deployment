@@ -26,6 +26,7 @@ spec:
       containers:
       - name: nginx
         image: nginxinc/nginx-unprivileged
+        imagePullPolicy: Always
         ports:
         - containerPort: 8443
         volumeMounts:

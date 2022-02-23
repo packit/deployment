@@ -29,6 +29,7 @@ spec:
       containers:
         - name: packit-service-fedmsg
           image: packit-service-fedmsg:{{ deployment }}
+          imagePullPolicy: Always
           env:
             - name: FEDORA_MESSAGING_CONF
               value: /home/packit/.config/fedora.toml

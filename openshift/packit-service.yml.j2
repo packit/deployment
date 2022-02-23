@@ -26,6 +26,7 @@ spec:
       containers:
         - name: packit-service
           image: packit-service:{{ deployment }}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8443
               protocol: TCP

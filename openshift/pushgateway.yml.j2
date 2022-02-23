@@ -18,9 +18,9 @@ spec:
       containers:
         - name: pushgateway
           image: weaveworks/prom-aggregation-gateway
+          imagePullPolicy: Always
           args:
             - "--listen=:9091"
-          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9091
           resources:

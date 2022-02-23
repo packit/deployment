@@ -20,6 +20,7 @@ spec:
       containers:
         - name: packit-dashboard
           image: packit-dashboard:{{ deployment }}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8443
           volumeMounts:

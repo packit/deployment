@@ -21,7 +21,10 @@ spec:
         name: postgres-13
     spec:
       containers:
-        - env:
+        - name: postgres
+          image: quay.io/centos7/postgresql-13-centos7
+          imagePullPolicy: Always
+          env:
             - name: POSTGRESQL_USER
               valueFrom:
                 secretKeyRef:
@@ -40,9 +43,6 @@ spec:
             # https://www.postgresql.org/docs/13/kernel-resources.html#LINUX-MEMORY-OVERCOMMIT
             - name: PG_OOM_ADJUST_FILE
               value: "/proc/self/oom_score_adj"
-          image: quay.io/centos7/postgresql-13-centos7
-          imagePullPolicy: IfNotPresent
-          name: postgres
           ports:
             - containerPort: 5432
               protocol: TCP

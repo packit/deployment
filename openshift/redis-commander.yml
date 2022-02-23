@@ -20,6 +20,7 @@ spec:
       containers:
         - name: redis-commander
           image: rediscommander/redis-commander
+          imagePullPolicy: Always
           env:
             - name: REDIS_HOST
               value: redis
