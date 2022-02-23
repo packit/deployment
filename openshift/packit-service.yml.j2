@@ -15,6 +15,9 @@ spec:
       labels:
         name: packit-service
         app: packit
+      # https://docs.openshift.com/container-platform/4.9/openshift_images/using-imagestreams-with-kube-resources.html
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
     spec:
       volumes:
         - name: packit-secrets

@@ -41,7 +41,7 @@ spec:
       labels:
         name: {{ name }}
         app: packit
-      # https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#using-is-with-k8s
+      # https://docs.openshift.com/container-platform/4.9/openshift_images/using-imagestreams-with-kube-resources.html
       annotations:
         alpha.image.policy.openshift.io/resolve-names: '*'
     spec:
