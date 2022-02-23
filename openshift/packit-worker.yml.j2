@@ -10,9 +10,9 @@ metadata:
   annotations:
     # Setting triggers to StatefulSet is tricky (they also don't appear in GUI).
     # I run the following and then checked how the resulting yaml looks like.
-    # oc set triggers statefulset.apps/packit-worker --from-image=packit-worker:dev -c packit-worker-1
+    # oc set triggers statefulset.apps/packit-worker --from-image=packit-worker:dev -c packit-worker
     image.openshift.io/triggers: >-
-      [{"from":{"kind":"ImageStreamTag","name":"packit-worker:{{ deployment }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"packit-worker-1\")].image"}]
+      [{"from":{"kind":"ImageStreamTag","name":"packit-worker:{{ deployment }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"packit-worker\")].image"}]
 spec:
   selector:
     matchLabels:
@@ -57,7 +57,7 @@ spec:
           secret:
             secretName: packit-config
       containers:
-        - name: packit-worker-1
+        - name: packit-worker
           image: packit-worker:{{ deployment }}
           env:
             - name: PROJECT
