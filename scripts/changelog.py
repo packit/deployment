@@ -11,10 +11,19 @@ from git import Commit, Repo
 
 NOT_IMPORTANT_VALUES = ["n/a", "none", "none.", ""]
 RELEASE_NOTES_TAG = "RELEASE NOTES"
-RELEASE_NOTES_RE = f"{RELEASE_NOTES_TAG} BEGIN(.+){RELEASE_NOTES_TAG} END"
+RELEASE_NOTES_RE = f"{RELEASE_NOTES_TAG} BEGIN\n(.+)\n{RELEASE_NOTES_TAG} END"
+PRE_COMMIT_CI_MESSAGE = "pre-commit autoupdate"
 
 
-def get_relevant_commits(repository: Repo, ref: str) -> List[Commit]:
+def get_relevant_commits(repository: Repo, ref: Optional[str]) -> List[Commit]:
+    if not ref:
+        tags = sorted(repository.tags, key=lambda t: t.commit.committed_datetime)
+        if not tags:
+            raise click.UsageError(
+                "No REF was specified and the repo contains no tags, "
+                "the REF must be specified manually."
+            )
+        ref = tags[-1]
     range = f"{ref}..HEAD"
     return list(repository.iter_commits(rev=range, merges=True))
 
@@ -34,7 +43,7 @@ def convert_message(message: str) -> Optional[str]:
     return None if there is no release note"""
     if RELEASE_NOTES_TAG in message:
         # new
-        if match := re.findall(RELEASE_NOTES_RE, message):
+        if match := re.findall(RELEASE_NOTES_RE, message, re.DOTALL):
             return match[0]
         else:
             return None
@@ -51,8 +60,10 @@ def convert_message(message: str) -> Optional[str]:
 def get_changelog(commits: List[Commit]) -> str:
     changelog = ""
     for commit in commits:
+        if PRE_COMMIT_CI_MESSAGE in commit.message:
+            continue
         message = convert_message(commit.message)
-        if messsage and message.lower() not in NOT_IMPORTANT_VALUES:
+        if message and message.lower() not in NOT_IMPORTANT_VALUES:
             suffix = get_pr_data(commit.message)
             changelog += f"- {message} ({suffix})\n"
     return changelog
@@ -63,10 +74,14 @@ def get_changelog(commits: List[Commit]) -> str:
     help="""Get the changelog from the merge commits
 
     The script goes through the merge commits since the specified REF
-    and get the changelog entry from the commit message.
-    By now, we parse a last paragraph of the pull-request description
-    (that is contained in the commit message).
-    In the future, we will have an explicit divider.
+    and gets the changelog entry from the commit message.
+    In case no REF is specified, the latest tag is used.
+
+    There are 2 possible ways to detect a changelog entry in the message:\n
+     1) The new way, beginning and end of the entry is explicitly marked
+        using `RELEASE NOTES BEGIN` and `RELEASE NOTES END` separators.\n
+     2) The old way, the entry is the last paragraph in the PR description
+        which is also present in the commit message.
     """,
 )
 @click.option(
@@ -76,7 +91,7 @@ def get_changelog(commits: List[Commit]) -> str:
     help="Git repository used for getting the changelog. "
     "Current directory is used by default.",
 )
-@click.argument("ref", type=click.STRING)
+@click.argument("ref", type=click.STRING, required=False)
 def changelog(git_dir, ref):
     print(get_changelog(get_relevant_commits(Repo(git_dir), ref)))
 
