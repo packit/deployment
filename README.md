@@ -17,6 +17,8 @@ This file documents basic usage, for more info see
   - [Monitoring](docs/monitoring.md)
   - [PostgreSQL data migration](docs/postgresql-db-upgrade.md)
   - [Packit service deployment specifics](docs/packit-service.md)
+  - [Fedora source-git bot deployment specifics](docs/fedora-source-git.md)
+  - [CentOS Stream source-git bot deployment specifics](docs/centos-stream-source-git.md)
 - [playbooks/](playbooks/) - Ansible playbooks
 - [roles/](roles/) - Ansible roles
 - [vars/](vars/) - Variable file(s). See [vars/README.md](vars/README.md).
