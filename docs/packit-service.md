@@ -1,4 +1,4 @@
-## Packit service/bot deployment specifics
+## Packit service deployment specifics
 
 ### Repository cache
 

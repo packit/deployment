@@ -1,16 +1,16 @@
-### How do I test my changes?
+## How do I test my changes?
 
-#### docker-compose (quick & dirty)
+### docker-compose (quick & dirty)
 
 There's a [docker-compose.yml in packit-service](https://github.com/packit/packit-service/blob/main/docker-compose.yml).
 See [Running packit-service locally](https://github.com/packit/packit-service/blob/main/CONTRIBUTING.md#running-packit-service-locally) for how to make that work.
 
-#### oc cluster up (slow & better)
+### oc cluster up (slow & better)
 
 Because we run the service in OpenShift the more reliable way to test it
 is to run an Openshift cluster locally and deploy the service there.
 `oc cluster up` spawns the Openshift cluster.
-Create `secrets/packit/dev/` (steal them from our secret repo).
+Create `secrets/packit/dev/` (steal them from our secret repo, see READMEs there).
 `cd vars/packit; cp dev_template.yml dev.yml` and
 in `dev.yml` set `api_key` to the output of `oc whoami -t`.
 
@@ -18,7 +18,7 @@ Run `DEPLOYMENT=dev make deploy`.
 That will also push locally built images (`:dev`) into the cluster's registry
 (make sure you have `push_dev_images: true` in `vars/packit/dev.yml`).
 
-#### minishift
+### minishift
 
 Similar to above 'oc cluster up' you can run [minishift](https://www.okd.io/minishift/) to get
 a local OpenShift cluster.
@@ -32,10 +32,12 @@ from the minishift environment after you start minishift:
 and then build worker & service images (`make worker; make service` in `packit-service` repo)
 with Docker, before you run `DEPLOYMENT=dev make deploy`.
 
-#### Staging (quick & reliable & but don't break it)
+### Staging (quick & reliable & but don't break it)
 
-If you're lazy and you're sure your changes won't do any harm, you can temporarily get hold of staging instance for that.
-Just build & push `packit-worker` and you can play.
+If you're fairly sure your changes won't do any harm,
+you can temporarily get hold of staging instance for that.
+
+In case of `packit-worker`:
 
 - in packit-service repo:
   - `make worker`
@@ -43,7 +45,7 @@ Just build & push `packit-worker` and you can play.
   - `podman push quay.io/packit/packit-worker:stg`
 - in deployment: `DEPLOYMENT=stg make import-images`
 
-Once you're done you should [revert to older image](#reverting-to-older-deploymentrevisionimage).
+Once you're done you should [revert to older image](continuous-deployment.md#reverting-to-older-deploymentrevisionimage).
 Or it will be automatically replaced once a packit-service PR is merged.
 
 ### Generating secrets for local packit-service deployment

@@ -1,16 +1,19 @@
-## Obtaining a Let's Encrypt cert using `certbot`
+## Obtaining a Let's Encrypt TLS cert using `certbot`
 
 Certbot manual: https://certbot.eff.org/docs/using.html#manual
 
 Please bear in mind this is the easiest process I was able to figure out: there
-is a ton of places for improvements and ideally make it automated 100%.
+is a ton of places for improvements and ideally
+[make it automated 100%](https://github.com/packit/research/tree/main/cert_management_automation).
 
 We are using multi-domain wildcard certificates for following domains:
 
 - \*.packit.dev
 - \*.stream.packit.dev
+- \*.fedora-source-git.packit.dev
 - \*.stg.packit.dev
 - \*.stg.stream.packit.dev
+- \*.stg.fedora-source-git.packit.dev
 
 In case the procedure bellow does not work,
 [previously used http challenge](https://github.com/packit/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot)
@@ -50,7 +53,7 @@ Check/install certbot locally: `dnf install certbot`.
 
 Run certbot:
 
-    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email user-cont-team@redhat.com -d *.packit.dev -d *.stream.packit.dev -d *.stg.packit.dev -d *.stg.stream.packit.dev
+    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email user-cont-team@redhat.com -d *.packit.dev -d *.stream.packit.dev -d *.fedora-source-git.packit.dev -d *.stg.packit.dev -d *.stg.stream.packit.dev -d *.stg.fedora-source-git.packit.dev
 
 You will be asked to set TXT record for every domain requested:
 
@@ -98,6 +101,8 @@ Copy certificates to secrets repository (prod & stg)
     cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/packit/stg/
     cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/stream/prod/
     cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/stream/stg/
+    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/fedora-source-git/prod/
+    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/fedora-source-git/stg/
 
 Push, create merge request and merge.
 
@@ -108,10 +113,10 @@ Push, create merge request and merge.
     DEPLOYMENT=stg make deploy TAGS=secrets
     DEPLOYMENT=prod make deploy TAGS=secrets
 
-#### stream service
+#### source-git bot
 
-    SERVICE=stream DEPLOYMENT=stg make deploy TAGS=secrets
-    SERVICE=stream DEPLOYMENT=prod make deploy TAGS=secrets
+    SERVICE={stream|fedora-source-git} DEPLOYMENT=stg make deploy TAGS=secrets
+    SERVICE={stream|fedora-source-git} DEPLOYMENT=prod make deploy TAGS=secrets
 
 Restart (scale down and up) `packit-service`, `packit-dashboard` and `nginx` for them to use the new certs.
 
