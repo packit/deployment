@@ -10,8 +10,6 @@ Just symlink/copy it here.
 └── secrets
     ├── packit/stream
     │   │   ├── prod/stg
-    │   │   ├── centos.cert
-    │   │   ├── centos-server-ca.cert
     │   │   ├── copr
     │   │   ├── extra-vars.yml
     │   │   ├── fedora.keytab
@@ -29,13 +27,12 @@ Just symlink/copy it here.
 
 Some of them are pre-filled in [template](/secrets/template) directory.
 
-- `centos[-server-ca].cert` - To run centosmsg.
-- `copr` - Your copr credentials where packit will build packages. See pre-filled template in [templates directory](/secrets/template/copr).
+- `copr` - Your copr credentials. See pre-filled template in [templates directory](/secrets/template/copr).
 - `extra-vars.yml` - Secrets for Postgresql & Redis.
 - `fedora.keytab` - Fedora kerberos.
 - `fedora.toml` - [fedora-messaging configuration](https://fedora-messaging.readthedocs.io/en/stable/configuration.html).
 - `fullchain.pem` & `privkey.pem`- Let's encrypt TLS certs.
-- `id_rsa[.pub]` - SSH keys.
+- `id_rsa[.pub]` - SSH keys, to push to a git forge.
 - `packit-service.yaml` - Configuration for Packit as a service. See pre-filled template in [templates directory](/secrets/template/packit-service.yaml).
 - `private-key.pem` - Specified in a Github App settings. Used to [sign access token requests](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app).
 - `sentry_key` - Sentry DSN.
