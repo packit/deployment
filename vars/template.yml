@@ -8,8 +8,8 @@
 # Openshift project/namespace name
 project: myproject
 
-# Openshift cluster url (example: https://console.pro-eu-west-1.openshift.com)
-host: https://your-openshift-cluster-url
+# Openshift cluster url
+host: https://api.your-openshift-cluster-url:6443
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
