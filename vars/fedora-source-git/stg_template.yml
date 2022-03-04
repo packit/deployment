@@ -6,30 +6,20 @@
 # -------------------------------------------------------------------
 
 # Openshift project/namespace name
-project: myproject
+project: fedora-source-git-stg
 
-# Openshift cluster url (example: https://console.pro-eu-west-1.openshift.com)
-host: https://127.0.0.1:8443
+# Openshift cluster url
+host: https://api.test-cluster.pxso.p1.openshiftapps.com:6443
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
 api_key: ""
 
-# To work-around 'SSL: CERTIFICATE_VERIFY_FAILED'
-validate_certs: false
-
-# Don't check that the deployment resources are up to date
-check_up_to_date: false
-
-# Check that the current vars file us up to date with the template
-# check_vars_template_diff: true
-
-# Git URL ("Clone with SSH") of the repository where secrets are stored
-# secrets_repo_url: ""
+# validate_certs: true
 
 with_tokman: false
 
-with_fedmsg: false
+# with_fedmsg: true
 
 # with_redis_commander: false
 
@@ -56,7 +46,7 @@ image_worker: quay.io/packit/hardly:{{ deployment }}
 # Used in dev/Zuul deployment to tag & push images to cluster.
 # It's set to "/usr/bin/podman" if there's podman installed, or to 'docker' otherwise.
 # If you still want to use docker even when podman is installed, set:
-# container_engine: "docker"
+# container_engine: docker
 
 celery_app: hardly.tasks
 
@@ -69,7 +59,7 @@ celery_retry_limit: 0
 # workers_short_running: 0
 # workers_long_running: 0
 
-distgit_url: https://gitlab.com/
-distgit_namespace: packit-service/rpms
+# distgit_url: https://src.fedoraproject.org/
+# distgit_namespace: rpms
 
 pushgateway_address: ""

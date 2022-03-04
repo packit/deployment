@@ -45,7 +45,7 @@
     pushgateway_address: http://pushgateway
     # Check that the deployment resources are up to date
     check_up_to_date: true
-    # Check that the current vars file us up to date with the template
+    # Check that the current vars file is up to date with the template
     check_vars_template_diff: true
     deployment_repo_url: https://github.com/packit/deployment.git
     # Needs to be defined in vars/
