@@ -73,7 +73,7 @@ spec:
           resources:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
-              memory: "196Mi"
+              memory: "320Mi"
               cpu: "200m"
             limits:
               # run_httpd.sh does 'alembic upgrade head' which might require more memory
@@ -81,7 +81,7 @@ spec:
               # you have to temporarily increase (in webUI/console) the limit
               # (2Gi@prod, 512Mi@stg was enough last time),
               # and once the alembic upgrade passes, revert.
-              memory: "196Mi"
+              memory: "320Mi"
               cpu: "200m"
           # In TLS world, hostname needs to match whatever is set in the cert
           # in our cause, k8s is doing here something like curl https://172.15.2.4:8443/api/healthz/
