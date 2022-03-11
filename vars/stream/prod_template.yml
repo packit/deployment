@@ -44,9 +44,6 @@ with_repository_cache: false
 
 with_sandbox: false
 
-# you can set the sandbox namespace name explicitly like this
-# sandbox_namespace: stream-prod-sandbox
-
 # image to use for service
 # image: quay.io/packit/packit-service:{{ deployment }}
 
