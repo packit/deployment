@@ -61,5 +61,7 @@ So when you happen to deploy broken worker and you want to revert/undo it
 because you don't know what's the cause/fix yet, you have to:
 
 1. `oc describe is/packit-worker` - select older image
-2. `oc tag --source=docker usercont/packit-worker@sha256:<older-hash> myproject/packit-worker:<deployment>`
+2. `oc tag --source=docker quay.io/packit/packit-worker@sha256:<older-hash> myproject/packit-worker:<deployment>`
    And see the `packit-worker-x` pods being re-deployed from the older image.
+3. Once you've built a fixed image, run
+   `oc tag quay.io/packit/packit-worker:<deployment> myproject/packit-worker:<deployment>`
