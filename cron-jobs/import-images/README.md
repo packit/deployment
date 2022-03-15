@@ -1,9 +1,9 @@
 ## Periodically updating ImageStreams
 
-OpenShift Online seems to have turned off periodical updates from image registry
-to ImageStream (even we explicitly [request them](https://docs.openshift.com/container-platform/3.11/architecture/core_concepts/builds_and_image_streams.html#image-stream-mappings-working-periodic)).
+On prod, where we don't want the images to be imported as soon as they're built,
+we run this cron job to import them (end hence re-deploy) into image streams
+at the day & time (currently at 2AM on Tuesday) we want.
 
-As a work-around, there's a CronJob to periodically import images metadata into image streams.
 See [job-import-images.yaml](./job-import-images.yaml) and `oc describe cronjob.batch/import-images`.
 The job uses importimager [service account](https://docs.openshift.com/container-platform/3.11/dev_guide/service_accounts.html)
 with `registry-editor` [role](https://docs.openshift.com/container-platform/3.11/admin_guide/manage_rbac.html) role added.
