@@ -1,4 +1,4 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: import-images
@@ -13,7 +13,6 @@ spec:
           containers:
             - name: import-images
               image: quay.io/packit/import-images
-              imagePullPolicy: IfNotPresent
               env:
                 - name: KUBECONFIG
                   value: /tmp/.kube/config
@@ -21,6 +20,7 @@ spec:
                   value: https://api.auto-prod.gi0n.p1.openshiftapps.com:6443
                 # - name: SERVICE
                 #   value: stream
+                #   value: fedora-source-git
                 - name: DEPLOYMENT
                   value: prod
                 - name: TOKEN
@@ -30,6 +30,8 @@ spec:
                       name: importimager-token-gjfb6
                       # stream-prod @ auto
                       # name: importimager-token-lwwsk
+                      # fedora-source-git-prod @ auto
+                      # name: importimager-token-8wlrc
                       key: token
               resources:
                 limits:
