@@ -47,14 +47,7 @@ def convert_message(message: str) -> Optional[str]:
             return match[0]
         else:
             return None
-    else:
-        # old
-        cleared_message = message.split("Reviewed-by")[0].strip()
-        release_note = cleared_message.split("\n\n")[-1].strip()
-        if "Signed-off-by" in release_note:
-            # empty release note
-            return None
-        return release_note
+    return None
 
 
 def get_changelog(commits: List[Commit]) -> str:
@@ -77,11 +70,9 @@ def get_changelog(commits: List[Commit]) -> str:
     and gets the changelog entry from the commit message.
     In case no REF is specified, the latest tag is used.
 
-    There are 2 possible ways to detect a changelog entry in the message:\n
-     1) The new way, beginning and end of the entry is explicitly marked
-        using `RELEASE NOTES BEGIN` and `RELEASE NOTES END` separators.\n
-     2) The old way, the entry is the last paragraph in the PR description
-        which is also present in the commit message.
+    Currently, the changelog entry in the message is detected based on
+    explicit marks of the beginning and the end denoted by
+    `RELEASE NOTES BEGIN` and `RELEASE NOTES END` separators.
     """,
 )
 @click.option(
