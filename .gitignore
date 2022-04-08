@@ -6,6 +6,7 @@ vars/**/*.yml
 
 secrets/packit/
 secrets/stream/
+secrets/fedora-source-git/
 secrets/secrets.yaml
 
 # used in move_stable script

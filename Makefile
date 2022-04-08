@@ -7,7 +7,10 @@ AP := ansible-playbook -vv -c local -i localhost, -e ansible_python_interpreter=
 # https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html#special-tags
 TAGS ?= all
 
-deploy:
+download-secrets:
+	./scripts/download_secrets.sh
+
+deploy: download-secrets
 	$(AP) playbooks/deploy.yml --tags $(TAGS)
 
 tags:
