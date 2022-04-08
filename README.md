@@ -54,3 +54,5 @@ Commander, run:
     $ DEPLOYMENT=dev TAGS="redis,redis-commander" make deploy
 
 Use `make tags` to list the currently available tags.
+
+## See [docs/](docs/) for more documentation.
