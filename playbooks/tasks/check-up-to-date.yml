@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 ---
-- name: Check that the deployment resources are up to date
+- name: Check that the deployment resources are up-to-date
   when: zuul is not defined and check_up_to_date
   block:
     - name: Get HEAD from the remote
@@ -23,26 +23,7 @@
       ansible.builtin.assert:
         that:
           - remote_head.stdout.split()[0] == local_head.stdout
-        fail_msg: "The main branch of the deployment repo is not up to date"
-    - name: Check HEAD from secrets remote
-      ansible.builtin.command:
-        chdir: "{{ path_to_secrets }}"
-        cmd: "git ls-remote {{ secrets_repo_url }} master"
-      register: remote_secrets_head
-      changed_when: remote_secrets_head.rc != 0
-      failed_when: remote_secrets_head.rc != 0
-    - name: Check HEAD from local secrets
-      ansible.builtin.command:
-        chdir: "{{ path_to_secrets }}"
-        cmd: git show-ref -s refs/heads/master
-      register: local_secrets_head
-      changed_when: local_secrets_head.rc != 0
-      failed_when: local_secrets_head.rc != 0
-    - name: Compare secrets repo hashes
-      ansible.builtin.assert:
-        that:
-          - remote_secrets_head.stdout.split()[0] == local_secrets_head.stdout
-        fail_msg: "The master branch of the secrets repo is not up to date"
+        fail_msg: "The main branch of the deployment repo is not up-to-date"
     - name: Calculate the diff of the current vars file
       when: check_vars_template_diff
       ansible.builtin.shell:
@@ -50,7 +31,7 @@
         # Remove the keys expected to be different and lines specific to the diff-format.
         cmd: >-
           diff vars/{{ service }}/{{ deployment }}.yml vars/{{ service }}/{{ deployment }}_template.yml |
-          sed '/api_key/d;/secrets_repo_url/d;/[0-9]\+c[0-9]\+/d;/---/d'
+          sed '/api_key/d;/[0-9]\+c[0-9]\+/d;/---/d'
       register: diff
       changed_when: diff.rc != 0
       failed_when: diff.rc != 0
@@ -62,5 +43,5 @@
         fail_msg: >-
           The diff between
           'vars/{{ service }}/{{ deployment }}.yml' and
-          'vars/{{ service }}/{{ deployment }}_template.yml' is has some
+          'vars/{{ service }}/{{ deployment }}_template.yml' has some
           unexpected lines: {{ diff.stdout }}
