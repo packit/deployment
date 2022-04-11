@@ -93,18 +93,11 @@ Go to the terminal with certbot command waiting for your action and hit Enter.
 
 Repeat this for all requested domains.
 
-### 4. Update secrets repository
+### 4. Update secrets in vault
 
-Copy certificates to secrets repository (prod & stg)
-
-    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/packit/prod/
-    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/packit/stg/
-    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/stream/prod/
-    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/stream/stg/
-    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/fedora-source-git/prod/
-    cp ~/.certbot/live/packit.dev/{fullchain,privkey}.pem <cloned secrets repo>/secrets/fedora-source-git/stg/
-
-Push, create merge request and merge.
+[Upload](https://bitwarden.com/help/attachments/#upload-a-file)
+`fullchain.pem` and `privkey.pem` from `~/.certbot/live/packit.dev/`
+to `secrets-tls-certs` item in our shared `Packit` collection in Bitwarden vault.
 
 ### 5.Re-deploy stg and prod environment:
 

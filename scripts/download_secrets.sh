@@ -2,7 +2,8 @@
 
 # Script to
 # - login to Bitwarden and/or unlock the vault
-# - download all files attached to secrets-${SERVICE}-${DEPLOYMENT} note
+# - download all files attached to
+#   secrets-${SERVICE}-${DEPLOYMENT} and secrets-tls-certs notes
 #   into secrets/${SERVICE}/${DEPLOYMENT}/
 # Example usage:
 # SERVICE=packit DEPLOYMENT=stg PATH_TO_SECRETS=/tmp/xyz/ ./scripts/download_secrets.sh
@@ -25,10 +26,6 @@ DEFAULT_PATH_TO_SECRETS="secrets/${SERVICE}/${DEPLOYMENT}/"
 [[ "${DEPLOYMENT}" == "dev" ]] && { echo "Not downloading secrets for DEPLOYMENT==dev"; exit 0; }
 : "${PATH_TO_SECRETS:=$DEFAULT_PATH_TO_SECRETS}"
 
-# Name of the shared (Bitwarden vault) secure note,
-# which contains the secret files as attachments.
-BW_ITEM="secrets-${SERVICE}-${DEPLOYMENT}"
-
 command -v bw >/dev/null 2>&1 || { echo >&2 "'bw' command not found, see https://bitwarden.com/help/cli"; exit 1; }
 
 # Debug
@@ -49,9 +46,17 @@ bw unlock --check
 # Pull the latest vault data from server
 bw sync
 
-# Get the item id first
-ITEM_ID=$(bw get item "${BW_ITEM}" | jq -r .id)
-[[ -z ${ITEM_ID} ]] && { echo >&2 "Couldn't find ${BW_ITEM} in Bitwarden vault"; exit 1; }
+download_attachments_of_item() {
+  # Parameter is the name of the shared (Bitwarden vault) item,
+  # which contains the secret files as attachments.
 
-# Download all attachments of that item
-bw get item "${BW_ITEM}" | jq -r .attachments[].id | xargs -L1 bw get attachment --itemid "${ITEM_ID}" --output "${PATH_TO_SECRETS}"
+  # Get the item id first
+  ITEM_ID=$(bw get item "${1}" | jq -r .id)
+  [[ -z ${ITEM_ID} ]] && { echo >&2 "Couldn't find ${1} in Bitwarden vault"; exit 1; }
+
+  # Download all attachments of that item
+  bw get item "${1}" | jq -r .attachments[].id | xargs -L1 bw get attachment --itemid "${ITEM_ID}" --output "${PATH_TO_SECRETS}"
+}
+
+download_attachments_of_item "secrets-${SERVICE}-${DEPLOYMENT}"
+download_attachments_of_item "secrets-tls-certs"
