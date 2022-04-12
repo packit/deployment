@@ -14,8 +14,9 @@
 # For example I (jpopelka) have this in my ~/.bashrc
 # alias bwunlock='bw unlock --check || export BW_SESSION="$(bw unlock --raw)"'
 
-# Debug
-#set -x
+# If run via 'make deploy', you can use this (on your own risk) to
+# not download secrets again, if you just did it.
+[[ -n "${SKIP_SECRETS_SYNC}" || -n "${SSS}" ]] && { echo "Not downloading secrets"; exit 0; }
 
 # Where to download the files
 DEFAULT_PATH_TO_SECRETS="secrets/${SERVICE}/${DEPLOYMENT}/"
