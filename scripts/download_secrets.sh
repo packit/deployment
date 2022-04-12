@@ -39,9 +39,7 @@ elif ! bw unlock --check; then
   BW_SESSION="$(bw unlock --raw)"
   export BW_SESSION
 fi
-
-# Debug
-bw unlock --check
+bw unlock --check || { echo >&2 "Failed to unlock vault"; exit 1; }
 
 # Pull the latest vault data from server
 bw sync
