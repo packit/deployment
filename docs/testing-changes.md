@@ -32,14 +32,18 @@ from the minishift environment after you start minishift:
 and then build worker & service images (`make worker; make service` in `packit-service` repo)
 with Docker, before you run `DEPLOYMENT=dev make deploy`.
 
+#### Generating secrets for local deployment
+
+See [secrets/README.md](../secrets/README.md)
+
 ### Staging (quick & reliable & but don't break it)
 
 If you're fairly sure your changes won't do any harm,
 you can temporarily get hold of staging instance for that.
 
-In case of `packit-worker`:
+For example, in case of `packit-worker`:
 
-- in packit-service repo:
+- in cloned [packit-service repo](https://github.com/packit/packit-service):
   - `make worker`
   - `podman tag quay.io/packit/packit-worker:dev quay.io/packit/packit-worker:stg`
   - `podman push quay.io/packit/packit-worker:stg`
@@ -47,17 +51,6 @@ In case of `packit-worker`:
 
 Once you're done you should [revert to older image](continuous-deployment.md#reverting-to-older-deploymentrevisionimage).
 Or it will be automatically replaced once a packit-service PR is merged.
-
-### Generating secrets for local packit-service deployment
-
-Local deployment of Packit service needs some secrets which can be generated using the steps listed below:
-
-1. Create `dev` directory under `secrets`
-2. Create a [new GitHub app](https://github.com/settings/apps/new) or [open existing one](https://github.com/settings/apps) and download key file as `secrets/dev/private-key.pem`
-3. Replace variables with your user specific values in `roles/generate-secrets/vars/main.yml`
-4. Run the playbook `make generate-local-secrets`
-
-Then, copy the `secrets` directory to your `packit-service` directory
 
 ## Zuul
 
