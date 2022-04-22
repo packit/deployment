@@ -1,0 +1,15 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+# https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
+- name: Create k8s object
+  k8s:
+    namespace: "{{ project }}"
+    resource_definition: "{{ item }}"
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    validate_certs: "{{ validate_certs }}"
+    apply: "{{ k8s_apply }}"
+  tags:
+    - always

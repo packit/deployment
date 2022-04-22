@@ -3,7 +3,7 @@
 
 ---
 - name: Create empty files
-  file:
+  ansible.builtin.file:
     path: "{{ path_to_secrets }}/{{ item }}"
     state: touch
     mode: 0644

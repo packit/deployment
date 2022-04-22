@@ -9,18 +9,18 @@
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
   tasks:
     - name: include variables
-      include_vars: ../vars/{{ service }}/{{ deployment }}.yml
+      ansible.builtin.include_vars: ../vars/{{ service }}/{{ deployment }}.yml
 
     - name: oc login
-      command: oc login {{ host }} --token={{ api_key }} --insecure-skip-tls-verify
+      ansible.builtin.command: oc login {{ host }} --token={{ api_key }} --insecure-skip-tls-verify
       # it doesn't change anything, so don't report 'changed'
       changed_when: false
 
     - name: oc project
-      command: oc project {{ project }}
+      ansible.builtin.command: oc project {{ project }}
       # it doesn't change anything, so don't report 'changed'
       changed_when: false
 
     - name: oc delete all
-      command: oc delete all,cm,pvc --all
+      ansible.builtin.command: oc delete all,cm,pvc --all
       when: deployment != "prod"

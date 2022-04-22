@@ -48,13 +48,15 @@
     # Check that the current vars file is up-to-date with the template
     check_vars_template_diff: true
     deployment_repo_url: https://github.com/packit/deployment.git
+    # used by a few tasks below
+    k8s_apply: false
   tasks:
     - include_tasks: tasks/project-dir.yml
       tags:
         - always
 
     - name: include variables
-      include_vars: "{{ project_dir }}/vars/{{ service }}/{{ deployment }}.yml"
+      ansible.builtin.include_vars: "{{ project_dir }}/vars/{{ service }}/{{ deployment }}.yml"
       tags:
         - always
 
@@ -69,24 +71,25 @@
 
       # to be able to read the github_app_id from the configuration file in tokman
     - name: include packit-service configuration
-      include_vars:
+      ansible.builtin.include_vars:
         file: "{{ path_to_secrets }}/packit-service.yaml"
         name: packit_service_config
       tags:
         - tokman
 
     - name: include extra secret vars
-      include_vars: "{{ path_to_secrets }}/extra-vars.yml"
+      ansible.builtin.include_vars: "{{ path_to_secrets }}/extra-vars.yml"
       tags:
         - always
 
     - name: Get k8s token and check it.
       block:
         - name: get kubeconfig token
-          command: oc whoami -t
+          ansible.builtin.command: oc whoami -t
           register: kubeconfig_token
+          changed_when: false
         - name: check if tokens match
-          assert:
+          ansible.builtin.assert:
             that:
               - kubeconfig_token.stdout == api_key
             msg: "OpenShift API token defined in vars/ does not match token from your current environment."
@@ -97,23 +100,29 @@
     - name: Push dev images to local registry
       block:
         - name: Set --tls-verify=false if podman is used
-          set_fact: tls_verify_false="{{ '--tls-verify=false' if 'podman' in container_engine else '' }}"
+          ansible.builtin.set_fact: tls_verify_false="{{ '--tls-verify=false' if 'podman' in container_engine else '' }}"
+          changed_when: false
         - name: Login to local cluster
-          shell: "{{ container_engine }} login -u developer -p $(oc whoami -t) 172.30.1.1:5000 {{ tls_verify_false }}"
+          ansible.builtin.shell: "{{ container_engine }} login -u developer -p $(oc whoami -t) 172.30.1.1:5000 {{ tls_verify_false }}"
+          changed_when: false
         - name: Inspect service image
-          command: "{{ container_engine }} inspect {{ image }}"
+          ansible.builtin.command: "{{ container_engine }} inspect {{ image }}"
+          changed_when: false
         - name: Tag the image with :dev
-          command: "{{ container_engine }} tag {{ image }} 172.30.1.1:5000/myproject/packit-service:dev"
+          ansible.builtin.command: "{{ container_engine }} tag {{ image }} 172.30.1.1:5000/myproject/packit-service:dev"
+          changed_when: true
         - name: Push the image
-          command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-service:dev {{ tls_verify_false }}"
+          ansible.builtin.command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-service:dev {{ tls_verify_false }}"
+          changed_when: true
         - name: Inspect worker image
-          command: "{{ container_engine }} inspect {{ image_worker }}"
+          ansible.builtin.command: "{{ container_engine }} inspect {{ image_worker }}"
+          changed_when: false
         - name: Tag the image with :dev
-          command: "{{ container_engine }} tag {{ image_worker }} 172.30.1.1:5000/myproject/packit-worker:dev"
+          ansible.builtin.command: "{{ container_engine }} tag {{ image_worker }} 172.30.1.1:5000/myproject/packit-worker:dev"
+          changed_when: true
         - name: Push the image
-          command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-worker:dev {{ tls_verify_false }}"
-      #        - command: "{{ container_engine }} tag {{ image_fedmsg }} 172.30.1.1:5000/myproject/packit-service-fedmsg:dev"
-      #        - command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-service-fedmsg:dev {{ tls_verify_false }}"
+          ansible.builtin.command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-worker:dev {{ tls_verify_false }}"
+          changed_when: true
       when: push_dev_images
       tags:
         - packit-service
@@ -121,13 +130,7 @@
         - packit-service-beat
 
     - name: Deploy secrets
-      # https://docs.ansible.com/k8s_module.html
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ item }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-ssh.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-secrets.yml.j2') }}"
@@ -141,46 +144,35 @@
     - name: Set up sandbox namespace
       block:
         - name: Set finalizers to sandbox namespace
-          k8s:
-            namespace: "{{ project }}"
-            definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
-            host: "{{ host }}"
-            api_key: "{{ api_key }}"
-            validate_certs: "{{ validate_certs }}"
+          include_tasks: tasks/k8s.yml
+          loop:
+            - "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
         - name: Add edit role to service account in sandbox namespace
-          command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
+          ansible.builtin.command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
           register: rolebinding
           changed_when: "'added:' in rolebinding.stdout"
       when: with_sandbox
 
     - name: Deploy postgres
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/postgres.yml.j2')  }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/postgres.yml.j2')  }}"
       tags:
         - postgres
 
     - name: Deploy redis
-      k8s:
-        namespace: "{{ project }}"
-        src: "{{ project_dir }}/openshift/redis.yml"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        apply: true
+      vars:
+        k8s_apply: true
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('file', '{{ project_dir }}/openshift/redis.yml') }}"
       tags:
         - redis
 
     - name: Deploy packit-service
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service.yml.j2')  }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service.yml.j2')  }}"
       tags:
         - packit-service
 
@@ -209,12 +201,9 @@
         worker_requests_cpu: "100m"
         worker_limits_memory: "1024Mi"
         worker_limits_cpu: "400m"
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
       tags:
         - packit-worker
       when: workers_all_tasks > 0
@@ -230,12 +219,9 @@
         worker_requests_cpu: "100m"
         worker_limits_memory: "320Mi"
         worker_limits_cpu: "100m"
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
       tags:
         - packit-worker
       when: workers_short_running > 0
@@ -265,35 +251,25 @@
         worker_requests_cpu: "100m"
         worker_limits_memory: "1024Mi"
         worker_limits_cpu: "400m"
-
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
       tags:
         - packit-worker
       when: workers_long_running > 0
 
     - name: Deploy packit-service-beat
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-beat.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-beat.yml.j2') }}"
       when: with_beat
       tags:
         - packit-service-beat
 
     - name: Deploy dashboard
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/dashboard.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/dashboard.yml.j2') }}"
       when: with_dashboard
       tags:
         - dashboard
@@ -313,13 +289,11 @@
       when: with_redis_commander
 
     - name: Deploy redis-commander
-      k8s:
-        namespace: "{{ project }}"
-        src: "{{ project_dir }}/openshift/redis-commander.yml"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        apply: true
+      vars:
+        k8s_apply: true
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('file', '{{ project_dir }}/openshift/redis-commander.yml') }}"
       when: with_redis_commander
       tags:
         - redis-commander
@@ -340,24 +314,18 @@
       when: with_flower
 
     - name: Deploy flower
-      k8s:
-        namespace: "{{ project }}"
-        src: "{{ project_dir }}/openshift/flower.yml"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('file', '{{ project_dir }}/openshift/flower.yml') }}"
       when: with_flower
       tags:
         - flower
       register: flower
 
     - name: Deploy packit-service-fedmsg
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-fedmsg.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-fedmsg.yml.j2') }}"
       tags:
         - fedmsg
       when: with_fedmsg
@@ -365,7 +333,7 @@
     - name: Deploy GitHub App Private Key
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/github-app-private-key.yml.j2')  }}"
+        resource_definition: "{{ lookup('template', '{{ project_dir }}/openshift/github-app-private-key.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -376,84 +344,51 @@
       when: with_tokman
 
     - name: Deploy tokman
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/tokman.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/tokman.yml.j2') }}"
       tags:
         - tokman
       register: tokman
       when: with_tokman
 
     - name: Deploy aggregating pushgateway
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/pushgateway.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/pushgateway.yml.j2') }}"
       tags:
         - pushgateway
       when: with_pushgateway
 
     - name: Deploy nginx to reverse proxy the pushgateway
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/nginx.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/nginx.yml.j2') }}"
       tags:
         - pushgateway
       when: with_pushgateway
 
     - name: Wait for worker-0 to be running
-      k8s:
-        namespace: "{{ project }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        name: packit-worker-0
-        kind: Pod
-        wait: true
-        wait_condition:
-          type: Ready
-        wait_timeout: 600 # 10 minutes to pull the image and run the container
+      vars:
+        pod_name: packit-worker-0
+      include_tasks: tasks/wait_for_pod.yml
       when: workers_all_tasks > 0
 
     - name: Wait for worker-short-running-0 to be running
-      k8s:
-        namespace: "{{ project }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        name: packit-worker-short-running-0
-        kind: Pod
-        wait: true
-        wait_condition:
-          type: Ready
-        wait_timeout: 600 # 10 minutes to pull the image and run the container
+      vars:
+        pod_name: packit-worker-short-running-0
+      include_tasks: tasks/wait_for_pod.yml
       when: workers_short_running > 0
 
     - name: Wait for worker-long-running-0 to be running
-      k8s:
-        namespace: "{{ project }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        name: packit-worker-long-running-0
-        kind: Pod
-        wait: true
-        wait_condition:
-          type: Ready
-        wait_timeout: 600 # 10 minutes to pull the image and run the container
+      vars:
+        pod_name: packit-worker-long-running-0
+      include_tasks: tasks/wait_for_pod.yml
       when: workers_long_running > 0
 
     - name: Wait for deploymentconfig rollouts to complete
       # timeout 10min to not wait indefinitely in case of a problem
-      command: timeout 10m oc rollout status -w dc/{{ item }}
+      ansible.builtin.command: timeout 10m oc rollout status -w dc/{{ item }}
       register: oc_rollout_status
       changed_when: false
       failed_when: '"successfully rolled out" not in oc_rollout_status.stdout'
@@ -461,19 +396,19 @@
 
   handlers:
     - name: Rollout redis-commander
-      command: oc rollout latest dc/redis-commander
+      ansible.builtin.command: oc rollout latest dc/redis-commander
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not redis_commander.changed
 
     - name: Rollout tokman
-      command: oc rollout latest dc/tokman
+      ansible.builtin.command: oc rollout latest dc/tokman
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not tokman.changed
 
     - name: Rollout flower
-      command: oc rollout latest dc/flower
+      ansible.builtin.command: oc rollout latest dc/flower
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not flower.changed

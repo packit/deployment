@@ -15,7 +15,7 @@
       - name={{ item }}
   register: pods
 - name: Checking resources
-  assert:
+  ansible.builtin.assert:
     that:
       - "pods.resources|length > 0"
       - "pods.resources[0].status.phase == 'Running'"
