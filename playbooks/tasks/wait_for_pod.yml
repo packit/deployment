@@ -1,0 +1,15 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- k8s:
+    namespace: "{{ project }}"
+    host: "{{ host }}"
+    api_key: "{{ api_key }}"
+    validate_certs: "{{ validate_certs }}"
+    name: "{{ pod_name }}"
+    kind: Pod
+    wait: true
+    wait_condition:
+      type: Ready
+    wait_timeout: 600 # 10 minutes to pull the image and run the container

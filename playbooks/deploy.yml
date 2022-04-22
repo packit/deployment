@@ -48,6 +48,8 @@
     # Check that the current vars file is up-to-date with the template
     check_vars_template_diff: true
     deployment_repo_url: https://github.com/packit/deployment.git
+    # used by a few tasks below
+    k8s_apply: false
   tasks:
     - include_tasks: tasks/project-dir.yml
       tags:
@@ -121,13 +123,7 @@
         - packit-service-beat
 
     - name: Deploy secrets
-      # https://github.com/ansible-collections/kubernetes.core
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ item }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-ssh.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-secrets.yml.j2') }}"
@@ -141,12 +137,9 @@
     - name: Set up sandbox namespace
       block:
         - name: Set finalizers to sandbox namespace
-          k8s:
-            namespace: "{{ project }}"
-            definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
-            host: "{{ host }}"
-            api_key: "{{ api_key }}"
-            validate_certs: "{{ validate_certs }}"
+          include_tasks: tasks/k8s.yml
+          loop:
+            - "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
         - name: Add edit role to service account in sandbox namespace
           command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
           register: rolebinding
@@ -154,33 +147,25 @@
       when: with_sandbox
 
     - name: Deploy postgres
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/postgres.yml.j2')  }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/postgres.yml.j2')  }}"
       tags:
         - postgres
 
     - name: Deploy redis
-      k8s:
-        namespace: "{{ project }}"
-        src: "{{ project_dir }}/openshift/redis.yml"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        apply: true
+      vars:
+        k8s_apply: true
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('file', '{{ project_dir }}/openshift/redis.yml') }}"
       tags:
         - redis
 
     - name: Deploy packit-service
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service.yml.j2')  }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service.yml.j2')  }}"
       tags:
         - packit-service
 
@@ -209,12 +194,9 @@
         worker_requests_cpu: "100m"
         worker_limits_memory: "1024Mi"
         worker_limits_cpu: "400m"
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
       tags:
         - packit-worker
       when: workers_all_tasks > 0
@@ -230,12 +212,9 @@
         worker_requests_cpu: "100m"
         worker_limits_memory: "320Mi"
         worker_limits_cpu: "100m"
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
       tags:
         - packit-worker
       when: workers_short_running > 0
@@ -265,35 +244,25 @@
         worker_requests_cpu: "100m"
         worker_limits_memory: "1024Mi"
         worker_limits_cpu: "400m"
-
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
       tags:
         - packit-worker
       when: workers_long_running > 0
 
     - name: Deploy packit-service-beat
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-beat.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-beat.yml.j2') }}"
       when: with_beat
       tags:
         - packit-service-beat
 
     - name: Deploy dashboard
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/dashboard.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/dashboard.yml.j2') }}"
       when: with_dashboard
       tags:
         - dashboard
@@ -313,13 +282,11 @@
       when: with_redis_commander
 
     - name: Deploy redis-commander
-      k8s:
-        namespace: "{{ project }}"
-        src: "{{ project_dir }}/openshift/redis-commander.yml"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        apply: true
+      vars:
+        k8s_apply: true
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('file', '{{ project_dir }}/openshift/redis-commander.yml') }}"
       when: with_redis_commander
       tags:
         - redis-commander
@@ -340,24 +307,18 @@
       when: with_flower
 
     - name: Deploy flower
-      k8s:
-        namespace: "{{ project }}"
-        src: "{{ project_dir }}/openshift/flower.yml"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('file', '{{ project_dir }}/openshift/flower.yml') }}"
       when: with_flower
       tags:
         - flower
       register: flower
 
     - name: Deploy packit-service-fedmsg
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-fedmsg.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-fedmsg.yml.j2') }}"
       tags:
         - fedmsg
       when: with_fedmsg
@@ -365,7 +326,7 @@
     - name: Deploy GitHub App Private Key
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/github-app-private-key.yml.j2')  }}"
+        resource_definition: "{{ lookup('template', '{{ project_dir }}/openshift/github-app-private-key.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
@@ -376,79 +337,46 @@
       when: with_tokman
 
     - name: Deploy tokman
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/tokman.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/tokman.yml.j2') }}"
       tags:
         - tokman
       register: tokman
       when: with_tokman
 
     - name: Deploy aggregating pushgateway
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/pushgateway.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/pushgateway.yml.j2') }}"
       tags:
         - pushgateway
       when: with_pushgateway
 
     - name: Deploy nginx to reverse proxy the pushgateway
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/nginx.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/nginx.yml.j2') }}"
       tags:
         - pushgateway
       when: with_pushgateway
 
     - name: Wait for worker-0 to be running
-      k8s:
-        namespace: "{{ project }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        name: packit-worker-0
-        kind: Pod
-        wait: true
-        wait_condition:
-          type: Ready
-        wait_timeout: 600 # 10 minutes to pull the image and run the container
+      vars:
+        pod_name: packit-worker-0
+      include_tasks: tasks/wait_for_pod.yml
       when: workers_all_tasks > 0
 
     - name: Wait for worker-short-running-0 to be running
-      k8s:
-        namespace: "{{ project }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        name: packit-worker-short-running-0
-        kind: Pod
-        wait: true
-        wait_condition:
-          type: Ready
-        wait_timeout: 600 # 10 minutes to pull the image and run the container
+      vars:
+        pod_name: packit-worker-short-running-0
+      include_tasks: tasks/wait_for_pod.yml
       when: workers_short_running > 0
 
     - name: Wait for worker-long-running-0 to be running
-      k8s:
-        namespace: "{{ project }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        name: packit-worker-long-running-0
-        kind: Pod
-        wait: true
-        wait_condition:
-          type: Ready
-        wait_timeout: 600 # 10 minutes to pull the image and run the container
+      vars:
+        pod_name: packit-worker-long-running-0
+      include_tasks: tasks/wait_for_pod.yml
       when: workers_long_running > 0
 
     - name: Wait for deploymentconfig rollouts to complete
