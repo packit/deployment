@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 ---
-- k8s:
+- name: Waiting for {{ pod_name }}
+  k8s:
     namespace: "{{ project }}"
     host: "{{ host }}"
     api_key: "{{ api_key }}"

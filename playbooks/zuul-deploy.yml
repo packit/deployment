@@ -6,7 +6,7 @@
   hosts: all
   tasks:
     - name: Install packages for deployment
-      package:
+      ansible.builtin.package:
         name:
           - ansible
           - python-openshift
@@ -17,19 +17,19 @@
     # For the "equalto" test we need Jinja2>=2.8.x, there's 2.7.2 in centos7
     # Needs to be installed before running the set-facts.yml playbook
     - name: Install Jinja-2.8.1
-      pip:
+      ansible.builtin.pip:
         name: Jinja2==2.8.1
       become: true
       when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7")
 
     - name: get token
-      command: oc whoami -t
+      ansible.builtin.command: oc whoami -t
       register: kubeconfig_token
       become: true
       changed_when: false
 
     - name: Create packit/dev.yml
-      copy:
+      ansible.builtin.copy:
         content: |
           # See https://github.com/packit/deployment/blob/main/vars/packit/dev_template.yml
           project: myproject
@@ -56,7 +56,7 @@
         mode: 0644
 
     - name: Actually deploy
-      command: make deploy
+      ansible.builtin.command: make deploy
       environment:
         DEPLOYMENT: dev
         ANSIBLE_STDOUT_CALLBACK: debug

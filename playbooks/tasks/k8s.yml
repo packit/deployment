@@ -3,7 +3,8 @@
 
 ---
 # https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
-- k8s:
+- name: Create k8s object
+  k8s:
     namespace: "{{ project }}"
     resource_definition: "{{ item }}"
     host: "{{ host }}"

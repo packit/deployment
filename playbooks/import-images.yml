@@ -12,32 +12,32 @@
     with_tokman: true
   tasks:
     - name: include variables
-      include_vars: ../vars/{{ service }}/{{ deployment }}.yml
+      ansible.builtin.include_vars: ../vars/{{ service }}/{{ deployment }}.yml
 
     - name: oc login
-      command: oc login {{ host }} --token={{ api_key }} --insecure-skip-tls-verify
+      ansible.builtin.command: oc login {{ host }} --token={{ api_key }} --insecure-skip-tls-verify
       # it doesn't change anything, so don't report 'changed'
       changed_when: false
 
     - name: check/import newer packit-service image into image stream
-      command: oc import-image is/packit-service:{{ deployment }} -n {{ service }}-{{ deployment }}
+      ansible.builtin.command: oc import-image is/packit-service:{{ deployment }} -n {{ service }}-{{ deployment }}
       changed_when: true
 
     - name: check/import newer packit-worker image into image stream
-      command: oc import-image is/packit-worker:{{ deployment }} -n {{ service }}-{{ deployment }}
+      ansible.builtin.command: oc import-image is/packit-worker:{{ deployment }} -n {{ service }}-{{ deployment }}
       changed_when: true
 
     - name: check/import newer packit-service-fedmsg image into image stream
-      command: oc import-image is/packit-service-fedmsg:{{ deployment }} -n {{ service }}-{{ deployment }}
+      ansible.builtin.command: oc import-image is/packit-service-fedmsg:{{ deployment }} -n {{ service }}-{{ deployment }}
       when: with_fedmsg
       changed_when: true
 
     - name: check/import newer dashboard image into image stream
-      command: oc import-image is/packit-dashboard:{{ deployment }} -n {{ service }}-{{ deployment }}
+      ansible.builtin.command: oc import-image is/packit-dashboard:{{ deployment }} -n {{ service }}-{{ deployment }}
       when: with_dashboard
       changed_when: true
 
     - name: check/import newer tokman image into image stream
-      command: oc import-image is/tokman:{{ deployment }} -n {{ service }}-{{ deployment }}
+      ansible.builtin.command: oc import-image is/tokman:{{ deployment }} -n {{ service }}-{{ deployment }}
       when: with_tokman
       changed_when: true

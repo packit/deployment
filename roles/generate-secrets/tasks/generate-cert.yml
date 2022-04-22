@@ -3,7 +3,7 @@
 
 ---
 - name: Install Python cryptography module
-  package:
+  ansible.builtin.package:
     name:
       - python-cryptography
   become: true
@@ -35,7 +35,7 @@
     - { cert: fullchain.pem, key: privkey.pem, csr: fullchain.csr }
 
 - name: Remove CSR
-  file:
+  ansible.builtin.file:
     path: "{{ path_to_secrets }}/{{ item }}"
     state: absent
   loop:

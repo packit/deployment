@@ -3,7 +3,7 @@
 
 ---
 - name: Create secrets directory hierarchy
-  file:
+  ansible.builtin.file:
     path: "{{ path_to_secrets }}"
     state: directory
     mode: 0755

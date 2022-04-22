@@ -3,7 +3,7 @@
 
 ---
 - name: Generate config files
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ path_to_secrets }}/{{ item }}"
     mode: 0644

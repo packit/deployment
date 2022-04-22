@@ -6,7 +6,7 @@
   hosts: all
   tasks:
     - name: Run 'make check'
-      command: make check
+      ansible.builtin.command: make check
       environment:
         DEPLOYMENT: dev
         ANSIBLE_STDOUT_CALLBACK: debug
