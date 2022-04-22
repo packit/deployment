@@ -121,7 +121,7 @@
         - packit-service-beat
 
     - name: Deploy secrets
-      # https://docs.ansible.com/k8s_module.html
+      # https://github.com/ansible-collections/kubernetes.core
       k8s:
         namespace: "{{ project }}"
         definition: "{{ item }}"

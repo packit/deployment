@@ -3,5 +3,18 @@
 skip_list:
   - yaml  # clashes with prettier
   - role-name  # we're not going to publish the roles
+
 warn_list:
   - command-instead-of-module  # sometimes this is desired
+
+mock_modules:
+  # k8s module was moved to community.kubernetes collection in ansible 2.10
+  # and then later to kubernetes.core collection.
+  # Ansible 2.9.27 in F35 still contains the k8s module so we can ignore the error until F36,
+  # where we can switch to kubernetes.core.k8s as ansible-5.x in F36 contains it.
+  - k8s
+  # Ignore until F36, where these are in community.crypto collection (part of ansible-5.x rpm).
+  - openssh_keypair
+  - openssl_certificate
+  - openssl_csr
+  - openssl_privatekey
