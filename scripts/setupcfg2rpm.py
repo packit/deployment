@@ -24,6 +24,7 @@ import configparser
 
 def normalize_name(name: str) -> str:
     """https://www.python.org/dev/peps/pep-0503/#normalized-names"""
+    name = name.split(";")[0]  # in case there is a comment
     return re.sub(r"[-_.]+", "-", name).lower()
 
 
