@@ -15,7 +15,6 @@ NAMESPACE: str = "packit"
 REPOSITORIES: List[str] = [
     "packit",
     "packit-service-fedmsg",
-    "packit-service-centosmsg",
     "sandcastle",
     "dashboard",
     "tokman",
