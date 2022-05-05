@@ -3,12 +3,15 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-import click
-
 from datetime import date, datetime, timedelta
 from pathlib import Path
 import subprocess
-from typing import List
+from typing import List, Optional
+
+import click
+from git import Repo
+
+import changelog
 
 
 NAMESPACE: str = "packit"
@@ -20,6 +23,10 @@ REPOSITORIES: List[str] = [
     "tokman",
     "packit-service",
     "hardly",
+]
+REPOS_FOR_BLOG: List[str] = [
+    "packit",
+    "packit-service",
 ]
 STABLE_BRANCH: str = "stable"
 ROLLING_BRANCH: str = "main"
@@ -122,6 +129,10 @@ def move_repository(repository: str, remote: str, repo_store: str) -> None:
 
     REPOSITORIES are Git repositories cloned to repo store.
 
+    Once the stable branches are moved, a blogpost template describing the
+    work done in the last week is output. The entries are collected from
+    the following repositories: {', '.join(REPOS_FOR_BLOG)}.
+
     Example:
 
     To move the \'{STABLE_BRANCH}\' branch in all the repositories,
@@ -161,6 +172,8 @@ def move_all(ctx, remote, repo_store: str) -> None:
             move_repository, repository=repository, remote=remote, repo_store=repo_store
         )
 
+    create_blogpost(remote, repo_store)
+
 
 @cli.command(
     short_help="Prints an URL GitHub query for pull requests that has release notes."
@@ -197,6 +210,39 @@ def github_query(till: datetime) -> None:
             label="has-release-notes",
         )
     )
+
+
+def format_day(day: int) -> str:
+    suffixes = ["th", "st", "nd", "rd"]
+    if day % 10 in (1, 2, 3) and day not in (11, 12, 13):
+        suffix = suffixes[day % 10]
+        return f"{day}{suffix}"
+    else:
+        return f"{day}{suffixes[0]}"
+
+
+def format_date(to_format: date) -> str:
+    month = to_format.strftime("%B")
+    day = format_day(to_format.day)
+    return f"{month} {day}"
+
+
+def create_blogpost(remote: str, repo_store: str, till: Optional[datetime] = None):
+    till = (till or datetime.today()).date()
+
+    click.echo(
+        "Here is a template for this week's blogpost (modifications may be needed)\n"
+    )
+    # Get the start of the week and its number, we consider Tue - Mon (6 days)
+    since = till - timedelta(days=6)
+    week_number = since.isocalendar()[1]
+    click.echo(f"## Week {week_number} ({format_date(since)} - {format_date(till)})\n")
+    for repo in REPOS_FOR_BLOG:
+        path_to_repository = Path(repo_store, repo).absolute()
+        git_repo = Repo(path_to_repository)
+        main_hash = get_reference(path_to_repository, remote, ROLLING_BRANCH)[:7]
+        commits = git_repo.iter_commits(main_hash, merges=True, since=since)
+        click.echo(changelog.get_changelog(commits, repo).rstrip())
 
 
 def get_reference(path_to_repository: Path, remote: str, branch: str) -> str:

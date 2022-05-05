@@ -28,14 +28,21 @@ def get_relevant_commits(repository: Repo, ref: Optional[str]) -> List[Commit]:
     return list(repository.iter_commits(rev=range, merges=True))
 
 
-def get_pr_data(message: str) -> str:
+def get_pr_data(message: str, repo: Optional[str] = None) -> str:
     """
     obtain PR ID and produce a markdown link to it
+
+    if repo is set, creates a markdown link to the given repo (useful for blogposts)
     """
     # Merge pull request #1483 from majamassarini/fix/1357
     first_line = message.split("\n")[0]
     fourth_word = first_line.split(" ")[3]
-    return fourth_word
+    if repo:
+        pr_id = fourth_word.lstrip("#")
+        url = f"https://github.com/packit/{repo}/pull/{pr_id}"
+        return f"[{repo}#{pr_id}]({url})"
+    else:
+        return fourth_word
 
 
 def convert_message(message: str) -> Optional[str]:
@@ -50,14 +57,14 @@ def convert_message(message: str) -> Optional[str]:
     return None
 
 
-def get_changelog(commits: List[Commit]) -> str:
+def get_changelog(commits: List[Commit], repo: Optional[str] = None) -> str:
     changelog = ""
     for commit in commits:
         if PRE_COMMIT_CI_MESSAGE in commit.message:
             continue
         message = convert_message(commit.message)
         if message and message.lower() not in NOT_IMPORTANT_VALUES:
-            suffix = get_pr_data(commit.message)
+            suffix = get_pr_data(commit.message, repo)
             changelog += f"- {message} ({suffix})\n"
     return changelog
 
