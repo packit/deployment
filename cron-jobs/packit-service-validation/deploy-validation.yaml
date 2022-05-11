@@ -12,6 +12,8 @@
     # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
     api_key: ""
     validate_certs: false
+    deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
+    cronjob_name: packit-{{ deployment }}-validation
 
   tasks:
     - name: Deploy secrets
@@ -31,7 +33,7 @@
     - name: Deploy cron job for running validation script
       k8s:
         namespace: "{{ project }}"
-        definition: "{{ lookup('template', './openshift/job-run-validation.yaml')  }}"
+        definition: "{{ lookup('template', './openshift/job-run-validation.yml.j2')  }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"
