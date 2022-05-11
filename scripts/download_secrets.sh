@@ -18,13 +18,13 @@
 # not download secrets again, if you just did it.
 [[ -n "${SKIP_SECRETS_SYNC}" || -n "${SSS}" ]] && { echo "Not downloading secrets"; exit 0; }
 
-# Where to download the files
-DEFAULT_PATH_TO_SECRETS="secrets/${SERVICE}/${DEPLOYMENT}/"
-
 # Set default values if not set already
 : "${SERVICE:=packit}"
 : "${DEPLOYMENT:=dev}"
 [[ "${DEPLOYMENT}" == "dev" ]] && { echo "Not downloading secrets for DEPLOYMENT==dev"; exit 0; }
+
+# Where to download the files
+DEFAULT_PATH_TO_SECRETS="secrets/${SERVICE}/${DEPLOYMENT}/"
 : "${PATH_TO_SECRETS:=$DEFAULT_PATH_TO_SECRETS}"
 
 command -v bw >/dev/null 2>&1 || { echo >&2 "'bw' command not found, see https://bitwarden.com/help/cli"; exit 1; }
@@ -33,17 +33,17 @@ command -v bw >/dev/null 2>&1 || { echo >&2 "'bw' command not found, see https:/
 bw status
 
 if ! bw login --check; then
-  bw login
+  BW_SESSION="$(bw login --raw)"
 # The vault unlocks once you login. It can however happen
 # that you're already logged in, but the vault is locked.
 elif ! bw unlock --check; then
   BW_SESSION="$(bw unlock --raw)"
-  export BW_SESSION
 fi
-bw unlock --check || { echo >&2 "Failed to unlock vault"; exit 1; }
+[ -n "$BW_SESSION" ] || { echo >&2 "Bitwarden session (BW_SESSION) is not set"; exit 1; }
+export BW_SESSION
 
 # Pull the latest vault data from server
-bw sync
+bw sync --force
 
 download_attachments_of_item() {
   # Parameter is the name of the shared (Bitwarden vault) item,
