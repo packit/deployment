@@ -28,7 +28,8 @@ If you want to deploy the script:
   - `github_token` - Github token for `usercont-release-bot` user
   - `secret_sentry` - Sentry key
 - You have to define your Openshift API token [here](./openshift/job-run-validation.yaml).
-- If you have everything prepared, you just need to run `make deploy` in this directory.
+- If you have everything prepared, you just need to run `DEPLOYMENT=production make deploy`
+  or `DEPLOYMENT=staging make deploy` in this directory.
 
 If you want to run the script on your own:
 
