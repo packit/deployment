@@ -74,7 +74,8 @@ class Testcase:
         self,
         pr: PullRequest = None,
         trigger: Trigger = Trigger.pr_opened,
-        deployment: DeploymentInfo = None):
+        deployment: DeploymentInfo = None,
+    ):
         self.pr = pr
         self.pr_branch_ref: GitRef = None
         self.failure_msg = ""
