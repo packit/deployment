@@ -8,6 +8,7 @@ import logging
 from copr.v3 import Client
 from datetime import datetime, timedelta, date
 from os import getenv
+from dataclasses import dataclass
 
 from github import InputGitAuthor
 from github.Commit import Commit
@@ -17,13 +18,49 @@ from ogr.services.github import GithubService
 from ogr.abstract import PullRequest
 from ogr.services.github.check_run import GithubCheckRunStatus, GithubCheckRunResult
 
-APP_NAME = "Packit-as-a-Service"
-
 copr = Client({"copr_url": "https://copr.fedorainfracloud.org"})
 service = GithubService(token=getenv("GITHUB_TOKEN"))
 project = service.get_project(repo="hello-world", namespace="packit")
 user = InputGitAuthor(name="Release Bot", email="user-cont-team+release-bot@redhat.com")
 logging.basicConfig(level=logging.WARNING)
+
+
+class Deployment(str, enum.Enum):
+    production = "production"
+    staging = "staging"
+
+
+@dataclass
+class YamlFix:
+    from_str: str = ""
+    to_str: str = ""
+    git_msg: str = ""
+
+
+@dataclass
+class DeploymentInfo:
+    app_name: str = "Packit-as-a-Service"
+    pr_comment: str = "/packit build"
+    opened_pr_trigger__packit_yaml_fix: YamlFix = None
+    copr_user = "packit"
+    push_trigger_tests_prefix = "Basic test case - push trigger"
+    bot_name = "packit-as-a-service[bot]"
+
+
+class ProductionInfo(DeploymentInfo):
+    pass
+
+
+@dataclass
+class StagingInfo(DeploymentInfo):
+    app_name = "Packit-as-a-Service-stg"
+    pr_comment = "/packit-stg build"
+    opened_pr_trigger__packit_yaml_fix = YamlFix(
+        b"---", b'---\npackit_instances: ["stg"]', "Build on staging"
+    )
+    copr_user = "packit-stg"
+    push_trigger_tests_prefix = "Basic test case (stg) - push trigger"
+    bot_name = "packit-as-a-service-stg[bot]"
 
 
 class Trigger(str, enum.Enum):
@@ -33,13 +70,19 @@ class Trigger(str, enum.Enum):
 
 
 class Testcase:
-    def __init__(self, pr: PullRequest = None, trigger: Trigger = Trigger.pr_opened):
+    def __init__(
+        self,
+        pr: PullRequest = None,
+        trigger: Trigger = Trigger.pr_opened,
+        deployment: DeploymentInfo = None,
+    ):
         self.pr = pr
         self.pr_branch_ref: GitRef = None
         self.failure_msg = ""
         self.trigger = trigger
         self.head_commit = pr.head_commit if pr else None
         self._copr_project_name = None
+        self.deployment = deployment if deployment else ProductionInfo()
 
     @property
     def copr_project_name(self):
@@ -72,7 +115,7 @@ class Testcase:
         :return:
         """
         if self.trigger == Trigger.comment:
-            self.pr.comment("/packit build")
+            self.pr.comment(self.deployment.pr_comment)
         elif self.trigger == Trigger.push:
             self.push_to_pr()
         else:
@@ -99,6 +142,25 @@ class Testcase:
         )["commit"]
         self.head_commit = commit.sha
 
+    def fix_packit_yaml(self, ref: str, branch: str):
+        """
+        Update .packit.yaml file according to the deployment needs
+        """
+        if self.deployment.opened_pr_trigger__packit_yaml_fix:
+            packit_yaml = project.github_repo.get_contents(path=".packit.yaml", ref=ref)
+            packit_yaml_content = packit_yaml.decoded_content
+            packit_yaml_content = packit_yaml_content.replace(
+                self.deployment.opened_pr_trigger__packit_yaml_fix.from_str,
+                self.deployment.opened_pr_trigger__packit_yaml_fix.to_str,
+            )
+            project.github_repo.update_file(
+                packit_yaml.path,
+                self.deployment.opened_pr_trigger__packit_yaml_fix.git_msg,
+                packit_yaml_content,
+                packit_yaml.sha,
+                branch=branch,
+            )
+
     def create_pr(self):
         """
         Create a new PR, if the source branch 'test_case_opened_pr' does not exist,
@@ -107,12 +169,11 @@ class Testcase:
         """
         source_branch = "test_case_opened_pr"
         pr_title = "Basic test case - opened PR trigger"
+        ref = f"refs/heads/{source_branch}"
 
         # create a new branch and commit for the PR
         commit = project.github_repo.get_commit("HEAD")
-        self.pr_branch_ref = project.github_repo.create_git_ref(
-            f"refs/heads/{source_branch}", commit.sha
-        )
+        self.pr_branch_ref = project.github_repo.create_git_ref(ref, commit.sha)
         project.github_repo.create_file(
             path="test.txt",
             message="Opened PR trigger",
@@ -121,6 +182,7 @@ class Testcase:
             committer=user,
             author=user,
         )
+        self.fix_packit_yaml(ref, source_branch)
 
         existing_pr = [pr for pr in project.get_pr_list() if pr.title == pr_title]
         if len(existing_pr) == 1:
@@ -157,7 +219,7 @@ class Testcase:
         check_runs = [
             check_run.name
             for check_run in project.get_check_runs(commit_sha=self.head_commit)
-            if check_run.app.name == APP_NAME
+            if check_run.app.name == self.deployment.app_name
         ]
 
         watch_end = datetime.now() + timedelta(seconds=60)
@@ -171,7 +233,7 @@ class Testcase:
             check_runs = [
                 check_run.name
                 for check_run in project.get_check_runs(commit_sha=self.head_commit)
-                if check_run.app.name == APP_NAME
+                if check_run.app.name == self.deployment.app_name
             ]
 
         while True:
@@ -200,7 +262,9 @@ class Testcase:
         if self.pr:
             try:
                 old_build_len = len(
-                    copr.build_proxy.get_list("packit", self.copr_project_name)
+                    copr.build_proxy.get_list(
+                        self.deployment.copr_user, self.copr_project_name
+                    )
                 )
             except Exception:
                 old_build_len = 0
@@ -225,7 +289,9 @@ class Testcase:
                 return None
 
             try:
-                new_builds = copr.build_proxy.get_list("packit", self.copr_project_name)
+                new_builds = copr.build_proxy.get_list(
+                    self.deployment.copr_user, self.copr_project_name
+                )
             except Exception:
                 # project does not exist yet
                 continue
@@ -240,7 +306,7 @@ class Testcase:
                 comment = [
                     comment.comment
                     for comment in new_comments
-                    if comment.author == "packit-as-a-service[bot]"
+                    if comment.author == self.deployment.bot_name
                 ]
                 if len(comment) > 0:
                     if "error" in comment[0] or "whitelist" in comment[0]:
@@ -308,7 +374,7 @@ class Testcase:
             states = [
                 check_run.status
                 for check_run in check_runs
-                if check_run.app.name == APP_NAME
+                if check_run.app.name == self.deployment.app_name
             ]
 
             if all(state == GithubCheckRunStatus.completed for state in states):
@@ -321,7 +387,7 @@ class Testcase:
                 )
                 for check_run in check_runs:
                     if (
-                        check_run.app.name == APP_NAME
+                        check_run.app.name == self.deployment.app_name
                         and check_run.status != GithubCheckRunStatus.completed
                     ):
                         self.failure_msg += f"{check_run.name}\n"
@@ -342,7 +408,7 @@ class Testcase:
         check_runs = self.watch_check_runs()
         for check_run in check_runs:
             if (
-                check_run.app.name == APP_NAME
+                check_run.app.name == self.deployment.app_name
                 and check_run.conclusion == GithubCheckRunResult.failure
             ):
                 self.failure_msg += (
@@ -361,7 +427,7 @@ class Testcase:
             packit_comments = [
                 comment
                 for comment in self.pr.get_comments(reverse=True)
-                if comment.author == "packit-as-a-service[bot]"
+                if comment.author == self.deployment.bot_name
             ]
             if not packit_comments:
                 self.failure_msg += (
@@ -378,21 +444,29 @@ if __name__ == "__main__":
     else:
         logging.warning("SENTRY_SECRET was not set!")
 
+    deployment = (
+        ProductionInfo()
+        if getenv("DEPLOYMENT", Deployment.production) == Deployment.production
+        else StagingInfo()
+    )
+
     # run testcases where the build is triggered by a '/packit build' comment
     prs_for_comment = [
         pr for pr in project.get_pr_list() if pr.title.startswith("Basic test case:")
     ]
     for pr in prs_for_comment:
-        Testcase(pr=pr, trigger=Trigger.comment).run_test()
+        Testcase(pr=pr, trigger=Trigger.comment, deployment=deployment).run_test()
 
     # run testcase where the build is triggered by push
     pr_for_push = [
         pr
         for pr in project.get_pr_list()
-        if pr.title.startswith("Basic test case - push trigger")
+        if pr.title.startswith(deployment.push_trigger_tests_prefix)
     ]
     if pr_for_push:
-        Testcase(pr=pr_for_push[0], trigger=Trigger.push).run_test()
+        Testcase(
+            pr=pr_for_push[0], trigger=Trigger.push, deployment=deployment
+        ).run_test()
 
     # run testcase where the build is triggered by opening a new PR
-    Testcase().run_test()
+    Testcase(deployment=deployment).run_test()

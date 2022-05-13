@@ -4,7 +4,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: packit-validation
+  name: {{ cronjob_name }}
 spec:
   # runs every day at 4 a.m.
   schedule: "0 4 * * *"
@@ -30,6 +30,8 @@ spec:
                     secretKeyRef:
                       name: packit-sentry
                       key: sentry
+                - name: DEPLOYMENT
+                  value: {{ deployment }}
               command: ["python3", "/usr/bin/packit-service-validation.py"]
               resources:
                 limits:
