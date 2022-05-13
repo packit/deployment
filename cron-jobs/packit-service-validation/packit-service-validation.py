@@ -5,6 +5,7 @@ import enum
 import time
 import logging
 
+from typing import Union
 from copr.v3 import Client
 from datetime import datetime, timedelta, date
 from os import getenv
@@ -38,7 +39,7 @@ class YamlFix:
 
 
 @dataclass
-class DeploymentInfo:
+class ProductionInfo:
     app_name: str = "Packit-as-a-Service"
     pr_comment: str = "/packit build"
     opened_pr_trigger__packit_yaml_fix: YamlFix = None
@@ -47,12 +48,8 @@ class DeploymentInfo:
     bot_name = "packit-as-a-service[bot]"
 
 
-class ProductionInfo(DeploymentInfo):
-    pass
-
-
 @dataclass
-class StagingInfo(DeploymentInfo):
+class StagingInfo:
     app_name = "Packit-as-a-Service-stg"
     pr_comment = "/packit-stg build"
     opened_pr_trigger__packit_yaml_fix = YamlFix(
@@ -61,6 +58,9 @@ class StagingInfo(DeploymentInfo):
     copr_user = "packit-stg"
     push_trigger_tests_prefix = "Basic test case (stg) - push trigger"
     bot_name = "packit-as-a-service-stg[bot]"
+
+
+DeploymentInfo = Union[ProductionInfo, StagingInfo]
 
 
 class Trigger(str, enum.Enum):
