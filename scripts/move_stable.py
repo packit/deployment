@@ -235,13 +235,17 @@ def create_blogpost(remote: str, repo_store: str, till: Optional[datetime] = Non
     )
     # Get the start of the week and its number, we consider Tue - Mon (6 days)
     since = till - timedelta(days=6)
+    # git-rev-list --since (which iter_commits uses) does a strong comparison of dates,
+    # it includes commits more recent than the given date, hence we need to pass in
+    # Monday to also include Tuesday.
+    git_since = since - timedelta(days=1)
     week_number = since.isocalendar()[1]
     click.echo(f"## Week {week_number} ({format_date(since)} - {format_date(till)})\n")
     for repo in REPOS_FOR_BLOG:
         path_to_repository = Path(repo_store, repo).absolute()
         git_repo = Repo(path_to_repository)
         main_hash = get_reference(path_to_repository, remote, ROLLING_BRANCH)[:7]
-        commits = git_repo.iter_commits(main_hash, merges=True, since=since)
+        commits = git_repo.iter_commits(main_hash, merges=True, since=git_since)
         click.echo(changelog.get_changelog(commits, repo).rstrip())
 
 
