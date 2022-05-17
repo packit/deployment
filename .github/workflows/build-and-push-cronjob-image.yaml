@@ -47,6 +47,7 @@ jobs:
           image: ${{ matrix.image }}
           context: ${{ env.path }}
           oci: true
+          tags: latest ${GITHUB_SHA::7}
 
       - name: Push To Quay
         # To push only relevant images
