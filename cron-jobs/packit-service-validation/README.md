@@ -25,7 +25,7 @@ If you want to deploy the script:
 - You have to have a directory with secrets and you need to define path to it [here](./openshift/job-run-validation.yaml)
   (by default `./secrets`).
 - The directory with secrets needs to contain:
-  - `github_token` - Github token for `usercont-release-bot` user; take it from [trezor repo](https://gitlab.cee.redhat.com/user-cont/trezor)
+  - `github_token` - Github token for `usercont-release-bot` user; take it from 'Release/usercont bot' item in our Bitwarden vault.
   - `secret_sentry` - Sentry key
 - You have to define your Openshift API token [here](./openshift/job-run-validation.yaml) take it from [PSI](https://ocp4.psi.redhat.com/).
 - If you have everything prepared, you just need to run `DEPLOYMENT=production make deploy`
