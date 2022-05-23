@@ -27,6 +27,7 @@ REPOSITORIES: List[str] = [
 REPOS_FOR_BLOG: List[str] = [
     "packit",
     "packit-service",
+    "dashboard",
 ]
 STABLE_BRANCH: str = "stable"
 ROLLING_BRANCH: str = "main"
