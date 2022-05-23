@@ -9,4 +9,4 @@ metadata:
 type: Opaque
 data:
   # Github app cert
-  private-key.pem: "{{ lookup('file', '{{ path_to_secrets }}/private-key.pem') | b64encode }}"
+  private-key.pem: "{{ lookup('file', '{{ path_to_secrets }}/private-key.pem', rstrip=False) | b64encode }}"
