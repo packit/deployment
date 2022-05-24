@@ -37,6 +37,12 @@ jobs:
           echo "::set-output name=changed_files::${changed_files}"
         id: changed_files
 
+      - name: Add short SHA to the list of tags
+        shell: bash
+        run: |
+          echo "::set-output name=tags::latest ${GITHUB_SHA::7}"
+        id: calculate-tags
+
       - name: Build Image
         # To build only relevant images
         if: contains(steps.changed_files.outputs.changed_files, env.path)
@@ -47,7 +53,7 @@ jobs:
           image: ${{ matrix.image }}
           context: ${{ env.path }}
           oci: true
-          tags: "latest ${GITHUB_SHA::7}"
+          tags: ${{ steps.calculate-tags.outputs.tags }}
 
       - name: Push To Quay
         # To push only relevant images
