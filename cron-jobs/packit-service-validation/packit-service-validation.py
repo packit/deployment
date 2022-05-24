@@ -19,6 +19,7 @@ from ogr.services.github import GithubService
 from ogr.abstract import PullRequest
 from ogr.services.github.check_run import GithubCheckRunStatus, GithubCheckRunResult
 
+
 copr = Client({"copr_url": "https://copr.fedorainfracloud.org"})
 service = GithubService(token=getenv("GITHUB_TOKEN"))
 project = service.get_project(repo="hello-world", namespace="packit")
