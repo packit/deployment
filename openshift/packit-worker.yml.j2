@@ -53,6 +53,10 @@ spec:
           secret: {secretName: packit-secrets}
         - name: packit-config
           secret: {secretName: packit-config}
+        - name: promtail-config
+          configMap: {name: promtail-config}
+        - name: logs
+          emptyDir: { }
       containers:
         - name: packit-worker
           image: packit-worker:{{ deployment }}
@@ -111,6 +115,28 @@ spec:
             limits:
               memory: {{ worker_limits_memory }}
               cpu: {{ worker_limits_cpu }}
+        - name: promtail-sidecar
+          image: quay.io/openshift-logging/promtail
+          args:
+            - -config.file=/home/packit/.config/promtail.yaml
+            - -config.expand-env=true
+          env:
+            - name: SERVICE
+              value: {{ service }}
+            - name: DEPLOYMENT
+              value: {{ deployment }}
+            - name: LOKI_USERNAME
+              value: {secretKeyRef: {name: loki, key: username}}
+            - name: LOKI_PASSWORD
+              valueFrom: {secretKeyRef: {name: loki, key: password}}
+          resources:
+            requests: {cpu: 15m, memory: 120Mi}
+            limits: {cpu: 30m, memory: 240Mi}
+          volumeMounts:
+            - name: logs
+              mountPath: /logs
+            - name: promtail-config
+              mountPath: /home/packit/.config
 ---
 # https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#writing-image-stream-definitions
 kind: ImageStream
@@ -129,3 +155,30 @@ spec:
   lookupPolicy:
     # allows all resources pointing to this image stream to use it in the image field
     local: true
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: promtail-config
+data:
+  promtail.yaml: |-
+    server:
+      http_listen_port: 9080
+      grpc_listen_port: 0
+    positions:
+      filename: /tmp/positions.yaml
+    clients:
+      - url: http://loki.tft.osci.redhat.com/loki/api/v1/push
+        basic_auth:
+          username: ${LOKI_USERNAME}
+          password: ${LOKI_PASSWORD}
+    scrape_configs:
+      - job_name: celery
+        pipeline_stages:
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              service: ${SERVICE}
+              deployment: ${DEPLOYMENT}
+              __path__: "/logs/*.log"
