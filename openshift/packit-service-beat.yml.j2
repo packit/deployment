@@ -36,31 +36,16 @@ spec:
               value: {{ celery_app }}
             - name: REDIS_SERVICE_HOST
               value: redis
-            - name: SENTRY_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: packit-sentry
-                  key: sentry
             - name: POSTGRESQL_USER
-              valueFrom:
-                secretKeyRef:
-                  key: database-user
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-user}}
             - name: POSTGRESQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: database-password
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-password}}
             - name: POSTGRESQL_HOST
-              valueFrom:
-                secretKeyRef:
-                  key: database-host
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-host}}
             - name: POSTGRESQL_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  key: database-name
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-name}}
+            - name: SENTRY_SECRET
+              valueFrom: {secretKeyRef: {name: packit-sentry, key: sentry}}
             - name: CELERY_COMMAND
               value: beat
           volumeMounts:

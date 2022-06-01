@@ -23,20 +23,11 @@ spec:
       containers:
         - env:
             - name: POSTGRESQL_USER
-              valueFrom:
-                secretKeyRef:
-                  key: database-user
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-user}}
             - name: POSTGRESQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: database-password
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-password}}
             - name: POSTGRESQL_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  key: database-name
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-name}}
             # https://www.postgresql.org/docs/13/kernel-resources.html#LINUX-MEMORY-OVERCOMMIT
             - name: PG_OOM_ADJUST_FILE
               value: "/proc/self/oom_score_adj"
