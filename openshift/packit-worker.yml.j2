@@ -48,14 +48,11 @@ spec:
       terminationGracePeriodSeconds: 10
       volumes:
         - name: packit-ssh
-          secret:
-            secretName: packit-ssh
+          secret: {secretName: packit-ssh}
         - name: packit-secrets
-          secret:
-            secretName: packit-secrets
+          secret: {secretName: packit-secrets}
         - name: packit-config
-          secret:
-            secretName: packit-config
+          secret: {secretName: packit-config}
       containers:
         - name: packit-worker
           image: packit-worker:{{ deployment }}
@@ -72,31 +69,16 @@ spec:
               value: {{ celery_app }}
             - name: REDIS_SERVICE_HOST
               value: redis
-            - name: SENTRY_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: packit-sentry
-                  key: sentry
             - name: POSTGRESQL_USER
-              valueFrom:
-                secretKeyRef:
-                  key: database-user
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-user}}
             - name: POSTGRESQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: database-password
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-password}}
             - name: POSTGRESQL_HOST
-              valueFrom:
-                secretKeyRef:
-                  key: database-host
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-host}}
             - name: POSTGRESQL_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  key: database-name
-                  name: postgres-secret
+              valueFrom: {secretKeyRef: {name: postgres-secret, key: database-name}}
+            - name: SENTRY_SECRET
+              valueFrom: {secretKeyRef: {name: packit-sentry, key: sentry}}
             - name: CELERY_RETRY_LIMIT
               value: "{{ celery_retry_limit }}"
             - name: CELERY_RETRY_BACKOFF
@@ -106,15 +88,9 @@ spec:
             - name: PUSHGATEWAY_ADDRESS
               value: "{{ pushgateway_address }}"
             - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: aws
-                  key: access-key-id
+              valueFrom: {secretKeyRef: {name: aws, key: access-key-id}}
             - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: aws
-                  key: secret-access-key
+              valueFrom: {secretKeyRef: {name: aws, key: secret-access-key}}
 {% if queues == 'short-running' %}
             - name: CONCURRENCY
               value: "16"
