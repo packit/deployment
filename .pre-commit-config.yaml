@@ -20,7 +20,7 @@ repos:
         args:
           - --allow-missing-credentials
   - repo: https://github.com/ansible/ansible-lint.git
-    rev: v6.0.2
+    rev: v6.2.2
     hooks:
       - id: ansible-lint
         files: \.(yaml|yml)$

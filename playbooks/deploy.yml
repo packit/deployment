@@ -93,7 +93,6 @@
             that:
               - kubeconfig_token.stdout == api_key
             msg: "OpenShift API token defined in vars/ does not match token from your current environment."
-      ignore_errors: true
       tags:
         - always
 
