@@ -93,12 +93,6 @@ metadata:
   name: postgres-config
 data:
   packit.conf: |-
-    # max mem to be used by a query operation (sort/hash table) before writing to temp disk files, default 4MB
-    # work_mem = 4MB
-    # max number of background processes, default 8
-    max_worker_processes = 4
-    # maximum num of autovacuum processes that may be running at any one time, default 3
-    autovacuum_max_workers = 1
     # default is 4.0. Use 1.1 for SSD storage
     random_page_cost = 1.1
     # default is 1. Use hundreds for SSD storage
