@@ -68,11 +68,11 @@ spec:
           resources:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
-              memory: "{{ '512Mi' if deployment == 'prod' else '256Mi' }}"
-              cpu: "{{ '400m' if deployment == 'prod' else '100m' }}"
+              memory: "{{ '1Gi' if project == 'packit-prod' else '128Mi' }}"
+              cpu: "{{ '400m' if project == 'packit-prod' else '100m' }}"
             limits:
-              memory: "{{ '512Mi' if deployment == 'prod' else '256Mi' }}"
-              cpu: "{{ '400m' if deployment == 'prod' else '100m' }}"
+              memory: "{{ '1Gi' if project == 'packit-prod' else '128Mi' }}"
+              cpu: "{{ '400m' if project == 'packit-prod' else '100m' }}"
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/pgsql/data
