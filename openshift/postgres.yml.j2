@@ -93,16 +93,15 @@ metadata:
   name: postgres-config
 data:
   packit.conf: |-
+    # Values based on https://pgtune.leopard.in.ua
     # default is 4.0. Use 1.1 for SSD storage
     random_page_cost = 1.1
     # default is 1. Use hundreds for SSD storage
     effective_io_concurrency = 200
-    # https://www.postgresql.org/docs/current/wal-configuration.html
-    # wal values based on https://pgtune.leopard.in.ua
-    # wal_buffers = -1
-    min_wal_size = 2GB
-    max_wal_size = 8GB
-    # (shared_buffers, effective_cache_size and max_connections are set by env. vars)
+    min_wal_size = 1GB
+    max_wal_size = 4GB
+    # (shared_buffers, effective_cache_size and max_connections can be set by env. vars
+    # https://github.com/sclorg/postgresql-container/tree/generated/13#environment-variables-and-volumes)
 ---
 apiVersion: v1
 kind: Service
