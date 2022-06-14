@@ -24,6 +24,6 @@
 - name: Set deploymentconfigs fact
   ansible.builtin.set_fact:
     # To know what DCs rollouts to wait for and also to check in tests
-    deploymentconfigs: '{{ mandatory_deploymentconfigs + optional_deploymentconfigs|dict2items|selectattr("value", "equalto", true)|list|map(attribute="key")|flatten }}'
+    deploymentconfigs: '{{ mandatory_deploymentconfigs + optional_deploymentconfigs | dict2items | selectattr("value", "equalto", true) | list | map(attribute="key") | flatten }}'
   tags:
     - always
