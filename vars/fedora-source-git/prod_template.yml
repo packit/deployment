@@ -40,6 +40,10 @@ with_sandbox: false
 
 # image to use for worker
 image_worker: quay.io/packit/hardly:{{ deployment }}
+
+# image to use for fluentd sidecar
+# image_fluentd: quay.io/packit/fluentd-splunk-hec:latest
+
 # Path to secrets (in case you don't have it in the root of this project)
 # path_to_secrets: ../secrets
 

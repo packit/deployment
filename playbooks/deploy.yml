@@ -26,6 +26,7 @@
     image_fedmsg: quay.io/packit/packit-service-fedmsg:{{ deployment }}
     image_dashboard: quay.io/packit/dashboard:{{ deployment }}
     image_tokman: quay.io/packit/tokman:{{ deployment }}
+    image_fluentd: quay.io/packit/fluentd-splunk-hec:latest
     # project_dir is set in tasks/project-dir.yml
     path_to_secrets: "{{ project_dir }}/secrets/{{ service }}/{{ deployment }}"
     # to be used in Image streams as importPolicy:scheduled value
@@ -137,6 +138,7 @@
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-sentry.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-postgres.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-aws.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-splunk.yml.j2') }}"
       tags:
         - secrets
 

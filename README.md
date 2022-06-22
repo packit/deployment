@@ -19,6 +19,7 @@ This file documents basic usage, for more info see
   - [Packit service deployment specifics](docs/packit-service.md)
   - [Fedora source-git bot deployment specifics](docs/fedora-source-git.md)
   - [CentOS Stream source-git bot deployment specifics](docs/centos-stream-source-git.md)
+  - [Logs](docs/logs.md) - how we aggregate worker logs and where to find them
 - [playbooks/](playbooks/) - Ansible playbooks
 - [roles/](roles/) - Ansible roles
 - [vars/](vars/) - Variable file(s). See [vars/README.md](vars/README.md).
