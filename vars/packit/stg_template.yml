@@ -30,8 +30,7 @@ api_key: ""
 
 # with_redis_commander: false
 
-# with_flower: false
-
+with_flower: true
 # with_beat: true
 
 # with_dashboard: true

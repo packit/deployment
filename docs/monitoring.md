@@ -2,7 +2,7 @@
 
 ### Pushgateway
 
-To record *packit-service* related metrics from Celery tasks we are going to use
+To record _packit-service_ related metrics from Celery tasks we are going to use
 [Prometheus Pushgateway](https://github.com/prometheus/pushgateway) which is
 [deployed](../openshift/pushgateway.yml.j2) in our cluster.
 It can collect the metrics from the workers and provide the `/metrics` endpoint for Prometheus.
@@ -17,5 +17,6 @@ proxy for the pushgateway, which enables us to allow only `GET` requests and
 forward these to pushgateway (workers can send `POST` requests internally).
 
 ### Flower
-To record *celery* related metrics from Celery tasks we are going to use
+
+To record _celery_ related metrics from Celery tasks we are going to use
 [Flower Prometheus Integration](http://mher.github.io/flower/prometheus-integration.html#prometheus-integration).
