@@ -18,3 +18,4 @@ mock_modules:
   - openssl_certificate
   - openssl_csr
   - openssl_privatekey
+  - htpasswd

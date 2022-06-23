@@ -359,13 +359,31 @@
         - pushgateway
       when: with_pushgateway
 
-    - name: Deploy nginx to reverse proxy the pushgateway
+    - name: Create htpasswd file with flower-boss passwd
+      htpasswd:
+        path: "{{ flower_secret_htpasswd }}"
+        name: "flower-boss"
+        password: "{{ flower_basic_auth | regex_replace('flower-boss:', '') }}"
+        mode: 0640
+      tags:
+        - flower
+      when: with_flower
+
+    - name: Upload flower secret
+      include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-flower-htpasswd.yml.j2') }}"
+      tags:
+        - flower
+      when: with_flower
+
+    - name: Deploy nginx to reverse proxy the pushgateway and flower
       include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/nginx.yml.j2') }}"
       tags:
         - pushgateway
-      when: with_pushgateway
+      when: with_pushgateway and with_flower
 
     - name: Wait for worker-0 to be running
       vars:
