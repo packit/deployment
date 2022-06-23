@@ -1,9 +1,41 @@
-## Secrets
+# Secrets
 
 Deployment process (`make deploy`) expects files to be transformed to
 Openshift secrets to be found in these subdirectories.
 These files are either automatically downloaded (`make download-secrets`)
 or they need to be created manually in case of local/dev/test deployment.
+
+## Update secrets in Bitwarden
+
+Use `scripts/update_bw_secret.sh` to update secrets, and don't have to click
+through the Bitwarden Web UI, deleting and uploading attachments.
+
+Here is the workflow how to do that:
+
+1. Make sure your local copy is up to date. For example:
+
+   ```
+   $ SERVICE=packit DEPLOYMENT=stg make download-secrets
+   ```
+
+2. Edit the secret file you want to update, for example:
+
+   ```
+   $ $EDITOR secrets/packit/stg/packit-service.yaml
+   ```
+
+3. Update the secret in Bitwarden. For example:
+
+   ```
+   $ ./scripts/update_bw_secret.sh secrets/packit/stg/packit-service.yaml
+   ```
+
+The script figures out which Bitwarden item to edit from the path to the file,
+so that needs to be provided as `secrets/<service>/<deployment>/<file>`.
+
+Nothing happens if the file did not change. The script also helps with
+updating the `! Changelog !`: saves the note in a file, opens the file with
+`$EDITOR` to be edited, and updates the note in Bitwarden.
 
 ## What secret files the deployment expects
 
