@@ -37,6 +37,48 @@ Nothing happens if the file did not change. The script also helps with
 updating the `! Changelog !`: saves the note in a file, opens the file with
 `$EDITOR` to be edited, and updates the note in Bitwarden.
 
+## Update secrets in OpenShift
+
+Use `scripts/update_oc_secret.sh` to update secrets directly in OpenShift from
+the command-line.
+
+1. First make sure the local copy of the secret you are updating is in sync
+   with the one stored in Bitwarden, so download the secrets for the service
+   and deployment you want to work on. For example:
+
+   ```
+   $ SERVICE=packit DEPLOYMENT=stg make download-secrets
+   ```
+
+2. Login to OpenShift and select the right project. For example:
+
+   ```
+   $ oc login ...
+   $ oc project packit-stg
+   ```
+
+3. Edit the secret file you want to update. For example:
+
+   ```
+   $ $EDITOR secrets/packit/stg/packit-service.yaml
+   ```
+
+4. Update the secret in OpenShift with the content of the file. You'll need to
+   know the name of the secret. For example:
+
+   ```
+   $ scripts/update_oc_secret.sh packit-config secrets/packit/stg/packit-service.yaml
+   ```
+
+5. Update the secret in Bitwarden. For example:
+
+   ```
+   $ scripts/update_bw_secret.sh secrets/packit/stg/packit-service.yaml
+   ```
+
+Don't forget that you'll need to re-spin the pods using the secret, so that
+they pick up the change.
+
 ## What secret files the deployment expects
 
 Not all services expect all of them. For example source-git services don't need `copr` & `private-key.pem`.
