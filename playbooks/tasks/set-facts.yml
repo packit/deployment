@@ -27,3 +27,8 @@
     deploymentconfigs: '{{ mandatory_deploymentconfigs + optional_deploymentconfigs | dict2items | selectattr("value", "equalto", true) | list | map(attribute="key") | flatten }}'
   tags:
     - always
+- name: Set flower_secret_htpasswd path
+  ansible.builtin.set_fact:
+    flower_secret_htpasswd: "{{ path_to_secrets }}/flower-htpasswd"
+  tags:
+    - flower

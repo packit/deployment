@@ -32,7 +32,7 @@ with_fedmsg: false
 
 with_redis_commander: false
 
-with_flower: false
+with_flower: true
 
 with_beat: false
 
