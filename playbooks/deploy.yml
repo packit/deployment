@@ -359,20 +359,18 @@
         - pushgateway
       when: with_pushgateway
 
-    - name: Create htpasswd file with flower-boss passwd
-      htpasswd:
-        path: "{{ flower_secret_htpasswd }}"
-        name: "flower-boss"
-        password: "{{ flower_basic_auth | regex_replace('flower-boss:', '') }}"
-        mode: 0640
-      tags:
-        - flower
-      when: with_flower
-
-    - name: Upload flower secret
-      include_tasks: tasks/k8s.yml
-      loop:
-        - "{{ lookup('template', '{{ project_dir }}/openshift/secret-flower-htpasswd.yml.j2') }}"
+    - name: Create htpasswd file and deploy it as a secret
+      block:
+        - name: Create htpasswd file
+          htpasswd:
+            path: "{{ flower_secret_htpasswd }}"
+            name: "flower-boss"
+            password: "{{ flower_basic_auth | regex_replace('flower-boss:', '') }}"
+            mode: 0640
+        - name: Deploy flower-htpasswd secret
+          include_tasks: tasks/k8s.yml
+          loop:
+            - "{{ lookup('template', '{{ project_dir }}/openshift/secret-flower-htpasswd.yml.j2') }}"
       tags:
         - flower
       when: with_flower
