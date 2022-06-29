@@ -368,9 +368,13 @@
             password: "{{ flower_basic_auth | regex_replace('flower-boss:', '') }}"
             mode: 0640
         - name: Deploy flower-htpasswd secret
-          include_tasks: tasks/k8s.yml
-          loop:
-            - "{{ lookup('template', '{{ project_dir }}/openshift/secret-flower-htpasswd.yml.j2') }}"
+          # Don't use tasks/k8s.yml here because the loop item is always evaluated
+          k8s:
+            namespace: "{{ project }}"
+            resource_definition: "{{ lookup('template', '{{ project_dir }}/openshift/secret-flower-htpasswd.yml.j2') }}"
+            host: "{{ host }}"
+            api_key: "{{ api_key }}"
+            validate_certs: "{{ validate_certs }}"
       tags:
         - flower
       when: with_flower
