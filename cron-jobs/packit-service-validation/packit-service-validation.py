@@ -170,6 +170,16 @@ class Testcase:
         source_branch = "test_case_opened_pr"
         pr_title = "Basic test case - opened PR trigger"
         ref = f"refs/heads/{source_branch}"
+        # Delete the branch from the previous test run if it exists.
+        existing_branch = project.github_repo.get_git_matching_refs(
+            f"heads/{source_branch}"
+        )
+        if existing_branch.totalCount:
+            existing_branch[0].delete()
+        # Delete the PR from the previous test run if it exists.
+        existing_pr = [pr for pr in project.get_pr_list() if pr.title == pr_title]
+        if len(existing_pr) == 1:
+            existing_pr[0].close()
 
         # create a new branch and commit for the PR
         commit = project.github_repo.get_commit("HEAD")
@@ -183,10 +193,6 @@ class Testcase:
             author=user,
         )
         self.fix_packit_yaml(ref, source_branch)
-
-        existing_pr = [pr for pr in project.get_pr_list() if pr.title == pr_title]
-        if len(existing_pr) == 1:
-            existing_pr[0].close()
 
         self.pr = project.create_pr(
             title=pr_title,
