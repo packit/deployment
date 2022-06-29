@@ -163,6 +163,8 @@ class Testcase:
                 packit_yaml_content,
                 packit_yaml.sha,
                 branch=branch,
+                committer=user,
+                author=user,
             )
 
     def create_pr(self):
