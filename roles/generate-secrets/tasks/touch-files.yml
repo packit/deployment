@@ -10,3 +10,4 @@
   loop:
     - fedora.keytab
     - sentry_key
+    - flower-htpasswd
