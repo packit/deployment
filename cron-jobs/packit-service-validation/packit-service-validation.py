@@ -26,6 +26,8 @@ user = InputGitAuthor(name="Release Bot", email="user-cont-team+release-bot@redh
 logging.basicConfig(level=logging.WARNING)
 
 
+# Everywhere else in the deployment repo environments are called 'prod' and 'stg'.
+# Call them some other name here to avoid accidentally deploying the wrong thing.
 class Deployment(str, enum.Enum):
     production = "production"
     staging = "staging"
@@ -40,6 +42,7 @@ class YamlFix:
 
 @dataclass
 class ProductionInfo:
+    name: str = "prod"
     app_name: str = "Packit-as-a-Service"
     pr_comment: str = "/packit build"
     opened_pr_trigger__packit_yaml_fix: YamlFix = None
@@ -50,10 +53,11 @@ class ProductionInfo:
 
 @dataclass
 class StagingInfo:
+    name: str = "stg"
     app_name = "Packit-as-a-Service-stg"
     pr_comment = "/packit-stg build"
     opened_pr_trigger__packit_yaml_fix = YamlFix(
-        b"---", b'---\npackit_instances: ["stg"]', "Build on staging"
+        b"---", b'---\npackit_instances: ["stg"]', "Build using Packit-stg"
     )
     copr_user = "packit-stg"
     push_trigger_tests_prefix = "Basic test case (stg) - push trigger"
@@ -159,6 +163,8 @@ class Testcase:
                 packit_yaml_content,
                 packit_yaml.sha,
                 branch=branch,
+                committer=user,
+                author=user,
             )
 
     def create_pr(self):
@@ -167,9 +173,19 @@ class Testcase:
         create one and commit some changes before it.
         :return:
         """
-        source_branch = "test_case_opened_pr"
-        pr_title = "Basic test case - opened PR trigger"
+        source_branch = f"test/{self.deployment.name}/opened_pr"
+        pr_title = f"Basic test case ({self.deployment.name}) - opened PR trigger"
         ref = f"refs/heads/{source_branch}"
+        # Delete the branch from the previous test run if it exists.
+        existing_branch = project.github_repo.get_git_matching_refs(
+            f"heads/{source_branch}"
+        )
+        if existing_branch.totalCount:
+            existing_branch[0].delete()
+        # Delete the PR from the previous test run if it exists.
+        existing_pr = [pr for pr in project.get_pr_list() if pr.title == pr_title]
+        if len(existing_pr) == 1:
+            existing_pr[0].close()
 
         # create a new branch and commit for the PR
         commit = project.github_repo.get_commit("HEAD")
@@ -183,10 +199,6 @@ class Testcase:
             author=user,
         )
         self.fix_packit_yaml(ref, source_branch)
-
-        existing_pr = [pr for pr in project.get_pr_list() if pr.title == pr_title]
-        if len(existing_pr) == 1:
-            existing_pr[0].close()
 
         self.pr = project.create_pr(
             title=pr_title,
