@@ -7,6 +7,7 @@
   vars:
     service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
+    path_to_secrets: "{{ project_dir }}/secrets/{{ service }}/{{ deployment }}"
   tasks:
     - include_tasks: tasks/project-dir.yml
 
