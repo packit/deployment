@@ -2,8 +2,18 @@
 # SPDX-License-Identifier: MIT
 
 ---
-# https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
+# Usage:
+#   include_tasks: tasks/k8s.yml
+#   loop:
+#     - "{{ lookup('template', 'object.yml.j2') }}"
+#     - "{{ lookup('file', 'another.yml') }}"
+
+# Limitations:
+# - It doesn't work (reason unknown) together with a 'notify:'.
+# - If used with 'when:' condition the lookups are run even when the 'when:' resolves to False.
+#   https://docs.ansible.com/ansible/latest/user_guide/playbooks_conditionals.html#loops-and-conditionals
 - name: Create k8s object
+  # https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
   k8s:
     namespace: "{{ project }}"
     resource_definition: "{{ item }}"
