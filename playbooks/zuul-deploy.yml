@@ -11,7 +11,7 @@
           - ansible
           - python-openshift
           - python-pip
-          - python3-passlib # for using htpasswd ansible module
+          - python-passlib # for using htpasswd ansible module
           - make
       become: true
 
@@ -42,6 +42,7 @@
           with_tokman: true
           with_beat: true
           with_fedmsg: true
+          with_flower: true
           # TODO: why these two (dashboard, pushgateway) don't work in Zuul? Error msg:
           # "The task includes an option with an undefined variable. The error was: the inline
           # if-expression on line 92/95 evaluated to false and no else section was defined."
