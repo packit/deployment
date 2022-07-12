@@ -228,20 +228,67 @@ def format_date(to_format: date) -> str:
     return f"{month} {day}"
 
 
-def create_blogpost(remote: str, repo_store: str, till: Optional[datetime] = None):
-    till = (till or datetime.today()).date()
+@cli.command(
+    short_help="Create a blog post from commit messages.",
+    help=f"""Create a blog post by collecting release notes from commit
+    messages of repositories of interest, namely: {', '.join(REPOS_FOR_BLOG)}.
 
+    By default do this for the past week. Use --since and --till to gather
+    release notes from some other period.""",
+)
+@click.option(
+    "--remote",
+    default="origin",
+    show_default=True,
+    help="Remote that represents upstream",
+)
+@click.option(
+    "--repo-store",
+    default=DEFAULT_REPO_STORE,
+    show_default=True,
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    help="Path to dir where the repositories are stored",
+)
+@click.option(
+    "--since",
+    default=str(date.today() - timedelta(days=6)),
+    show_default=True,
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="""Date starting with which Git commits are searched for release notes.
+    By default, six days ago.""",
+)
+@click.option(
+    "--till",
+    default=str(date.today()),
+    show_default=True,
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    help="""Date until which Git commits are searched for release notes.
+    By default, today.""",
+)
+def create_blogpost(
+    remote: str,
+    repo_store: str,
+    since: Optional[datetime] = None,
+    till: Optional[datetime] = None,
+):
     click.echo(
         "Here is a template for this week's blogpost (modifications may be needed)\n"
     )
-    # Get the start of the week and its number, we consider Tue - Mon (6 days)
-    since = till - timedelta(days=6)
+    till = (till or datetime.today()).date()
+    since = (since or (till - timedelta(days=6))).date()
     # git-rev-list --since (which iter_commits uses) does a strong comparison of dates,
     # it includes commits more recent than the given date, hence we need to pass in
     # Monday to also include Tuesday.
     git_since = since - timedelta(days=1)
-    week_number = since.isocalendar()[1]
-    click.echo(f"## Week {week_number} ({format_date(since)} - {format_date(till)})\n")
+    since_week_number = since.isocalendar().week
+    # Blog posts are for work done last week, but they might include work
+    # merged this week Monday.
+    till_week_number = till.isocalendar().week - 1
+    if since_week_number != till_week_number:
+        title_text = f"Weeks {since_week_number}–{till_week_number}"
+    else:
+        title_text = f"Week {since_week_number}"
+    click.echo(f"## {title_text} ({format_date(since)}–{format_date(till)})\n")
     for repo in REPOS_FOR_BLOG:
         path_to_repository = Path(repo_store, repo).absolute()
         git_repo = Repo(path_to_repository)
