@@ -158,7 +158,7 @@ def move_repository(repository: str, remote: str, repo_store: str) -> None:
     help="Path to dir where the repositories are stored",
 )
 @click.pass_context
-def move_all(ctx, remote, repo_store: str) -> None:
+def move_all(ctx, remote: str, repo_store: str) -> None:
     if not Path(repo_store).is_dir():
         click.echo(
             click.style(
@@ -173,7 +173,7 @@ def move_all(ctx, remote, repo_store: str) -> None:
             move_repository, repository=repository, remote=remote, repo_store=repo_store
         )
 
-    create_blogpost(remote, repo_store)
+    ctx.invoke(create_blogpost, remote=remote, repo_store=repo_store)
 
 
 @cli.command(
