@@ -23,11 +23,15 @@ REPOSITORIES: List[str] = [
     "tokman",
     "packit-service",
     "hardly",
+    "ogr",
+    "specfile",
 ]
 REPOS_FOR_BLOG: List[str] = [
     "packit",
     "packit-service",
     "dashboard",
+    "ogr",
+    "specfile",
 ]
 STABLE_BRANCH: str = "stable"
 ROLLING_BRANCH: str = "main"
