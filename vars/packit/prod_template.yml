@@ -73,7 +73,7 @@ repository_cache_storage: 10Gi
 # celery_retry_backoff: 3
 
 # Number of worker pods to be deployed to serve the queues
-# workers_all_tasks: 1
+workers_all_tasks: 0
 workers_short_running: 4
 workers_long_running: 2
 # pushgateway_address: http://pushgateway
