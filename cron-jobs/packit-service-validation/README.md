@@ -2,13 +2,12 @@
 
 For the validation of the packit-service we run a validation script every night.
 
-Currently this is deployed in the cyborg project in PSI.
+Currently, this is deployed in the cyborg project in [PSI](https://ocp4.psi.redhat.com/).
 
-[Cron job](./openshift/job-run-validation.yaml) - job for running of the validation script
-
-[Containerfile](./Containerfile) - image used by the job
-
-[packit-service-validation.py](./packit-service-validation.py) - script in the image
+- [Cron job](./openshift/job-run-validation.yml.j2) - cron job for running of the validation script
+- [Containerfile](./Containerfile) - image used by the job
+- [packit-service-validation.py](./packit-service-validation.py) - script (in the image) to run by the Cron job
+- [Playbook](deploy-validation.yaml) - to deploy the cron job & secrets
 
 The script verifies that Copr builds and Testing farm runs are processed correctly for pull requests in `packit/hello-world` repo:
 
@@ -22,12 +21,12 @@ The script verifies that Copr builds and Testing farm runs are processed correct
 
 If you want to deploy the script:
 
-- You have to have a directory with secrets and you need to define path to it [here](./openshift/job-run-validation.yaml)
+- You have to have a directory with secrets and you need to define path to it [here](./deploy-validation.yaml)
   (by default `./secrets`).
 - The directory with secrets needs to contain:
   - `github_token` - Github token for `usercont-release-bot` user; take it from 'Release/usercont bot' item in our Bitwarden vault.
   - `secret_sentry` - Sentry key
-- You have to define your Openshift API token [here](./openshift/job-run-validation.yaml) take it from [PSI](https://ocp4.psi.redhat.com/).
+- You have to define your Openshift API token [here](./deploy-validation.yaml) take it from [PSI](https://ocp4.psi.redhat.com/).
 - If you have everything prepared, you just need to run `DEPLOYMENT=production make deploy`
   or `DEPLOYMENT=staging make deploy` in this directory.
 
