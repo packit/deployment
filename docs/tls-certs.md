@@ -53,7 +53,7 @@ Check/install certbot locally: `dnf install certbot`.
 
 Run certbot:
 
-    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email user-cont-team@redhat.com -d *.packit.dev -d *.stream.packit.dev -d *.fedora-source-git.packit.dev -d *.stg.packit.dev -d *.stg.stream.packit.dev -d *.stg.fedora-source-git.packit.dev
+    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email hello@packit.dev -d *.packit.dev -d *.stream.packit.dev -d *.fedora-source-git.packit.dev -d *.stg.packit.dev -d *.stg.stream.packit.dev -d *.stg.fedora-source-git.packit.dev
 
 You will be asked to set TXT record for every domain requested:
 
@@ -99,17 +99,19 @@ Repeat this for all requested domains.
 `fullchain.pem` and `privkey.pem` from `~/.certbot/live/packit.dev/`
 to `secrets-tls-certs` item in our shared `Packit` collection in Bitwarden vault.
 
-### 5.Re-deploy stg and prod environment:
+### 5.Re-deploy secrets for all services and environments:
 
-#### packit service
+Update `api_key` in `vars/{packit|stream|fedora-source-git}/{prod|stg}.yml` and run:
 
-    DEPLOYMENT=stg make deploy TAGS=secrets
-    DEPLOYMENT=prod make deploy TAGS=secrets
+    SERVICE=<service> DEPLOYMENT=<deployment> make deploy TAGS=secrets
 
-#### source-git bot
+or `oc login <cluster>; oc project <project>` and
 
-    SERVICE={stream|fedora-source-git} DEPLOYMENT=stg make deploy TAGS=secrets
-    SERVICE={stream|fedora-source-git} DEPLOYMENT=prod make deploy TAGS=secrets
+    scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/packit.dev/{fullchain|privkey}.pem
+
+You can also update the `packit-secrets` secret via the web console
+(`Actions` -> `Edit Secret`), but last time it probably (it happened at the same time)
+mangled also the `fedora.keytab`, so just be aware that this might happen.
 
 Restart (scale down and up) `packit-service`, `packit-dashboard` and `nginx` for them to use the new certs.
 
