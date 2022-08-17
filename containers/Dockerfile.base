@@ -6,6 +6,12 @@ FROM fedora:35
 ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
     ANSIBLE_STDOUT_CALLBACK=debug
 
-RUN dnf update -y && \
-    dnf install -y ansible python3-pip python3-packaging && \
-    dnf clean all
+RUN dnf update -y \
+    && dnf install -y \
+      ansible \
+      # this should be removed when the image is upgraded to Fedora 36,
+      # because ansible in F36 already contains the community collection
+      ansible-collection-community-general \
+      python3-pip \
+      python3-packaging \
+    && dnf clean all
