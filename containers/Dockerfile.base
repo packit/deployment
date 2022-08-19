@@ -13,5 +13,4 @@ RUN dnf update -y \
       # because ansible in F36 already contains the community collection
       ansible-collection-community-general \
       python3-pip \
-      python3-packaging \
     && dnf clean all
