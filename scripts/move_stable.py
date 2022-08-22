@@ -289,10 +289,10 @@ def create_blogpost(
     # merged this week Monday.
     till_week_number = till.isocalendar().week - 1
     if since_week_number != till_week_number:
-        title_text = f"Weeks {since_week_number} – {till_week_number}"
+        title_text = f"Weeks {since_week_number}–{till_week_number}"
     else:
         title_text = f"Week {since_week_number}"
-    click.echo(f"## {title_text} ({format_date(since)}–{format_date(till)})\n")
+    click.echo(f"## {title_text} ({format_date(since)} – {format_date(till)})\n")
     for repo in REPOS_FOR_BLOG:
         path_to_repository = Path(repo_store, repo).absolute()
         git_repo = Repo(path_to_repository)
