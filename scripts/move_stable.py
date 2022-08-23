@@ -355,7 +355,14 @@ def push_stable_branch(path_to_repository: Path, remote: str, commit_sha: str) -
 
 
 def specific_instructions(repository: str):
-    if repository == "packit-service":
+    if repository == "packit":
+        click.echo(
+            "Please wait for ogr & specfile builds "
+            "https://copr.fedorainfracloud.org/coprs/packit/packit-stable/builds/ "
+            "before you proceed (it's not strictly needed, but better)."
+        )
+
+    elif repository == "packit-service":
         click.echo(
             "packit-service images install ogr/specfile/packit from "
             "https://copr.fedorainfracloud.org/coprs/packit/packit-stable/builds/ "
