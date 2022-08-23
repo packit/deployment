@@ -16,6 +16,8 @@ import changelog
 
 NAMESPACE: str = "packit"
 REPOSITORIES: List[str] = [
+    "ogr",
+    "specfile",
     "packit",
     "packit-service-fedmsg",
     "sandcastle",
@@ -23,8 +25,6 @@ REPOSITORIES: List[str] = [
     "tokman",
     "packit-service",
     "hardly",
-    "ogr",
-    "specfile",
 ]
 REPOS_FOR_BLOG: List[str] = [
     "packit",
@@ -118,6 +118,8 @@ def move_repository(repository: str, remote: str, repo_store: str) -> None:
 
     get_git_log(path_to_repository, remote, stable_hash, main_hash)
     click.echo()
+
+    specific_instructions(repository)
 
     new_stable_hash = click.prompt(
         f"Enter new hash for {STABLE_BRANCH}", default=main_hash
@@ -289,10 +291,10 @@ def create_blogpost(
     # merged this week Monday.
     till_week_number = till.isocalendar().week - 1
     if since_week_number != till_week_number:
-        title_text = f"Weeks {since_week_number} – {till_week_number}"
+        title_text = f"Weeks {since_week_number}–{till_week_number}"
     else:
         title_text = f"Week {since_week_number}"
-    click.echo(f"## {title_text} ({format_date(since)}–{format_date(till)})\n")
+    click.echo(f"## {title_text} ({format_date(since)} – {format_date(till)})\n")
     for repo in REPOS_FOR_BLOG:
         path_to_repository = Path(repo_store, repo).absolute()
         git_repo = Repo(path_to_repository)
@@ -350,6 +352,24 @@ def push_stable_branch(path_to_repository: Path, remote: str, commit_sha: str) -
         ["git", "branch", "-f", STABLE_BRANCH, commit_sha], cwd=path_to_repository
     )
     subprocess.run(["git", "push", remote, STABLE_BRANCH], cwd=path_to_repository)
+
+
+def specific_instructions(repository: str):
+    if repository == "packit":
+        click.echo(
+            "Please wait for ogr & specfile builds "
+            "https://copr.fedorainfracloud.org/coprs/packit/packit-stable/builds/ "
+            "before you proceed (it's not strictly needed, but better)."
+        )
+
+    elif repository == "packit-service":
+        click.echo(
+            "packit-service images install ogr/specfile/packit from "
+            "https://copr.fedorainfracloud.org/coprs/packit/packit-stable/builds/ "
+            "so make sure the builds are done before you proceed!\n"
+            "You can also proceed now and rebuild the stable images later in "
+            "https://github.com/packit/packit-service/actions"
+        )
 
 
 if __name__ == "__main__":
