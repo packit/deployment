@@ -71,8 +71,7 @@ with_flower: true
 # celery_retry_backoff: 3
 
 # Number of worker pods to be deployed to serve the queues
-# workers_all_tasks: 1
-# workers_short_running: 0
-# workers_long_running: 0
-
+workers_all_tasks: 0
+workers_short_running: 1
+workers_long_running: 1
 # pushgateway_address: http://pushgateway

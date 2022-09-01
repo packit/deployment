@@ -115,6 +115,12 @@ spec:
                 secretKeyRef:
                   name: aws
                   key: secret-access-key
+{% if queues == 'short-running' %}
+            - name: AUTOSCALE
+              value: "8,1"
+            - name: POOL
+              value: gevent
+{% endif %}
           volumeMounts:
             - name: packit-ssh
               mountPath: /packit-ssh
