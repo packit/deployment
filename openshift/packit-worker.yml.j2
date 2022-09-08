@@ -116,8 +116,8 @@ spec:
                   name: aws
                   key: secret-access-key
 {% if queues == 'short-running' %}
-            - name: AUTOSCALE
-              value: "8,1"
+            - name: CONCURRENCY
+              value: "16"
             - name: POOL
               value: gevent
 {% endif %}
