@@ -3,19 +3,24 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+import os
 import re
-from typing import List, Optional
+from typing import Iterable, Optional
 
 import click
 from git import Commit, Repo
+from pathlib import Path
+from ogr import GithubService
 
 NOT_IMPORTANT_VALUES = ["n/a", "none", "none.", ""]
 RELEASE_NOTES_TAG = "RELEASE NOTES"
-RELEASE_NOTES_RE = f"{RELEASE_NOTES_TAG} BEGIN\n(.+)\n{RELEASE_NOTES_TAG} END"
+RELEASE_NOTES_RE = f"{RELEASE_NOTES_TAG} BEGIN\r?\n(.+)\r?\n{RELEASE_NOTES_TAG} END"
 PRE_COMMIT_CI_MESSAGE = "pre-commit autoupdate"
 
 
-def get_relevant_commits(repository: Repo, ref: Optional[str]) -> List[Commit]:
+def get_relevant_commits(
+    repository: Repo, ref: Optional[str] = None
+) -> Iterable[Commit]:
     if not ref:
         tags = sorted(repository.tags, key=lambda t: t.commit.committed_datetime)
         if not tags:
@@ -24,25 +29,18 @@ def get_relevant_commits(repository: Repo, ref: Optional[str]) -> List[Commit]:
                 "the REF must be specified manually."
             )
         ref = tags[-1]
-    range = f"{ref}..HEAD"
-    return list(repository.iter_commits(rev=range, merges=True))
+    ref_range = f"{ref}..HEAD"
+    return repository.iter_commits(rev=ref_range, merges=True)
 
 
-def get_pr_data(message: str, repo: Optional[str] = None) -> str:
+def get_pr_id(message: str) -> str:
     """
-    obtain PR ID and produce a markdown link to it
-
-    if repo is set, creates a markdown link to the given repo (useful for blogposts)
+    obtain PR ID
     """
     # Merge pull request #1483 from majamassarini/fix/1357
     first_line = message.split("\n")[0]
     fourth_word = first_line.split(" ")[3]
-    if repo:
-        pr_id = fourth_word.lstrip("#")
-        url = f"https://github.com/packit/{repo}/pull/{pr_id}"
-        return f"[{repo}#{pr_id}]({url})"
-    else:
-        return fourth_word
+    return fourth_word.lstrip("#")
 
 
 def convert_message(message: str) -> Optional[str]:
@@ -50,22 +48,35 @@ def convert_message(message: str) -> Optional[str]:
     return None if there is no release note"""
     if RELEASE_NOTES_TAG in message:
         # new
-        if match := re.findall(RELEASE_NOTES_RE, message, re.DOTALL):
-            return match[0]
+        if found := re.findall(RELEASE_NOTES_RE, message, re.DOTALL):
+            return found[0].strip()
         else:
             return None
     return None
 
 
-def get_changelog(commits: List[Commit], repo: Optional[str] = None) -> str:
+def get_message_from_pr(repo: str, pr_id: str) -> str:
+    service = GithubService(token=os.getenv("GITHUB_TOKEN"))
+    project = service.get_project(namespace="packit", repo=repo)
+    pr = project.get_pr(pr_id=int(pr_id))
+    return pr.description
+
+
+def get_changelog(commits: Iterable[Commit], repo: str, make_link: bool = False) -> str:
     changelog = ""
     for commit in commits:
         if PRE_COMMIT_CI_MESSAGE in commit.message:
             continue
         message = convert_message(commit.message)
         if message and message.lower() not in NOT_IMPORTANT_VALUES:
-            suffix = get_pr_data(commit.message, repo)
-            changelog += f"- {message} ({suffix})\n"
+            pr_id = get_pr_id(commit.message)
+            message = convert_message(get_message_from_pr(repo, pr_id))
+            if make_link:
+                url = f"https://github.com/packit/{repo}/pull/{pr_id}"
+                pr_id = f"[{repo}#{pr_id}]({url})"
+            else:
+                pr_id = "#" + pr_id
+            changelog += f"- {message} ({pr_id})\n"
     return changelog
 
 
@@ -91,7 +102,8 @@ def get_changelog(commits: List[Commit], repo: Optional[str] = None) -> str:
 )
 @click.argument("ref", type=click.STRING, required=False)
 def changelog(git_repo, ref):
-    print(get_changelog(get_relevant_commits(Repo(git_repo), ref)))
+    repo = Repo(git_repo)
+    print(get_changelog(get_relevant_commits(repo, ref), Path(repo.working_dir).name))
 
 
 if __name__ == "__main__":

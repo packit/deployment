@@ -300,7 +300,7 @@ def create_blogpost(
         git_repo = Repo(path_to_repository)
         main_hash = get_reference(path_to_repository, remote, ROLLING_BRANCH)[:7]
         commits = git_repo.iter_commits(main_hash, merges=True, since=git_since)
-        click.echo(changelog.get_changelog(commits, repo).rstrip())
+        click.echo(changelog.get_changelog(commits, repo, make_link=True).rstrip())
 
 
 def get_reference(path_to_repository: Path, remote: str, branch: str) -> str:
