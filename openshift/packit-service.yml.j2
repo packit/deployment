@@ -86,7 +86,6 @@ spec:
           #     scheme: HTTPS
           #     path: /api/healthz/
           #   initialDelaySeconds: 30
-  # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/basic_deployment_operations.html#image-change-trigger
   triggers:
     - type: ConfigChange
     - type: ImageChange
@@ -140,7 +139,6 @@ spec:
     insecureEdgeTerminationPolicy: Redirect
     termination: passthrough
 ---
-# https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#writing-image-stream-definitions
 kind: ImageStream
 apiVersion: v1
 metadata:

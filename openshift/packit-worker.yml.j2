@@ -41,7 +41,7 @@ spec:
       labels:
         name: {{ name }}
         app: packit
-      # https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#using-is-with-k8s
+      # https://docs.openshift.com/container-platform/4.11/openshift_images/using-imagestreams-with-kube-resources.html
       annotations:
         alpha.image.policy.openshift.io/resolve-names: '*'
     spec:
@@ -118,7 +118,6 @@ spec:
               memory: {{ worker_limits_memory }}
               cpu: {{ worker_limits_cpu }}
 ---
-# https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#writing-image-stream-definitions
 kind: ImageStream
 apiVersion: v1
 metadata:

@@ -5,8 +5,8 @@ we run this cron job to import them (end hence re-deploy) into image streams
 at the day & time (currently at 2AM on Tuesday) we want.
 
 See [job-import-images.yaml](./job-import-images.yaml) and `oc describe cronjob.batch/import-images`.
-The job uses importimager [service account](https://docs.openshift.com/container-platform/3.11/dev_guide/service_accounts.html)
-with `registry-editor` [role](https://docs.openshift.com/container-platform/3.11/admin_guide/manage_rbac.html) role added.
+The job uses importimager service account with `registry-editor`
+[role](https://docs.openshift.com/container-platform/4.11/authentication/using-rbac.html) added.
 
 If you ever needed to re-create it, just do:
 

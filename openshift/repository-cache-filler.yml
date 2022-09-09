@@ -1,7 +1,6 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
-# https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html
 kind: Pod
 apiVersion: v1
 metadata:
