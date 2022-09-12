@@ -40,6 +40,9 @@ spec:
             # https://www.postgresql.org/docs/13/kernel-resources.html#LINUX-MEMORY-OVERCOMMIT
             - name: PG_OOM_ADJUST_FILE
               value: "/proc/self/oom_score_adj"
+            # https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-SHARED-BUFFERS
+            - name: POSTGRESQL_SHARED_BUFFERS
+              value: "{{ '200MB' if project == 'packit-prod' else '32MB' }}"
           image: quay.io/centos7/postgresql-13-centos7
           imagePullPolicy: IfNotPresent
           name: postgres
@@ -69,10 +72,10 @@ spec:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
               memory: "{{ '1Gi' if project == 'packit-prod' else '128Mi' }}"
-              cpu: "{{ '400m' if project == 'packit-prod' else '100m' }}"
+              cpu: "{{ '300m' if project == 'packit-prod' else '100m' }}"
             limits:
               memory: "{{ '1Gi' if project == 'packit-prod' else '128Mi' }}"
-              cpu: "{{ '400m' if project == 'packit-prod' else '100m' }}"
+              cpu: "{{ '300m' if project == 'packit-prod' else '100m' }}"
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/pgsql/data
