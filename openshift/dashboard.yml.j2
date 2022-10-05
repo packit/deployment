@@ -25,6 +25,7 @@ spec:
           volumeMounts:
             - name: packit-secrets
               mountPath: /secrets
+              readOnly: true
           env:
             - name: DEPLOYMENT
               value: {{ deployment }}

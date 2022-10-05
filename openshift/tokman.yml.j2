@@ -48,8 +48,10 @@ spec:
           volumeMounts:
             - name: github-app-private-key
               mountPath: /secrets
+              readOnly: true
             - name: tokman-config
               mountPath: /etc/config
+              readOnly: true
             - name: access-tokens
               mountPath: /access_tokens
           resources:

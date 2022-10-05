@@ -51,8 +51,10 @@ spec:
           volumeMounts:
             - name: packit-secrets
               mountPath: /secrets
+              readOnly: true
             - name: packit-config
               mountPath: /home/packit/.config
+              readOnly: true
           command:
             - /usr/bin/run_httpd.sh
           resources:

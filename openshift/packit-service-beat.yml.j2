@@ -51,10 +51,13 @@ spec:
           volumeMounts:
             - name: packit-ssh
               mountPath: /packit-ssh
+              readOnly: true
             - name: packit-secrets
               mountPath: /secrets
+              readOnly: true
             - name: packit-config
               mountPath: /home/packit/.config
+              readOnly: true
           command:
             - "/usr/bin/run_worker.sh"
           resources:

@@ -34,10 +34,13 @@ spec:
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx
+          readOnly: true
         - name: packit-secrets
           mountPath: /secrets
+          readOnly: true
         - name: flower-secret
           mountPath: /etc/nginx/secrets
+          readOnly: true
         resources:
           # requests and limits have to be the same to have Guaranteed QoS
           requests:

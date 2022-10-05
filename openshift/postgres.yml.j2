@@ -72,6 +72,7 @@ spec:
               mountPath: /var/lib/pgsql/data
             - name: postgres-config
               mountPath: /opt/app-root/src/postgresql-cfg
+              readOnly: true
       restartPolicy: Always
       volumes:
         - name: postgres-data
