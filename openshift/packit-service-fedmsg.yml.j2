@@ -3,7 +3,7 @@
 
 # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   labels:
     app: packit
@@ -17,12 +17,6 @@ spec:
         app: packit
     spec:
       volumes:
-        - name: packit-ssh
-          secret:
-            secretName: packit-ssh
-        - name: packit-secrets
-          secret:
-            secretName: packit-secrets
         - name: packit-config
           secret:
             secretName: packit-config
@@ -37,15 +31,8 @@ spec:
             - name: DEPLOYMENT
               value: {{ deployment }}
             - name: SENTRY_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: packit-sentry
-                  key: sentry
+              valueFrom: {secretKeyRef: {name: packit-sentry, key: sentry}}
           volumeMounts:
-            - name: packit-ssh
-              mountPath: /packit-ssh
-            - name: packit-secrets
-              mountPath: /secrets
             - name: packit-config
               mountPath: /home/packit/.config
           command:
@@ -58,7 +45,6 @@ spec:
             limits:
               memory: "80Mi"
               cpu: "100m"
-  # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/basic_deployment_operations.html#image-change-trigger
   triggers:
     - type: ConfigChange
     - type: ImageChange
@@ -74,7 +60,7 @@ spec:
     type: Recreate
 ---
 kind: ImageStream
-apiVersion: v1
+apiVersion: image.openshift.io/v1
 metadata:
   name: packit-service-fedmsg
 spec:

@@ -41,7 +41,7 @@ spec:
       labels:
         name: {{ name }}
         app: packit
-      # https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#using-is-with-k8s
+      # https://docs.openshift.com/container-platform/4.11/openshift_images/using-imagestreams-with-kube-resources.html
       annotations:
         alpha.image.policy.openshift.io/resolve-names: '*'
     spec:
@@ -100,10 +100,13 @@ spec:
           volumeMounts:
             - name: packit-ssh
               mountPath: /packit-ssh
+              readOnly: true
             - name: packit-secrets
               mountPath: /secrets
+              readOnly: true
             - name: packit-config
               mountPath: /home/packit/.config
+              readOnly: true
 {% if with_repository_cache and 'long-running' in queues %}
             - name: packit-worker-repository-cache
               mountPath: /repository-cache
@@ -118,9 +121,8 @@ spec:
               memory: {{ worker_limits_memory }}
               cpu: {{ worker_limits_cpu }}
 ---
-# https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#writing-image-stream-definitions
 kind: ImageStream
-apiVersion: v1
+apiVersion: image.openshift.io/v1
 metadata:
   name: packit-worker
 spec:

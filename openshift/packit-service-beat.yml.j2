@@ -3,7 +3,7 @@
 
 ---
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   labels:
     app: packit
@@ -51,10 +51,13 @@ spec:
           volumeMounts:
             - name: packit-ssh
               mountPath: /packit-ssh
+              readOnly: true
             - name: packit-secrets
               mountPath: /secrets
+              readOnly: true
             - name: packit-config
               mountPath: /home/packit/.config
+              readOnly: true
           command:
             - "/usr/bin/run_worker.sh"
           resources:

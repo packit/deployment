@@ -3,7 +3,7 @@
 
 # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   labels:
     app: packit
@@ -51,8 +51,10 @@ spec:
           volumeMounts:
             - name: packit-secrets
               mountPath: /secrets
+              readOnly: true
             - name: packit-config
               mountPath: /home/packit/.config
+              readOnly: true
           command:
             - /usr/bin/run_httpd.sh
           resources:
@@ -86,7 +88,6 @@ spec:
           #     scheme: HTTPS
           #     path: /api/healthz/
           #   initialDelaySeconds: 30
-  # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/basic_deployment_operations.html#image-change-trigger
   triggers:
     - type: ConfigChange
     - type: ImageChange
@@ -115,8 +116,8 @@ spec:
       protocol: TCP
       targetPort: 8443
 ---
-apiVersion: route.openshift.io/v1
 kind: Route
+apiVersion: route.openshift.io/v1
 metadata:
   labels:
     app: packit
@@ -140,9 +141,8 @@ spec:
     insecureEdgeTerminationPolicy: Redirect
     termination: passthrough
 ---
-# https://docs.openshift.com/container-platform/3.11/dev_guide/managing_images.html#writing-image-stream-definitions
 kind: ImageStream
-apiVersion: v1
+apiVersion: image.openshift.io/v1
 metadata:
   name: packit-service
 spec:

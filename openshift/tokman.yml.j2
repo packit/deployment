@@ -3,7 +3,7 @@
 
 # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   labels:
     app: packit
@@ -48,8 +48,10 @@ spec:
           volumeMounts:
             - name: github-app-private-key
               mountPath: /secrets
+              readOnly: true
             - name: tokman-config
               mountPath: /etc/config
+              readOnly: true
             - name: access-tokens
               mountPath: /access_tokens
           resources:
@@ -75,7 +77,6 @@ spec:
               port: 8000
             timeoutSeconds: 2
             periodSeconds: 20
-  # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/basic_deployment_operations.html#image-change-trigger
   triggers:
     - type: ConfigChange
     - type: ImageChange
@@ -103,7 +104,7 @@ data:
     TOKEN_RENEW_AT = 60
 ---
 kind: ImageStream
-apiVersion: v1
+apiVersion: image.openshift.io/v1
 metadata:
   name: tokman
 spec:

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 ---
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   name: nginx
   labels:
@@ -34,10 +34,13 @@ spec:
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx
+          readOnly: true
         - name: packit-secrets
           mountPath: /secrets
+          readOnly: true
         - name: flower-secret
           mountPath: /etc/nginx/secrets
+          readOnly: true
         resources:
           # requests and limits have to be the same to have Guaranteed QoS
           requests:
@@ -109,8 +112,8 @@ spec:
   selector:
     service: nginx
 ---
-apiVersion: v1
 kind: Route
+apiVersion: route.openshift.io/v1
 metadata:
   name: nginx
   labels:

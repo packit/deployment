@@ -3,7 +3,7 @@
 
 ---
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   name: packit-dashboard
   labels:
@@ -25,6 +25,7 @@ spec:
           volumeMounts:
             - name: packit-secrets
               mountPath: /secrets
+              readOnly: true
           env:
             - name: DEPLOYMENT
               value: {{ deployment }}
@@ -69,8 +70,8 @@ spec:
   selector:
     service: packit-dashboard
 ---
-apiVersion: v1
 kind: Route
+apiVersion: route.openshift.io/v1
 metadata:
   name: packit-dashboard
 spec:
@@ -85,7 +86,7 @@ spec:
     termination: passthrough
 ---
 kind: ImageStream
-apiVersion: v1
+apiVersion: image.openshift.io/v1
 metadata:
   name: packit-dashboard
 spec:
