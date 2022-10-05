@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 ---
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   name: nginx
   labels:
@@ -109,8 +109,8 @@ spec:
   selector:
     service: nginx
 ---
-apiVersion: v1
 kind: Route
+apiVersion: route.openshift.io/v1
 metadata:
   name: nginx
   labels:

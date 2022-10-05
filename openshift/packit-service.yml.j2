@@ -3,7 +3,7 @@
 
 # https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   labels:
     app: packit
@@ -114,8 +114,8 @@ spec:
       protocol: TCP
       targetPort: 8443
 ---
-apiVersion: route.openshift.io/v1
 kind: Route
+apiVersion: route.openshift.io/v1
 metadata:
   labels:
     app: packit
@@ -140,7 +140,7 @@ spec:
     termination: passthrough
 ---
 kind: ImageStream
-apiVersion: v1
+apiVersion: image.openshift.io/v1
 metadata:
   name: packit-service
 spec:
