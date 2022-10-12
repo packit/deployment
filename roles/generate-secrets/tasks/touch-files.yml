@@ -9,4 +9,3 @@
     mode: 0644
   loop:
     - fedora.keytab
-    - sentry_key

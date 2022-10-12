@@ -47,7 +47,7 @@ spec:
             - name: POSTGRESQL_DATABASE
               valueFrom: {secretKeyRef: {name: postgres-secret, key: database-name}}
             - name: SENTRY_SECRET
-              valueFrom: {secretKeyRef: {name: packit-sentry, key: sentry}}
+              valueFrom: {secretKeyRef: {name: sentry, key: dsn}}
           volumeMounts:
             - name: packit-secrets
               mountPath: /secrets
