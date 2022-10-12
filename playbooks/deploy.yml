@@ -302,20 +302,6 @@
         - redis-commander
       register: redis_commander
 
-    - name: Create flower secret
-      k8s:
-        namespace: "{{ project }}"
-        definition: "{{ lookup('template', '{{ project_dir }}/openshift/secret-flower.yml.j2') }}"
-        host: "{{ host }}"
-        api_key: "{{ api_key }}"
-        validate_certs: "{{ validate_certs }}"
-        apply: true
-      tags:
-        - flower
-      notify:
-        - Rollout flower
-      when: with_flower
-
     - name: Deploy flower
       include_tasks: tasks/k8s.yml
       loop:
@@ -367,7 +353,7 @@
       block:
         - name: Create htpasswd file
           htpasswd:
-            path: "{{ flower_secret_htpasswd }}"
+            path: "{{ flower_htpasswd_path }}"
             name: "flower-boss"
             password: "{{ vault.flower.basic_auth | regex_replace('flower-boss:', '') }}"
             mode: 0640
