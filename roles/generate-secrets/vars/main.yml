@@ -22,7 +22,7 @@ copr_token: <copr_token>
 postgres_host: postgres
 postgres_user: <user>
 postgres_password: <passwd>
-postgres_database_name: <db name>
+postgres_database: <db name>
 redis_commander_user: <user>
 redis_commander_password: <passwd>
 flower_basic_auth: <user>:<passwd>[,<user>:<passwd>]

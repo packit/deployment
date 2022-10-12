@@ -1,10 +1,18 @@
-postgres_user: {{ postgres_user }}
-postgres_password: {{ postgres_password }}
-# instance hostname/url
-postgres_host: {{ postgres_host }}
-postgres_database_name: {{ postgres_database_name }}
-redis_commander_user: {{ redis_commander_user }}
-redis_commander_password: {{ redis_commander_password }}
-flower_basic_auth: {{ flower_basic_auth }}
-aws_access_key_id: ""
-aws_secret_access_key: ""
+postgres:
+    user: {{ postgres_user }}
+    password: {{ postgres_password }}
+    host: {{ postgres_host }}
+    database: {{ postgres_database }}
+redis_commander:
+    user: {{ redis_commander_user }}
+    password: {{ redis_commander_password }}
+flower:
+    basic_auth: {{ flower_basic_auth }}
+aws:
+    access_key_id: ""
+    secret_access_key: ""
+splunk:
+    hec:
+        host: ""
+        port: "443"
+        token: ""

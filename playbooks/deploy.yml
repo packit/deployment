@@ -79,7 +79,9 @@
         - tokman
 
     - name: include extra secret vars
-      ansible.builtin.include_vars: "{{ path_to_secrets }}/extra-vars.yml"
+      ansible.builtin.include_vars:
+        file: "{{ path_to_secrets }}/extra-vars.yml"
+        name: vault
       tags:
         - always
 
@@ -367,7 +369,7 @@
           htpasswd:
             path: "{{ flower_secret_htpasswd }}"
             name: "flower-boss"
-            password: "{{ flower_basic_auth | regex_replace('flower-boss:', '') }}"
+            password: "{{ vault.flower.basic_auth | regex_replace('flower-boss:', '') }}"
             mode: 0640
         - name: Deploy flower-htpasswd secret
           # Don't use tasks/k8s.yml here because the loop item is always evaluated
