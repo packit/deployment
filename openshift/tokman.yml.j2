@@ -99,7 +99,7 @@ data:
   config.py: |-
     SQLALCHEMY_DATABASE_URI = "sqlite:////access_tokens/access_tokens.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    GITHUB_APP_ID = {{ packit_service_config.authentication["github.com"].github_app_id }}
+    GITHUB_APP_ID = {{ vault.packit_service.authentication["github.com"].github_app_id }}
     GITHUB_APP_PRIVATE_KEY = "/secrets/private-key.pem"
     TOKEN_RENEW_AT = 60
 ---

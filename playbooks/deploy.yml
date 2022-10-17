@@ -70,14 +70,6 @@
       tags:
         - always
 
-      # to be able to read the github_app_id from the configuration file in tokman
-    - name: include packit-service configuration
-      ansible.builtin.include_vars:
-        file: "{{ path_to_secrets }}/packit-service.yaml"
-        name: packit_service_config
-      tags:
-        - tokman
-
     - name: include extra secret vars
       ansible.builtin.include_vars:
         file: "{{ path_to_secrets }}/extra-vars.yml"

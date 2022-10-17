@@ -1,9 +1,10 @@
 # Secrets
 
-Deployment process (`make deploy`) expects files to be transformed to
-Openshift secrets to be found in these subdirectories.
-These files are either automatically downloaded (`make download-secrets`)
-or they need to be created manually in case of local/dev/test deployment.
+During deployment (`make deploy`), secret files are downloaded from a vault
+into one of the subdirectories and transformed into Kubernetes/Openshift secrets.
+They can also be downloaded independently with `make download-secrets`.
+By default, these subdirectories contain only templates, which don't contain any secret,
+but which are processes and injected with secrets during the deployment process.
 
 ## Update secrets in Bitwarden
 
@@ -12,7 +13,7 @@ through the Bitwarden Web UI, deleting and uploading attachments.
 
 Here is the workflow how to do that:
 
-1. Make sure your local copy is up to date. For example:
+1. Make sure your local copy is up-to-date. For example:
 
    ```
    $ SERVICE=packit DEPLOYMENT=stg make download-secrets
@@ -85,15 +86,14 @@ Not all services expect all of them. For example source-git services don't need 
 Some of them are pre-filled in the [template](/secrets/template) directory.
 
 - `copr` - Your copr credentials. See pre-filled template in [templates directory](/secrets/template/copr).
-- `extra-vars.yml` - Secrets for Postgresql & Redis.
+- `extra-vars.yml` - tokens, passwords, keys, etc.
 - `fedora.keytab` - Fedora kerberos.
 - `fedora.toml` - [fedora-messaging configuration](https://fedora-messaging.readthedocs.io/en/stable/configuration.html).
 - `fullchain.pem` & `privkey.pem`- Let's encrypt TLS certs.
 - `id_rsa[.pub]` - SSH keys, to push to a git forge.
-- `packit-service.yaml` - Configuration for Packit as a service. See pre-filled template in [templates directory](/secrets/template/packit-service.yaml).
-- `private-key.pem` - Specified in a Github App settings. Used to [sign access token requests](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app).
-- `sentry_key` - Sentry DSN.
-- `ssh_config` - SSH configuration to be able to run fedpkg inside of the OpenShift pod. See pre-filled template in [templates directory](/secrets/template/ssh_config).
+- `packit-service.yaml.j2` - Template for the service/bot configuration with secret values to be taken from `extra-vars.yml`. See pre-filled template in [templates directory](/secrets/template/packit-service.yaml).
+- `private-key.pem` - Specified in a GitHub App settings. Used to [sign access token requests](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app).
+- `ssh_config` - SSH configuration to be able to run fedpkg inside the OpenShift pod. See pre-filled template in [templates directory](/secrets/template/ssh_config).
 
 ## Running a service/bot locally
 
@@ -111,13 +111,14 @@ Local deployment needs some secrets which can be obtained using the steps listed
 The easiest is to download `stg/` secrets (`DEPLOYMENT=stg make download-secrets`),
 copy into `dev/` and do some tweaks there - like:
 
-- `packit-service.yaml`:
+- `packit-service.yaml.j2`:
   - `deployment: stg` -> `deployment: dev`
   - `fas_user: packit` -> `fas_user: your-fas-username`
   - `validate_webhooks: true` -> `validate_webhooks: false`
   - `server_name: stg.packit.dev` -> `server_name: service.localhost:8443`
-  - would be nice to use your tokens/api keys in `authentication`, but it's not crucial since it's for staging instances
-- `sentry_key`: just empty it to not send your devel bugs to Sentry
+- `extra-vars.yml`
+  - would be nice to use your tokens/api keys in `packit_service.authentication`, but it's not crucial since it's for staging instances
+  - `sentry.dsn`: just empty it to not send your devel bugs to Sentry
 - `copr`: would be nice to use [your own token](https://copr.fedorainfracloud.org/api/) if you're planning to build in Copr
 - `fedora.toml`: there's (2x) unique queue uuid which needs to be replaced with a new generated (`uuidgen`) one
   (if you'll run [fedmsg](https://github.com/packit/packit-service-fedmsg))
