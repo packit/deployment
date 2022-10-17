@@ -9,7 +9,7 @@
 project: packit-stg
 
 # Openshift cluster url
-host: https://api.auto-stage.c58b.p1.openshiftapps.com:6443
+host: https://api.auto-prod.gi0n.p1.openshiftapps.com:6443
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
