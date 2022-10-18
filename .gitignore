@@ -11,6 +11,7 @@ secrets/stream/stg/*
 secrets/fedora-source-git/prod/*
 secrets/fedora-source-git/stg/*
 !secrets/**/*.j2
+!secrets/**/ssh_config
 
 # used in move_stable script
 move_stable_repositories
