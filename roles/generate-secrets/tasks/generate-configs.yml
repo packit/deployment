@@ -8,7 +8,7 @@
     dest: "{{ path_to_secrets }}/{{ item }}"
     mode: 0644
   loop:
-    - packit-service.yaml
+    - packit-service.yaml.j2
     - extra-vars.yml
     - fedora.toml
     - copr

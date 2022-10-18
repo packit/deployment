@@ -1,18 +1,25 @@
-postgres:
-    user: {{ postgres_user }}
-    password: {{ postgres_password }}
-    host: {{ postgres_host }}
-    database: {{ postgres_database }}
-redis_commander:
-    user: {{ redis_commander_user }}
-    password: {{ redis_commander_password }}
-flower:
-    basic_auth: {{ flower_basic_auth }}
 aws:
     access_key_id: ""
     secret_access_key: ""
+
+flower:
+    basic_auth: <user>:<passwd>[,<user>:<passwd>]
+
+packit_service: {{ packit_service.authentication }}
+
+postgres:
+    user: <user>
+    password: <passwd>
+    host: postgres
+    database: <db name>
+
+redis_commander:
+    user: <user>
+    password: <passwd>
+
 sentry:
     dsn: ""
+
 splunk:
     hec:
         host: ""

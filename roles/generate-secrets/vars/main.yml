@@ -1,28 +1,16 @@
-# Credentials used to login at https://admin.fedoraproject.org/accounts/
-fas_user: <fas_user>
-fas_passwd: <fas_passwd>
-
-# Get user's API Key from https://src.fedoraproject.org/settings#nav-api-tab
-package_api_key: <package_api_key>
-
-# After creating new github app
-# Also generate and place github app key as private-key.pem under secrets
-github_app_id: 123456
-
-command_handler: local
-server_hostname: localhost
-server_port: "8443"
-
 path_to_secrets: "{{ project_dir }}/secrets/packit/dev"
 
-# Get from https://copr.fedorainfracloud.org/api/
-copr_login: <copr_login>
-copr_token: <copr_token>
+packit_service:
+  authentication:
+    src.fedoraproject.org:
+      instance_url: https://src.fedoraproject.org
+      token: <package_api_key>
+    github.com:
+      github_app_id: "123456"
+      github_app_private_key_path: /secrets/private-key.pem
 
-postgres_host: postgres
-postgres_user: <user>
-postgres_password: <passwd>
-postgres_database: <db name>
-redis_commander_user: <user>
-redis_commander_password: <passwd>
-flower_basic_auth: <user>:<passwd>[,<user>:<passwd>]
+  fas_password: <fas_passwd>
+  webhook_secret: <webhook_secret>
+  testing_farm_secret: <testing-farm-secret>
+  internal_testing_farm_secret: <internal-testing-farm-secret>
+  gitlab_token_secret: <gitlab-token-secret>
