@@ -60,6 +60,9 @@ repository_cache_storage: 10Gi
 # image to use for tokman
 # image_tokman: "quay.io/packit/tokman:{{ deployment }}"
 
+# image to use for fluentd sidecar
+# image_fluentd: quay.io/packit/fluentd-splunk-hec:latest
+
 # Path to secrets (in case you don't have it in the root of this project)
 # path_to_secrets: ../secrets
 

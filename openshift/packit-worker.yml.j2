@@ -34,6 +34,13 @@ spec:
           requests:
             storage: {{ repository_cache_storage }}
 {% endif %}
+    - metadata:
+        name: logs
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
   updateStrategy.type: RollingUpdate
   podManagementPolicy: OrderedReady
   template:
@@ -53,6 +60,8 @@ spec:
           secret: {secretName: packit-secrets}
         - name: packit-config
           secret: {secretName: packit-config}
+        - name: fluentd-config
+          configMap: {name: fluentd-config}
       containers:
         - name: packit-worker
           image: packit-worker:{{ deployment }}
@@ -97,6 +106,9 @@ spec:
             - name: POOL
               value: gevent
 {% endif %}
+            - name: SYSLOG_HOST
+              # localhost doesn't work
+              value: "127.0.0.1"
           volumeMounts:
             - name: packit-ssh
               mountPath: /packit-ssh
@@ -120,6 +132,25 @@ spec:
             limits:
               memory: {{ worker_limits_memory }}
               cpu: {{ worker_limits_cpu }}
+        # See ../docs/logs.md
+        - name: fluentd-sidecar
+          image: fluentd:{{ deployment }}
+          ports:
+            - containerPort: 5140
+              protocol: UDP
+          env:
+            - name: SPLUNK_HEC_HOST
+              valueFrom: {secretKeyRef: {name: splunk, key: hec-host}}
+            - name: SPLUNK_HEC_PORT
+              valueFrom: {secretKeyRef: {name: splunk, key: hec-port}}
+            - name: SPLUNK_HEC_TOKEN
+              valueFrom: {secretKeyRef: {name: splunk, key: hec-token}}
+          volumeMounts:
+            - name: fluentd-config
+              mountPath: /fluentd/etc
+              readOnly: true
+            - name: logs
+              mountPath: /var/log/packit
 ---
 kind: ImageStream
 apiVersion: image.openshift.io/v1
@@ -131,6 +162,51 @@ spec:
       from:
         kind: DockerImage
         name: {{ image_worker }}
+      importPolicy:
+        # Periodically query registry to synchronize tag and image metadata.
+        scheduled: {{ auto_import_images }}
+  lookupPolicy:
+    # allows all resources pointing to this image stream to use it in the image field
+    local: true
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: fluentd-config
+data:
+  fluent.conf: |
+    <system>
+      log_level debug
+    </system>
+    <source>
+      @type syslog
+      <parse>
+        message_format rfc5424
+      </parse>
+      tag packit
+    </source>
+    <match packit.**>
+      @type file
+      path /var/log/packit/
+      compress gzip
+    </match>
+    <match packit.**>
+      @type splunk_hec
+      hec_host "#{ENV['SPLUNK_HEC_HOST']}"
+      hec_port "#{ENV['SPLUNK_HEC_PORT']}"
+      hec_token "#{ENV['SPLUNK_HEC_TOKEN']}"
+    </match>
+---
+kind: ImageStream
+apiVersion: v1
+metadata:
+  name: fluentd
+spec:
+  tags:
+    - name: {{ deployment }}
+      from:
+        kind: DockerImage
+        name: {{ image_fluentd }}
       importPolicy:
         # Periodically query registry to synchronize tag and image metadata.
         scheduled: {{ auto_import_images }}
