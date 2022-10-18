@@ -20,7 +20,7 @@ durable = true
 auto_delete = false
 arguments = {}
 
-[queues.my_queue]
+[queues.{{ fedora_messaging.queue }}]
 durable = true
 auto_delete = false
 exclusive = false
@@ -29,7 +29,7 @@ arguments = {}
 # Note the double brackets below. To add another binding, add another
 # [[bindings]] section. To use multiple routing keys, just expand the list here.
 [[bindings]]
-queue = "my_queue"
+queue = "{{ fedora_messaging.queue }}"
 exchange = "amq.topic"
 routing_keys = ["#"]
 

@@ -14,3 +14,6 @@ packit_service:
   testing_farm_secret: <testing-farm-secret>
   internal_testing_farm_secret: <internal-testing-farm-secret>
   gitlab_token_secret: <gitlab-token-secret>
+
+fedora_messaging:
+  queue: bananas
