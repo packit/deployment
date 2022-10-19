@@ -4,10 +4,14 @@ vars/**/*.yml
 .idea/
 .DS_Store
 
-secrets/packit/
-secrets/stream/
-secrets/fedora-source-git/
-secrets/secrets.yaml
+secrets/packit/prod/*
+secrets/packit/stg/*
+secrets/stream/prod/*
+secrets/stream/stg/*
+secrets/fedora-source-git/prod/*
+secrets/fedora-source-git/stg/*
+!secrets/**/*.j2
+!secrets/**/ssh_config
 
 # used in move_stable script
 move_stable_repositories

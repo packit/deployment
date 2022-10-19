@@ -31,7 +31,7 @@ spec:
             - name: DEPLOYMENT
               value: {{ deployment }}
             - name: SENTRY_SECRET
-              valueFrom: {secretKeyRef: {name: packit-sentry, key: sentry}}
+              valueFrom: {secretKeyRef: {name: sentry, key: dsn}}
           volumeMounts:
             - name: packit-config
               mountPath: /home/packit/.config

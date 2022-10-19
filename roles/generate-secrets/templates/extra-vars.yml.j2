@@ -1,10 +1,29 @@
-postgres_user: {{ postgres_user }}
-postgres_password: {{ postgres_password }}
-# instance hostname/url
-postgres_host: {{ postgres_host }}
-postgres_database_name: {{ postgres_database_name }}
-redis_commander_user: {{ redis_commander_user }}
-redis_commander_password: {{ redis_commander_password }}
-flower_basic_auth: {{ flower_basic_auth }}
-aws_access_key_id: ""
-aws_secret_access_key: ""
+aws:
+    access_key_id: ""
+    secret_access_key: ""
+
+fedora_messaging: {{ fedora_messaging }}
+
+flower:
+    basic_auth: <user>:<passwd>[,<user>:<passwd>]
+
+packit_service: {{ packit_service.authentication }}
+
+postgres:
+    user: <user>
+    password: <passwd>
+    host: postgres
+    database: <db name>
+
+redis_commander:
+    user: <user>
+    password: <passwd>
+
+sentry:
+    dsn: ""
+
+splunk:
+    hec:
+        host: ""
+        port: "443"
+        token: ""

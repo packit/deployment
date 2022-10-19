@@ -21,7 +21,7 @@
   openssl_csr:
     path: "{{ path_to_secrets }}/{{ item.csr }}"
     privatekey_path: "{{ path_to_secrets }}/{{ item.key }}"
-    common_name: "{{ server_hostname }}"
+    common_name: localhost
   loop:
     - { key: privkey.pem, csr: fullchain.csr }
 
