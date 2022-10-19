@@ -34,13 +34,6 @@ spec:
           requests:
             storage: {{ repository_cache_storage }}
 {% endif %}
-    - metadata:
-        name: logs
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 1Gi
   updateStrategy.type: RollingUpdate
   podManagementPolicy: OrderedReady
   template:
@@ -60,8 +53,10 @@ spec:
           secret: {secretName: packit-secrets}
         - name: packit-config
           secret: {secretName: packit-config}
+{% if with_fluentd_sidecar %}
         - name: fluentd-config
           configMap: {name: fluentd-config}
+{% endif %}
       containers:
         - name: packit-worker
           image: packit-worker:{{ deployment }}
@@ -132,6 +127,7 @@ spec:
             limits:
               memory: {{ worker_limits_memory }}
               cpu: {{ worker_limits_cpu }}
+{% if with_fluentd_sidecar %}
         # See ../docs/logs.md
         - name: fluentd-sidecar
           image: fluentd:{{ deployment }}
@@ -149,8 +145,7 @@ spec:
             - name: fluentd-config
               mountPath: /fluentd/etc
               readOnly: true
-            - name: logs
-              mountPath: /var/log/packit
+{% endif %}
 ---
 kind: ImageStream
 apiVersion: image.openshift.io/v1
@@ -168,6 +163,7 @@ spec:
   lookupPolicy:
     # allows all resources pointing to this image stream to use it in the image field
     local: true
+{% if with_fluentd_sidecar %}
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -185,11 +181,6 @@ data:
       </parse>
       tag packit
     </source>
-    <match packit.**>
-      @type file
-      path /var/log/packit/
-      compress gzip
-    </match>
     <match packit.**>
       @type splunk_hec
       hec_host "#{ENV['SPLUNK_HEC_HOST']}"
@@ -213,3 +204,4 @@ spec:
   lookupPolicy:
     # allows all resources pointing to this image stream to use it in the image field
     local: true
+{% endif %}

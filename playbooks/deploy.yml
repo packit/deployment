@@ -21,6 +21,7 @@
     repository_cache_storage: 16Gi
     with_sandbox: true
     push_dev_images: false
+    with_fluentd_sidecar: false
     image: quay.io/packit/packit-service:{{ deployment }}
     image_worker: quay.io/packit/packit-worker:{{ deployment }}
     image_fedmsg: quay.io/packit/packit-service-fedmsg:{{ deployment }}
