@@ -34,13 +34,6 @@ spec:
           requests:
             storage: {{ repository_cache_storage }}
 {% endif %}
-    - metadata:
-        name: logs
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 1Gi
   updateStrategy.type: RollingUpdate
   podManagementPolicy: OrderedReady
   template:
@@ -152,8 +145,6 @@ spec:
             - name: fluentd-config
               mountPath: /fluentd/etc
               readOnly: true
-            - name: logs
-              mountPath: /var/log/packit
 {% endif %}
 ---
 kind: ImageStream
@@ -190,11 +181,6 @@ data:
       </parse>
       tag packit
     </source>
-    <match packit.**>
-      @type file
-      path /var/log/packit/
-      compress gzip
-    </match>
     <match packit.**>
       @type splunk_hec
       hec_host "#{ENV['SPLUNK_HEC_HOST']}"
