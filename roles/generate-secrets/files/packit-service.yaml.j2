@@ -2,15 +2,10 @@
 deployment: dev
 debug: true
 fas_user: <fas_user>
-fas_password: {{ packit_service.fas_password }}
 keytab_path: /secrets/fedora.keytab
-
-authentication: {{ packit_service.authentication }}
-
 validate_webhooks: False
-webhook_secret: {{ packit_service.webhook_secret }}
-testing_farm_secret: {{ packit_service.testing_farm_secret }}
-gitlab_token_secret: {{ packit_service.gitlab_token_secret }}
+
+{{ vault.packit_service | to_nice_yaml }}
 
 command_handler: local
 command_handler_work_dir: /tmp/sandcastle

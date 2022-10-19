@@ -1,19 +1,1 @@
 path_to_secrets: "{{ project_dir }}/secrets/packit/dev"
-
-packit_service:
-  authentication:
-    src.fedoraproject.org:
-      instance_url: https://src.fedoraproject.org
-      token: <package_api_key>
-    github.com:
-      github_app_id: "123456"
-      github_app_private_key_path: /secrets/private-key.pem
-
-  fas_password: <fas_passwd>
-  webhook_secret: <webhook_secret>
-  testing_farm_secret: <testing-farm-secret>
-  internal_testing_farm_secret: <internal-testing-farm-secret>
-  gitlab_token_secret: <gitlab-token-secret>
-
-fedora_messaging:
-  queue: bananas

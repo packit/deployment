@@ -1,0 +1,42 @@
+aws:
+  access_key_id: ""
+  secret_access_key: ""
+
+fedora_messaging:
+  queue: bananas
+
+flower:
+  basic_auth: <user>:<passwd>[,<user>:<passwd>]
+
+packit_service:
+  authentication:
+    src.fedoraproject.org:
+      instance_url: https://src.fedoraproject.org
+      token: <package_api_key>
+    github.com:
+      github_app_id: "123456"
+      github_app_private_key_path: /secrets/private-key.pem
+  fas_password: <fas_passwd>
+  webhook_secret: <webhook_secret>
+  testing_farm_secret: <testing-farm-secret>
+  internal_testing_farm_secret: <internal-testing-farm-secret>
+  gitlab_token_secret: <gitlab-token-secret>
+
+postgres:
+  user: <user>
+  password: <passwd>
+  host: postgres
+  database: <db name>
+
+redis_commander:
+  user: <user>
+  password: <passwd>
+
+sentry:
+  dsn: ""
+
+splunk:
+  hec:
+    host: ""
+    port: "443"
+    token: ""

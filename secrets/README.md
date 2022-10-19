@@ -83,17 +83,17 @@ they pick up the change.
 ## What secret files the deployment expects
 
 Not all services expect all of them. For example source-git services don't need `copr` & `private-key.pem`.
-Some of them are pre-filled in the [template](/secrets/template) directory.
+Check [generate-secrets role](../roles/generate-secrets/files) to see some pre-filled.
 
-- `copr` - Your copr credentials. See pre-filled template in [templates directory](/secrets/template/copr).
+- `copr` - Your copr credentials.
 - `extra-vars.yml` - tokens, passwords, keys, etc.
 - `fedora.keytab` - Fedora kerberos.
 - `fedora.toml` - [fedora-messaging configuration](https://fedora-messaging.readthedocs.io/en/stable/configuration.html).
 - `fullchain.pem` & `privkey.pem`- Let's encrypt TLS certs.
 - `id_rsa[.pub]` - SSH keys, to push to a git forge.
-- `packit-service.yaml.j2` - Template for the service/bot configuration with secret values to be taken from `extra-vars.yml`. See pre-filled template in [templates directory](/secrets/template/packit-service.yaml).
+- `packit-service.yaml.j2` - Template for the service/bot configuration with secret values to be taken from `extra-vars.yml`.
 - `private-key.pem` - Specified in a GitHub App settings. Used to [sign access token requests](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app).
-- `ssh_config` - SSH configuration to be able to run fedpkg inside the OpenShift pod. See pre-filled template in [templates directory](/secrets/template/ssh_config).
+- `ssh_config` - SSH configuration to be able to run fedpkg inside the OpenShift pod.
 
 ## Running a service/bot locally
 
