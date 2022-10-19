@@ -35,6 +35,8 @@ with_repository_cache: false
 
 with_sandbox: false
 
+with_fluentd_sidecar: true
+
 # image to use for service
 # image: quay.io/packit/packit-service:{{ deployment }}
 

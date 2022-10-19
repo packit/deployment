@@ -23,6 +23,9 @@ api_key: ""
 # Check that the current vars file us up to date with the template
 # check_vars_template_diff: true
 
+# you can set the sandbox namespace name explicitly like this
+# sandbox_namespace: packit-prod-sandbox
+
 # with_tokman: true
 
 # if you want to deploy fedmsg, please make sure to
@@ -42,8 +45,7 @@ with_flower: true
 # with_repository_cache: true
 repository_cache_storage: 10Gi
 
-# you can set the sandbox namespace name explicitly like this
-# sandbox_namespace: packit-prod-sandbox
+with_fluentd_sidecar: true
 
 # image to use for service
 # image: quay.io/packit/packit-service:{{ deployment }}
