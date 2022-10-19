@@ -3,8 +3,8 @@
 
 ---
 - name: Generate config files
-  ansible.builtin.template:
-    src: "{{ item }}.j2"
+  ansible.builtin.copy:
+    src: "{{ item }}"
     dest: "{{ path_to_secrets }}/{{ item }}"
     mode: 0644
   loop:
