@@ -5,6 +5,8 @@ into one of the subdirectories and transformed into Kubernetes/Openshift secrets
 They can also be downloaded independently with `make download-secrets`.
 By default, these subdirectories contain only templates, which don't contain any secret,
 but which are processes and injected with secrets during the deployment process.
+If you want to see them rendered before you run the deployment,
+use `make render-secrets-from-templates`.
 
 ## Update secrets in Bitwarden
 
@@ -22,13 +24,13 @@ Here is the workflow how to do that:
 2. Edit the secret file you want to update, for example:
 
    ```
-   $ $EDITOR secrets/packit/stg/packit-service.yaml
+   $ $EDITOR secrets/packit/stg/extra-vars.yml
    ```
 
 3. Update the secret in Bitwarden. For example:
 
    ```
-   $ ./scripts/update_bw_secret.sh secrets/packit/stg/packit-service.yaml
+   $ ./scripts/update_bw_secret.sh secrets/packit/stg/extra-vars.yml
    ```
 
 The script figures out which Bitwarden item to edit from the path to the file,
@@ -43,38 +45,41 @@ updating the `! Changelog !`: saves the note in a file, opens the file with
 Use `scripts/update_oc_secret.sh` to update secrets directly in OpenShift from
 the command-line.
 
-1. First make sure the local copy of the secret you are updating is in sync
-   with the one stored in Bitwarden, so download the secrets for the service
-   and deployment you want to work on. For example:
+1. First make sure the local copies of the secrets are in sync
+   with what's stored in Bitwarden. For example:
 
    ```
    $ SERVICE=packit DEPLOYMENT=stg make download-secrets
    ```
 
-2. Login to OpenShift and select the right project. For example:
+2. Edit the file you want to update. For example:
+
+   ```
+   $ $EDITOR secrets/packit/stg/packit-service.yaml.j2
+   ```
+
+3. Render secret files from the templates:
+
+   ```
+   $ SERVICE=packit DEPLOYMENT=stg make render-secrets-from-templates
+   ```
+
+   This creates `packit-service.yaml` from `packit-service.yaml.j2`
+   (no secret values, stored in public repo) and `extra-vars.yml`
+   (secret values, downloaded from the vault).
+
+4. Login to OpenShift and select the right project. For example:
 
    ```
    $ oc login ...
    $ oc project packit-stg
    ```
 
-3. Edit the secret file you want to update. For example:
-
-   ```
-   $ $EDITOR secrets/packit/stg/packit-service.yaml
-   ```
-
-4. Update the secret in OpenShift with the content of the file. You'll need to
+5. Update the secret in OpenShift with the content of the file. You'll need to
    know the name of the secret. For example:
 
    ```
    $ scripts/update_oc_secret.sh packit-config secrets/packit/stg/packit-service.yaml
-   ```
-
-5. Update the secret in Bitwarden. For example:
-
-   ```
-   $ scripts/update_bw_secret.sh secrets/packit/stg/packit-service.yaml
    ```
 
 Don't forget that you'll need to re-spin the pods using the secret, so that

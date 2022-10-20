@@ -1,6 +1,6 @@
 # Configure projects to be built in custom Copr repositories
 
-By default Packit builds PRs in it's own namespace in Copr. It's possible
+By default, Packit builds PRs in its own namespace in Copr. It's possible
 though to configure it to use a dedicated Copr repository by setting a
 `project` and an `owner` config value.
 
@@ -40,10 +40,10 @@ sure you are doing everything right.
    $ SERVICE=packit DEPLOYMENT=stg make download-secrets
    ```
 
-2. Edit `packit-service.yaml` and add the new mapping.
+2. Edit `packit-service.yaml.j2` and add the new mapping.
 
    ```
-   $ $EDITOR secrets/packit/stg/packit-service.yaml
+   $ $EDITOR secrets/packit/stg/packit-service.yaml.j2
    ```
 
    In case of group owned Copr repos the change is going to look like this:
@@ -66,7 +66,13 @@ sure you are doing everything right.
    There can be multiple GitHub projects allowed to be built in the same Copr
    repo.
 
-   Test that `packit-service.yaml` is a valid YAML. Use Python or
+   Render `packit-service.yaml` from the template:
+
+   ```shell
+   $ SERVICE=packit DEPLOYMENT=stg make render-secrets-from-templates
+   ```
+
+   Test that it is a valid YAML. Use Python or
    [yq](https://github.com/mikefarah/yq) for this.
 
 3. Login to the stage cluster and select the stage namespace:
@@ -82,13 +88,7 @@ sure you are doing everything right.
    $ scripts/update_oc_secret.sh packit-config secrets/packit/stg/packit-service.yaml
    ```
 
-5. Save the new config to Bitwarden:
-
-   ```
-   $ scripts/update_bw_secret.sh secrets/packit/stg/packit-service.yaml
-   ```
-
-6. Respin all the worker pods to pick up the change, by first scaling the
+5. Re-spin all the worker pods to pick up the change, by first scaling the
    stateful sets to 0 replicas, and then scaling them back to the original
    number.
 
@@ -106,9 +106,8 @@ sure you are doing everything right.
 
 This is the same as doing it in stage, just replace `stg` with `prod`.
 
-In prod there might be more types of workers (`packit-worker`,
-`packit-worker-short-running`, `packit-worker-long-running`). All of them
-need to be respinned.
+In prod there might be more types of workers (`packit-worker-short-running`,
+`packit-worker-long-running`). All of them need to be respinned.
 
 ## 4. Let the user know that the change was made
 
