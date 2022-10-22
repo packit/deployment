@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# Script to update the attachement of a secret item in Bitwarden
+# Script to update the attachment of a secret item in Bitwarden
 #
 # Here is the workflow how to do that:
 #

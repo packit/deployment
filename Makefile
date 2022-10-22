@@ -10,6 +10,11 @@ TAGS ?= all
 download-secrets:
 	./scripts/download_secrets.sh
 
+# Mimic what we do during deployment when we render secret files
+# from their templates before we create k8s secrets from them.
+render-secrets-from-templates:
+	./scripts/render_secrets_from_templates.sh
+
 # If you're sure you want to skip the secrets downloading,
 # because for example you just did it and you don't want to wait for it again
 # just set SKIP_SECRETS_SYNC or SSS to any value.
