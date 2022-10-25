@@ -7,7 +7,7 @@
   ansible.builtin.set_fact:
     project_dir: "{{ ansible_user_dir }}/{{ zuul.project.src_dir }}"
   when: zuul is defined
-- name: stat {{ project_dir }}
+- name: Stat {{ project_dir }}
   ansible.builtin.stat:
     path: "{{ project_dir }}"
   tags:

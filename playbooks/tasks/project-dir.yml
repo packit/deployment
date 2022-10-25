@@ -11,7 +11,7 @@
   when: zuul is defined
   tags:
     - always
-- name: stat {{ project_dir }}
+- name: Stat {{ project_dir }}
   ansible.builtin.stat:
     path: "{{ project_dir }}"
   tags:

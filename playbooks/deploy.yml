@@ -57,7 +57,7 @@
       tags:
         - always
 
-    - name: include variables
+    - name: Include variables
       ansible.builtin.include_vars: "{{ project_dir }}/vars/{{ service }}/{{ deployment }}.yml"
       tags:
         - always
@@ -71,7 +71,7 @@
       tags:
         - always
 
-    - name: include extra secret vars
+    - name: Include extra secret vars
       ansible.builtin.include_vars:
         file: "{{ path_to_secrets }}/extra-vars.yml"
         name: vault
@@ -80,11 +80,11 @@
 
     - name: Get k8s token and check it.
       block:
-        - name: get kubeconfig token
+        - name: Get kubeconfig token
           ansible.builtin.command: oc whoami -t
           register: kubeconfig_token
           changed_when: false
-        - name: check if tokens match
+        - name: Check if tokens match
           ansible.builtin.assert:
             that:
               - kubeconfig_token.stdout == api_key
@@ -315,7 +315,7 @@
     - name: Deploy GitHub App Private Key
       k8s:
         namespace: "{{ project }}"
-        resource_definition: "{{ lookup('template', '{{ project_dir }}/openshift/github-app-private-key.yml.j2')  }}"
+        resource_definition: "{{ lookup('template', '{{ project_dir }}/openshift/github-app-private-key.yml.j2') }}"
         host: "{{ host }}"
         api_key: "{{ api_key }}"
         validate_certs: "{{ validate_certs }}"

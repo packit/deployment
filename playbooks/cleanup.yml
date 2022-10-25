@@ -8,19 +8,19 @@
     service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
   tasks:
-    - name: include variables
+    - name: Include variables
       ansible.builtin.include_vars: ../vars/{{ service }}/{{ deployment }}.yml
 
-    - name: oc login
+    - name: Login
       ansible.builtin.command: oc login {{ host }} --token={{ api_key }} --insecure-skip-tls-verify
       # it doesn't change anything, so don't report 'changed'
       changed_when: false
 
-    - name: oc project
+    - name: Switch to project
       ansible.builtin.command: oc project {{ project }}
       # it doesn't change anything, so don't report 'changed'
       changed_when: false
 
-    - name: oc delete all
+    - name: Delete all
       ansible.builtin.command: oc delete all,cm,pvc --all
       when: deployment != "prod"

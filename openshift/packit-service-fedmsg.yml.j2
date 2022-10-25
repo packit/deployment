@@ -35,8 +35,6 @@ spec:
           volumeMounts:
             - name: packit-config
               mountPath: /home/packit/.config
-          command:
-            - "listen-to-fedora-messaging"
           resources:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
