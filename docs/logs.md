@@ -3,10 +3,7 @@
 When a worker pod is restarted (due to image or cluster update), the pod logs are gone.
 To work around this, each worker pod has a sidecar container which runs [Fluentd](https://docs.fluentd.org).
 Fluentd is a data collector which allows us to get the logs from a worker via
-[syslog](https://docs.fluentd.org/input/syslog) and send them someplace to be stored permanently.
-Currently, until we figure out how to send the logs to Splunk,
-we're [sending them to files](https://docs.fluentd.org/output/file) in a persistent volume mount to
-`/var/log/packit/` in the fluentd container.
+[syslog](https://docs.fluentd.org/input/syslog) and send them to Splunk.
 
 We use [our fluentd-splunk-hec image](https://quay.io/repository/packit/fluentd-splunk-hec),
 built via [a workflow](https://github.com/jpopelka/fluent-plugin-splunk-hec/blob/main/.github/workflows/rebuild-and-push-image.yml)
@@ -14,19 +11,37 @@ because we don't want to use [docker.io/splunk/fluentd-hec image](https://hub.do
 
 ### Where do I find the logs?
 
-Select a worker pod -> `Terminal` -> `fluentd sidecar`
+First, you have to [get access to Splunk](https://source.redhat.com/departments/it/splunk/splunk_wiki/faq#jive_content_id_How_do_I_request_access_to_Splunk)
+(CMDB ID is 'PCKT-002').
 
-    $ cd /var/log/packit
-    $ ls -lah
-    $ gzip -d .20221006_0.log.gz
-    $ less .20221006_0.log
+Then go to https://rhcorporate.splunkcloud.com -> `Search & Reporting`
 
-You can see also a `buffer.*.log` file which contains today's logs.
-It'll be flushed and compressed into a permanent gzip file at the end of the day.
+[The more specific search, the faster it'll be](https://source.redhat.com/departments/it/splunk/splunk_wiki/splunk_training_search_best_practices#jive_content_id_Be_more_specific).
+At least, specify `index`, `source` and `msgid`.
+You can start with [this search ](https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20index%3Drh_linux%20source%3Dsyslog%20msgid%3Dpackit-prod)
+and tune it from there.
+For example:
 
-### What is missing?
+- add `| search message!="pidbox*"` to remove the ["pidbox received method" message which Celery pollutes the log with](https://stackoverflow.com/questions/43633914/pidbox-received-method-enable-events-reply-tonone-ticketnone-in-django-cel)
+- add `| reverse` if you want to se the results from oldest to newest
+- add `| fields _time, message | fields - _raw` to leave only time and message fields
 
-The format of the log files is not much readable as it contains all the info from syslog.
-Eventually, we want to send the logs to Splunk.
-Until then, it can happen that the (1Gi) space on the permanent volumes gets depleted.
-To delete old (>7d) log files, run `find /var/log/packit -mtime +7 -delete`.
+All in one URL [here](https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20index%3Drh_linux%20source%3Dsyslog%20msgid%3Dpackit-prod%20%7C%20search%20message!%3D%22pidbox*%22%20%7C%20reverse%20%7C%20fields%20_time%2C%20message%20%7C%20fields%20-%20_raw) -
+now just export it to csv; and you have almost the same log file
+as you'd get by exporting logs from a worker pod.
+
+For more info, see (Red Hat internal):
+
+- [demo](https://drive.google.com/file/d/15BIsRl7fP9bPdyLBQvoljF2yHy52ZqHm)
+- [Splunk wiki @ Source](https://source.redhat.com/departments/it/splunk)
+
+### Debugging
+
+To see the sidecar container logs, select a worker pod -> `Logs` -> `fluentd-sidecar`.
+
+To [manually send some event to Splunk](https://docs.splunk.com/Documentation/SplunkCloud/8.2.2203/Data/UsetheHTTPEventCollector#Send_data_to_HTTP_Event_Collector)
+try this (get the host & token from Bitwarden):
+
+    $ curl -v "https://${SPLUNK_HEC_HOST}:443/services/collector/event" \
+           -H "Authorization: Splunk ${SPLUNK_HEC_TOKEN}" \
+           -d '{"event": "jpopelkastest"}'
