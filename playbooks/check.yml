@@ -11,7 +11,7 @@
   tasks:
     - include_tasks: tasks/project-dir.yml
 
-    - name: include variables
+    - name: Include variables
       ansible.builtin.include_vars: "{{ project_dir }}/vars/{{ service }}/{{ deployment }}.yml"
 
     - name: Getting deploymentconfigs
