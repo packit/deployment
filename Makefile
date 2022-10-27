@@ -8,7 +8,11 @@ AP := ansible-playbook -vv -c local -i localhost, -e ansible_python_interpreter=
 TAGS ?= all
 
 download-secrets:
-	./scripts/download_secrets.sh
+	# Disable the system configuration for OpenSSL, so that older,
+	# deprecated algorithms can be used by Bitwarden CLI.
+	# TODO: Remove this, once the issue below is resolved.
+	# https://github.com/bitwarden/clients/issues/2726#issuecomment-1292153245
+	OPENSSL_CONF= ./scripts/download_secrets.sh
 
 # Mimic what we do during deployment when we render secret files
 # from their templates before we create k8s secrets from them.
