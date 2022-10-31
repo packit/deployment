@@ -6,10 +6,21 @@ Production instance runs in stream-prod project @ auto-prod cluster.
 It serves [redhat/centos-stream/src/ repos](https://gitlab.com/redhat/centos-stream/src/).
 A group webhook is set to send "Merge request events" to [API](https://prod.stream.packit.dev/api/webhooks/gitlab).
 
-Example MRs:
-[dist-git MR](https://gitlab.com/redhat/centos-stream/rpms/luksmeta/-/merge_requests/6)
-created from a
-[source-git MR](https://gitlab.com/redhat/centos-stream/src/luksmeta/-/merge_requests/6).
+#### redhat-internal-test-package
+
+There's a package called `redhat-internal-test-package` whose sole purpose
+of existence is to be used for dist-git / source-git experiments.
+
+- [Upstream](https://github.com/packit/redhat-internal-test-package)
+- [CentOS Stream Dist-git](https://gitlab.com/redhat/centos-stream/rpms/redhat-internal-test-package)
+- [CentOS Stream Source-git](https://gitlab.com/redhat/centos-stream/src/redhat-internal-test-package)
+
+To see how the (production) bot works, fork the
+[source-git repo](https://gitlab.com/redhat/centos-stream/src/redhat-internal-test-package),
+do some update in code, commit, push to your fork,
+and create a merge request against the repo you forked from.
+
+Example: https://gitlab.com/redhat/centos-stream/src/redhat-internal-test-package/-/merge_requests/1
 
 ### Staging
 
