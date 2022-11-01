@@ -5,16 +5,15 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  labels:
-    app: packit
-    name: packit-service-fedmsg
   name: packit-service-fedmsg
 spec:
+  selector:
+    matchLabels:
+      component: packit-service-fedmsg
   template:
     metadata:
       labels:
-        name: packit-service-fedmsg
-        app: packit
+        component: packit-service-fedmsg
     spec:
       volumes:
         - name: packit-config

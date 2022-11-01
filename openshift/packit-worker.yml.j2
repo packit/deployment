@@ -17,8 +17,7 @@ spec:
   selector:
     matchLabels:
       # has to match .spec.template.metadata.labels
-      name: {{ name }}
-      app: packit
+      component: {{ name }}
   serviceName: "{{ name }}"
   replicas: {{ worker_replicas }}
   volumeClaimTemplates:
@@ -39,8 +38,7 @@ spec:
   template:
     metadata:
       labels:
-        name: {{ name }}
-        app: packit
+        component: {{ name }}
       # https://docs.openshift.com/container-platform/latest/openshift_images/using-imagestreams-with-kube-resources.html
       annotations:
         alpha.image.policy.openshift.io/resolve-names: '*'

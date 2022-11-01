@@ -5,16 +5,15 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  labels:
-    app: packit
-    name: tokman
   name: tokman
 spec:
+  selector:
+    matchLabels:
+      component: tokman
   template:
     metadata:
       labels:
-        name: tokman
-        app: packit
+        component: tokman
     spec:
       volumes:
         - name: github-app-private-key
@@ -122,14 +121,13 @@ kind: Service
 metadata:
   name: tokman
 spec:
-  selector:
-    name: tokman
-    app: packit
   ports:
     - name: tokman
       port: 80
       protocol: TCP
       targetPort: 8000
+  selector:
+    component: tokman
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

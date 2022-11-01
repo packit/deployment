@@ -5,16 +5,15 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  labels:
-    app: packit
-    name: packit-service-beat
   name: packit-service-beat
 spec:
+  selector:
+    matchLabels:
+      component: packit-service-beat
   template:
     metadata:
       labels:
-        name: packit-service-beat
-        app: packit
+        component: packit-service-beat
     spec:
       volumes:
         - name: packit-ssh

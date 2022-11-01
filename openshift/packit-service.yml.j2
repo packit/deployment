@@ -5,16 +5,15 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  labels:
-    app: packit
-    name: packit-service
   name: packit-service
 spec:
+  selector:
+    matchLabels:
+      component: packit-service
   template:
     metadata:
       labels:
-        name: packit-service
-        app: packit
+        component: packit-service
     spec:
       volumes:
         - name: packit-secrets
@@ -107,21 +106,17 @@ kind: Service
 metadata:
   name: packit-service
 spec:
-  selector:
-    name: packit-service
-    app: packit
   ports:
     - name: prod-packit
       port: 443
       protocol: TCP
       targetPort: 8443
+  selector:
+    component: packit-service
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  labels:
-    app: packit
-    name: packit-service
   name: packit-service
 spec:
 # for local deployment (dev) creates default route for testing.
