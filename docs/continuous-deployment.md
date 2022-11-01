@@ -8,9 +8,9 @@ as intermediary between an image registry (Quay.io) and a Deployment/StatefulSet
 It has several significant benefits:
 
 - We can automatically trigger Deployment when a new image is pushed to the registry.
-- We can rollback/revert/undo the Deployment.
+- We can roll back/revert/undo the Deployment.
 
-`Image registry` -> [1] -> `ImageStream` -> `DeploymentConfig`/`StatefulSet`
+`Image registry` -> [1] -> `ImageStream` -> `Deployment`/`StatefulSet`
 
 [1] This is automatic (even it can take some time) on stg, but not on prod.
 On prod, where we don't want the images to
@@ -46,13 +46,13 @@ There's also 'import-images' target in the Makefile, so `DEPLOYMENT=prod make im
 
 ### Reverting to older deployment/revision/image
 
-`DeploymentConfig`s can be reverted with `oc rollout undo`:
+`Deployment`s can be reverted with `oc rollout undo`:
 
-    $ oc rollout undo dc/packit-service [--to-revision=X]
-    $ oc rollout undo dc/packit-service-fedmsg [--to-revision=X]
+    $ oc rollout undo deploy/packit-service [--to-revision=X]
+    $ oc rollout undo deploy/packit-service-fedmsg [--to-revision=X]
 
 where `X` is revision number.
-See also `oc rollout history dc/packit-service [--revision=X]`.
+See also `oc rollout history deploy/packit-service [--revision=X]`.
 
 It's more tricky in case of `StatefulSet` which we use for workers.
 `oc rollout undo` does not seem to work with `StatefulSet`

@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: MIT
 
 ---
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: redis-commander
   labels:
