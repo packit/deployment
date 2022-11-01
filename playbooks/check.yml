@@ -9,14 +9,15 @@
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
     path_to_secrets: "{{ project_dir }}/secrets/{{ service }}/{{ deployment }}"
   tasks:
-    - include_tasks: tasks/project-dir.yml
+    - name: Include tasks/project-dir.yml
+      ansible.builtin.include_tasks: tasks/project-dir.yml
 
     - name: Include variables
       ansible.builtin.include_vars: "{{ project_dir }}/vars/{{ service }}/{{ deployment }}.yml"
 
-    - name: Getting deploymentconfigs
-      include_tasks: tasks/set-facts.yml
+    - name: Include tasks/set-facts.yml
+      ansible.builtin.include_tasks: tasks/set-facts.yml
 
-    - name: Checking running pods of {{ deploymentconfigs }}
-      include_tasks: tasks/check-pod-running.yml
+    - name: Include tasks/check-pod-running.yml
+      ansible.builtin.include_tasks: tasks/check-pod-running.yml
       loop: "{{ deploymentconfigs + ['packit-worker'] }}"

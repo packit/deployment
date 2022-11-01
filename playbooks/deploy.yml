@@ -53,7 +53,8 @@
     # used by a few tasks below
     k8s_apply: false
   tasks:
-    - include_tasks: tasks/project-dir.yml
+    - name: Include tasks/project-dir.yml
+      ansible.builtin.include_tasks: tasks/project-dir.yml
       tags:
         - always
 
@@ -62,12 +63,13 @@
       tags:
         - always
 
-    - include_tasks: tasks/check-up-to-date.yml
+    - name: Include tasks/check-up-to-date.yml
+      ansible.builtin.include_tasks: tasks/check-up-to-date.yml
       tags:
         - always
 
-    - name: Getting deploymentconfigs
-      include_tasks: tasks/set-facts.yml
+    - name: Include tasks/set-facts.yml
+      ansible.builtin.include_tasks: tasks/set-facts.yml
       tags:
         - always
 
@@ -125,7 +127,7 @@
         - packit-service-beat
 
     - name: Deploy secrets
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-ssh.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-secrets.yml.j2') }}"
@@ -140,7 +142,7 @@
     - name: Set up sandbox namespace
       block:
         - name: Set finalizers to sandbox namespace
-          include_tasks: tasks/k8s.yml
+          ansible.builtin.include_tasks: tasks/k8s.yml
           loop:
             - "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
         - name: Add edit role to service account in sandbox namespace
@@ -150,25 +152,25 @@
       when: with_sandbox
 
     - name: Deploy postgres
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
-        - "{{ lookup('template', '{{ project_dir }}/openshift/postgres.yml.j2')  }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/postgres.yml.j2') }}"
       tags:
         - postgres
 
     - name: Deploy redis
       vars:
         k8s_apply: true
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('file', '{{ project_dir }}/openshift/redis.yml') }}"
       tags:
         - redis
 
     - name: Deploy packit-service
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
-        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service.yml.j2')  }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service.yml.j2') }}"
       tags:
         - packit-service
 
@@ -197,7 +199,7 @@
         worker_requests_cpu: "100m"
         worker_limits_memory: "1024Mi"
         worker_limits_cpu: "400m"
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
       tags:
@@ -215,7 +217,7 @@
         worker_requests_cpu: "100m"
         worker_limits_memory: "320Mi"
         worker_limits_cpu: "100m"
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
       tags:
@@ -247,7 +249,7 @@
         worker_requests_cpu: "100m"
         worker_limits_memory: "1024Mi"
         worker_limits_cpu: "400m"
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
       tags:
@@ -255,7 +257,7 @@
       when: workers_long_running > 0
 
     - name: Deploy packit-service-beat
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-beat.yml.j2') }}"
       when: with_beat
@@ -263,7 +265,7 @@
         - packit-service-beat
 
     - name: Deploy dashboard
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/dashboard.yml.j2') }}"
       when: with_dashboard
@@ -287,7 +289,7 @@
     - name: Deploy redis-commander
       vars:
         k8s_apply: true
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('file', '{{ project_dir }}/openshift/redis-commander.yml') }}"
       when: with_redis_commander
@@ -296,7 +298,7 @@
       register: redis_commander
 
     - name: Deploy flower
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('file', '{{ project_dir }}/openshift/flower.yml') }}"
       when: with_flower
@@ -305,7 +307,7 @@
       register: flower
 
     - name: Deploy packit-service-fedmsg
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-fedmsg.yml.j2') }}"
       tags:
@@ -326,7 +328,7 @@
       when: with_tokman
 
     - name: Deploy tokman
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/tokman.yml.j2') }}"
       tags:
@@ -335,7 +337,7 @@
       when: with_tokman
 
     - name: Deploy aggregating pushgateway
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/pushgateway.yml.j2') }}"
       tags:
@@ -363,7 +365,7 @@
       when: with_flower
 
     - name: Deploy nginx to reverse proxy the pushgateway and flower
-      include_tasks: tasks/k8s.yml
+      ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/nginx.yml.j2') }}"
       tags:
@@ -373,19 +375,19 @@
     - name: Wait for worker-0 to be running
       vars:
         pod_name: packit-worker-0
-      include_tasks: tasks/wait_for_pod.yml
+      ansible.builtin.include_tasks: tasks/wait_for_pod.yml
       when: workers_all_tasks > 0
 
     - name: Wait for worker-short-running-0 to be running
       vars:
         pod_name: packit-worker-short-running-0
-      include_tasks: tasks/wait_for_pod.yml
+      ansible.builtin.include_tasks: tasks/wait_for_pod.yml
       when: workers_short_running > 0
 
     - name: Wait for worker-long-running-0 to be running
       vars:
         pod_name: packit-worker-long-running-0
-      include_tasks: tasks/wait_for_pod.yml
+      ansible.builtin.include_tasks: tasks/wait_for_pod.yml
       when: workers_long_running > 0
 
     - name: Wait for deploymentconfig rollouts to complete
