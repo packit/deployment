@@ -18,20 +18,20 @@ spec:
     spec:
       containers:
         - name: redis
-          image: quay.io/centos7/redis-5-centos7
+          image: quay.io/sclorg/redis-6-c9s
           ports:
             - containerPort: 6379
           volumeMounts:
-            - mountPath: "/var/lib/redis/data"
+            - mountPath: /var/lib/redis/data
               name: redis-pv
           resources:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
               memory: "80Mi"
-              cpu: "100m"
+              cpu: "30m"
             limits:
               memory: "80Mi"
-              cpu: "100m"
+              cpu: "30m"
       volumes:
         - name: redis-pv
           persistentVolumeClaim:

@@ -1,7 +1,13 @@
 ---
-- include: ./project-dir.yml
-- include: ./create-directories.yml
-- include: ./generate-cert.yml
-- include: ./generate-ssh.yml
-- include: ./generate-configs.yml
-- include: ./touch-files.yml
+- name: Include ./project-dir.yml
+  ansible.builtin.include_tasks: ./project-dir.yml
+- name: Include ./create-directories.yml
+  ansible.builtin.include_tasks: ./create-directories.yml
+- name: Include ./generate-cert.yml
+  ansible.builtin.include_tasks: ./generate-cert.yml
+- name: Include ./generate-ssh.yml
+  ansible.builtin.include_tasks: ./generate-ssh.yml
+- name: Include ./generate-configs.yml
+  ansible.builtin.include_tasks: ./generate-configs.yml
+- name: Include ./touch-files.yml
+  ansible.builtin.include_tasks: ./touch-files.yml

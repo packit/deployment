@@ -17,7 +17,7 @@
   tags:
     - always
   register: src_path
-- name: Make sure {{ project_dir }} is present
+- name: Assert project_dir is present
   ansible.builtin.assert:
     that:
       - src_path.stat.isdir

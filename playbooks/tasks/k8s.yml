@@ -3,7 +3,7 @@
 
 ---
 # Usage:
-#   include_tasks: tasks/k8s.yml
+#   ansible.builtin.include_tasks: tasks/k8s.yml
 #   loop:
 #     - "{{ lookup('template', 'object.yml.j2') }}"
 #     - "{{ lookup('file', 'another.yml') }}"
