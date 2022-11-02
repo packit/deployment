@@ -8,9 +8,7 @@ apiVersion: apps/v1
 metadata:
   name: {{ name }}
   annotations:
-    # Setting triggers to StatefulSet is tricky (they also don't appear in GUI).
-    # I run the following and then checked how the resulting yaml looks like.
-    # oc set triggers statefulset.apps/packit-worker --from-image=packit-worker:dev -c packit-worker
+    # https://docs.openshift.com/container-platform/4.11/openshift_images/triggering-updates-on-imagestream-changes.html
     image.openshift.io/triggers: >-
       [{"from":{"kind":"ImageStreamTag","name":"packit-worker:{{ deployment }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"packit-worker\")].image"}]
 spec:

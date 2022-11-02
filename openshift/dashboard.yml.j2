@@ -6,6 +6,10 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: packit-dashboard
+  annotations:
+    # https://docs.openshift.com/container-platform/4.11/openshift_images/triggering-updates-on-imagestream-changes.html
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"packit-dashboard:{{ deployment }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"packit-dashboard\")].image"}]
 spec:
   selector:
     matchLabels:
@@ -39,17 +43,6 @@ spec:
         - name: packit-secrets
           secret:
             secretName: packit-secrets
-
-  triggers:
-    - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-          - packit-dashboard
-        from:
-          kind: ImageStreamTag
-          name: packit-dashboard:{{ deployment }}
   replicas: 1
   strategy:
     type: Recreate

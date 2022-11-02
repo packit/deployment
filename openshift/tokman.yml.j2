@@ -6,6 +6,10 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: tokman
+  annotations:
+    # https://docs.openshift.com/container-platform/4.11/openshift_images/triggering-updates-on-imagestream-changes.html
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"tokman:{{ deployment }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"tokman\")].image"}]
 spec:
   selector:
     matchLabels:
@@ -73,16 +77,6 @@ spec:
               port: 8000
             timeoutSeconds: 2
             periodSeconds: 20
-  triggers:
-    - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-          - tokman
-        from:
-          kind: ImageStreamTag
-          name: tokman:{{ deployment }}
   replicas: 1
   strategy:
     type: Recreate

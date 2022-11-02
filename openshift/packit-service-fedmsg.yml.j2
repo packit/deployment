@@ -6,6 +6,10 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: packit-service-fedmsg
+  annotations:
+    # https://docs.openshift.com/container-platform/4.11/openshift_images/triggering-updates-on-imagestream-changes.html
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"packit-service-fedmsg:{{ deployment }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"packit-service-fedmsg\")].image"}]
 spec:
   selector:
     matchLabels:
@@ -42,16 +46,6 @@ spec:
             limits:
               memory: "80Mi"
               cpu: "20m"
-  triggers:
-    - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-          - packit-service-fedmsg
-        from:
-          kind: ImageStreamTag
-          name: packit-service-fedmsg:{{ deployment }}
   replicas: 1
   strategy:
     type: Recreate
