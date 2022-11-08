@@ -2,6 +2,13 @@
 
 # Script to update the attachment of a secret item in Bitwarden
 #
+# Due to an [issue with Bitwarden CLI](https://github.com/bitwarden/clients/issues/2726),
+# set `OPENSSL_CONF` as an empty variable if using Fedora Linux,
+# in order to allow older, deprecated cryptographic algorithms to be used.
+# Without this `scripts/update_bw_secret.sh` will not work.
+#
+#    $ export OPENSSL_CONF=
+#
 # Here is the workflow how to do that:
 #
 # 1. Make sure your local copy is up to date. For example:
@@ -10,11 +17,11 @@
 #
 # 2. Edit the secret file you want to update, for example:
 #
-#     $ $EDITOR secrets/packit/stg/packit-service.yaml
+#     $ $EDITOR secrets/packit/stg/extra-vars.yml
 #
 # 3. Update the secret in Bitwarden. For example:
 #
-#     $ ./scripts/update_bw_secret.sh secrets/packit/stg/packit-service.yaml
+#     $ ./scripts/update_bw_secret.sh secrets/packit/stg/extra-vars.yml
 #
 # The script figures out which Bitwarden item to edit from the path to the file,
 # so that needs to be provided as `secrets/<service>/<deployment>/<file>`.
