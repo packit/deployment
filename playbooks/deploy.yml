@@ -80,7 +80,9 @@
       tags:
         - always
 
-    - name: Get k8s token and check it.
+    - name: Get k8s token and check it
+      tags:
+        - always
       block:
         - name: Get kubeconfig token
           ansible.builtin.command: oc whoami -t
@@ -91,13 +93,17 @@
             that:
               - kubeconfig_token.stdout == api_key
             msg: "OpenShift API token defined in vars/ does not match token from your current environment."
-      tags:
-        - always
 
     - name: Push dev images to local registry
+      when: push_dev_images
+      tags:
+        - packit-service
+        - packit-worker
+        - packit-service-beat
       block:
-        - name: Set --tls-verify=false if podman is used
-          ansible.builtin.set_fact: tls_verify_false="{{ '--tls-verify=false' if 'podman' in container_engine else '' }}"
+        - name: Set tls-verify to false if podman is used
+          ansible.builtin.set_fact:
+            tls_verify_false: "{{ '--tls-verify=false' if 'podman' in container_engine else '' }}"
           changed_when: false
         - name: Login to local cluster
           ansible.builtin.shell: "{{ container_engine }} login -u developer -p $(oc whoami -t) 172.30.1.1:5000 {{ tls_verify_false }}"
@@ -120,11 +126,6 @@
         - name: Push the image
           ansible.builtin.command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-worker:dev {{ tls_verify_false }}"
           changed_when: true
-      when: push_dev_images
-      tags:
-        - packit-service
-        - packit-worker
-        - packit-service-beat
 
     - name: Deploy secrets
       ansible.builtin.include_tasks: tasks/k8s.yml
@@ -140,6 +141,7 @@
         - secrets
 
     - name: Set up sandbox namespace
+      when: with_sandbox
       block:
         - name: Set finalizers to sandbox namespace
           ansible.builtin.include_tasks: tasks/k8s.yml
@@ -149,7 +151,6 @@
           ansible.builtin.command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
           register: rolebinding
           changed_when: "'added:' in rolebinding.stdout"
-      when: with_sandbox
 
     - name: Deploy postgres
       ansible.builtin.include_tasks: tasks/k8s.yml
@@ -345,6 +346,9 @@
       when: with_pushgateway
 
     - name: Create htpasswd file and deploy it as a secret
+      tags:
+        - flower
+      when: with_flower
       block:
         - name: Create htpasswd file
           htpasswd:
@@ -360,9 +364,6 @@
             host: "{{ host }}"
             api_key: "{{ api_key }}"
             validate_certs: "{{ validate_certs }}"
-      tags:
-        - flower
-      when: with_flower
 
     - name: Deploy nginx to reverse proxy the pushgateway and flower
       ansible.builtin.include_tasks: tasks/k8s.yml
