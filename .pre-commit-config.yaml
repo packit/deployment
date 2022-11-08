@@ -28,6 +28,10 @@ repos:
     rev: 22.6.0
     hooks:
       - id: black
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.8.0.4
+    hooks:
+      - id: shellcheck
 
 ci:
   # The project is too huge for pre-commit.ci

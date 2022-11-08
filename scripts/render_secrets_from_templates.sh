@@ -13,4 +13,4 @@ set -euo pipefail
 DEFAULT_PATH_TO_SECRETS="secrets/${SERVICE}/${DEPLOYMENT}/"
 : "${PATH_TO_SECRETS:=$DEFAULT_PATH_TO_SECRETS}"
 
-ansible-playbook -v -c local -i localhost, -e path_to_secrets=$(realpath "${PATH_TO_SECRETS}") playbooks/render_secrets_from_templates.yml
+ansible-playbook -v -c local -i localhost, -e path_to_secrets="$(realpath "${PATH_TO_SECRETS}")" playbooks/render_secrets_from_templates.yml

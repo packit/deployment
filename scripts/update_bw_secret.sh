@@ -36,7 +36,7 @@ test -f "$SECRET_FILE" || { echo "Secret file not found: $SECRET_FILE"; exit 1; 
 
 ITEM_ID=$(bw get item "$SECRET_NAME" | jq -r '.id')
 SECRET_NAME=$(bw get item "$SECRET_NAME" | jq -r '.name')
-ATTACHMENT_ID=$(bw get item "$ITEM_ID" | jq -r '.attachments[] | select(.fileName=="'${ATTACHMENT_NAME}'") | .id')
+ATTACHMENT_ID=$(bw get item "$ITEM_ID" | jq -r '.attachments[] | select(.fileName=="'"${ATTACHMENT_NAME}"'") | .id')
 
 test -n "$SECRET_NAME" || { echo "No secret name"; exit 1; }
 test -n "$ITEM_ID" || { echo "$SECRET_NAME has no ID"; exit 1; }
@@ -68,7 +68,7 @@ else
 
             bw delete attachment --itemid "$ITEM_ID" "$ATTACHMENT_ID" && echo "---> Attachment deleted"
             bw create attachment --itemid "$ITEM_ID" --file "$SECRET_FILE" && echo -e "\n---> Attachment re-created"
-            bw get item "$CHANGELOG_ID" | jq ".notes=$(cat .secrets.changelog | jq -sR)" | bw encode | bw edit item "$CHANGELOG_ID"
+            bw get item "$CHANGELOG_ID" | jq ".notes=$(jq -sR < .secrets.changelog)" | bw encode | bw edit item "$CHANGELOG_ID"
 
             rm -f .secrets.changelog .secrets.changelog.old
         };;
