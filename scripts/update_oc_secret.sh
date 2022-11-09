@@ -18,5 +18,5 @@
 
 set -euo pipefail
 
-DATA=$(basename $2)
-oc get secrets/$1 -o json | jq -r ".data.\"${DATA}\"=$(cat $2 | base64 -w0 | jq -sR)" | oc apply -f -
+DATA=$(basename "$2")
+oc get secrets/"$1" -o json | jq -r ".data.\"${DATA}\"=$(base64 -w0 < "$2" | jq -sR)" | oc apply -f -

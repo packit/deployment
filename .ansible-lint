@@ -6,6 +6,7 @@ skip_list:
 
 warn_list:
   - command-instead-of-module  # sometimes this is desired
+  - fqcn[action] # htpasswd -> community.general.web_infrastructure.htpasswd
 
 mock_modules:
   # k8s module was moved to community.kubernetes collection in ansible 2.10

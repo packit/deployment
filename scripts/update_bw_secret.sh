@@ -2,6 +2,13 @@
 
 # Script to update the attachment of a secret item in Bitwarden
 #
+# Due to an [issue with Bitwarden CLI](https://github.com/bitwarden/clients/issues/2726),
+# set `OPENSSL_CONF` as an empty variable if using Fedora Linux,
+# in order to allow older, deprecated cryptographic algorithms to be used.
+# Without this `scripts/update_bw_secret.sh` will not work.
+#
+#    $ export OPENSSL_CONF=
+#
 # Here is the workflow how to do that:
 #
 # 1. Make sure your local copy is up to date. For example:
@@ -10,11 +17,11 @@
 #
 # 2. Edit the secret file you want to update, for example:
 #
-#     $ $EDITOR secrets/packit/stg/packit-service.yaml
+#     $ $EDITOR secrets/packit/stg/extra-vars.yml
 #
 # 3. Update the secret in Bitwarden. For example:
 #
-#     $ ./scripts/update_bw_secret.sh secrets/packit/stg/packit-service.yaml
+#     $ ./scripts/update_bw_secret.sh secrets/packit/stg/extra-vars.yml
 #
 # The script figures out which Bitwarden item to edit from the path to the file,
 # so that needs to be provided as `secrets/<service>/<deployment>/<file>`.
@@ -36,7 +43,7 @@ test -f "$SECRET_FILE" || { echo "Secret file not found: $SECRET_FILE"; exit 1; 
 
 ITEM_ID=$(bw get item "$SECRET_NAME" | jq -r '.id')
 SECRET_NAME=$(bw get item "$SECRET_NAME" | jq -r '.name')
-ATTACHMENT_ID=$(bw get item "$ITEM_ID" | jq -r '.attachments[] | select(.fileName=="'${ATTACHMENT_NAME}'") | .id')
+ATTACHMENT_ID=$(bw get item "$ITEM_ID" | jq -r '.attachments[] | select(.fileName=="'"${ATTACHMENT_NAME}"'") | .id')
 
 test -n "$SECRET_NAME" || { echo "No secret name"; exit 1; }
 test -n "$ITEM_ID" || { echo "$SECRET_NAME has no ID"; exit 1; }
@@ -68,7 +75,7 @@ else
 
             bw delete attachment --itemid "$ITEM_ID" "$ATTACHMENT_ID" && echo "---> Attachment deleted"
             bw create attachment --itemid "$ITEM_ID" --file "$SECRET_FILE" && echo -e "\n---> Attachment re-created"
-            bw get item "$CHANGELOG_ID" | jq ".notes=$(cat .secrets.changelog | jq -sR)" | bw encode | bw edit item "$CHANGELOG_ID"
+            bw get item "$CHANGELOG_ID" | jq ".notes=$(jq -sR < .secrets.changelog)" | bw encode | bw edit item "$CHANGELOG_ID"
 
             rm -f .secrets.changelog .secrets.changelog.old
         };;
