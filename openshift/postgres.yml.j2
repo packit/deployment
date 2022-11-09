@@ -36,7 +36,7 @@ spec:
               value: "/proc/self/oom_score_adj"
             # https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-SHARED-BUFFERS
             - name: POSTGRESQL_SHARED_BUFFERS
-              value: "{{ '200MB' if project == 'packit-prod' else '32MB' }}"
+              value: "{{ '242MB' if project == 'packit-prod' else '32MB' }}"
           ports:
             - containerPort: 5432
               protocol: TCP
@@ -62,10 +62,10 @@ spec:
           resources:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
-              memory: "{{ '1Gi' if project == 'packit-prod' else '128Mi' }}"
+              memory: "{{ '1.5Gi' if project == 'packit-prod' else '128Mi' }}"
               cpu: "{{ '300m' if project == 'packit-prod' else '100m' }}"
             limits:
-              memory: "{{ '1Gi' if project == 'packit-prod' else '128Mi' }}"
+              memory: "{{ '1.5Gi' if project == 'packit-prod' else '128Mi' }}"
               cpu: "{{ '300m' if project == 'packit-prod' else '100m' }}"
           volumeMounts:
             - name: postgres-data
