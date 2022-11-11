@@ -5,12 +5,6 @@
 - name: Check deployment
   hosts: all
   tasks:
-    - name: Run 'make check'
-      ansible.builtin.command: make check
-      environment:
-        DEPLOYMENT: dev
-        ANSIBLE_STDOUT_CALLBACK: debug
-      args:
-        chdir: "{{ zuul.project.src_dir }}"
-      become: true
+    - name: noop
+      ansible.builtin.command: echo ok
       changed_when: false

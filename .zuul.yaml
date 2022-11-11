@@ -2,19 +2,17 @@
 - project:
     check:
       jobs:
-        - pre-commit
-    #        - deployment-tests
-    gate:
-      jobs:
-        - pre-commit
+        - deployment-tests
 
 - job:
     name: deployment-tests
-    parent: oc-cluster-up
+    parent: base
     description: Deploy and check
     extra-vars:
       deployment: dev
-    pre-run:
-      - playbooks/generate-local-secrets.yml
-      - playbooks/zuul-deploy.yml
     run: playbooks/zuul-check.yml
+    ansible-version: 5.9.0
+    nodeset:
+      nodes:
+        - name: container
+          label: cloud-fedora-37
