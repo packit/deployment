@@ -18,7 +18,7 @@
   tasks:
     - name: Deploy secrets
       # https://github.com/ansible-collections/kubernetes.core
-      k8s:
+      kubernetes.core.k8s:
         namespace: "{{ project }}"
         definition: "{{ item }}"
         host: "{{ host }}"
@@ -31,7 +31,7 @@
         - always
 
     - name: Deploy cron job for running validation script
-      k8s:
+      kubernetes.core.k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', './openshift/job-run-validation.yml.j2')  }}"
         host: "{{ host }}"

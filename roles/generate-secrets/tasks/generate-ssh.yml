@@ -3,5 +3,5 @@
 
 ---
 - name: Generate an OpenSSH keypair with the default values (4096 bits, rsa)
-  openssh_keypair:
+  community.crypto.openssh_keypair:
     path: "{{ path_to_secrets }}/id_rsa"

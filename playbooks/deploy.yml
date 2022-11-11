@@ -178,7 +178,7 @@
     - name: Deploy repository cache PVCs for packit-workers that serves both queues
       vars:
         name: "packit-worker-{{ item }}"
-      k8s:
+      kubernetes.core.k8s:
         namespace: "{{ sandbox_namespace }}"
         definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandcastle-volumes-for-cache.yml.j2') }}"
         host: "{{ host }}"
@@ -228,7 +228,7 @@
     - name: Deploy repository cache PVCs for packit-workers that serves long-running queue
       vars:
         name: "packit-worker-long-running-{{ item }}"
-      k8s:
+      kubernetes.core.k8s:
         namespace: "{{ sandbox_namespace }}"
         definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandcastle-volumes-for-cache.yml.j2') }}"
         host: "{{ host }}"
@@ -274,7 +274,7 @@
         - dashboard
 
     - name: Create redis-commander secrets
-      k8s:
+      kubernetes.core.k8s:
         namespace: "{{ project }}"
         definition: "{{ lookup('template', '{{ project_dir }}/openshift/secret-redis-commander.yml.j2') }}"
         host: "{{ host }}"
@@ -316,7 +316,7 @@
       when: with_fedmsg
 
     - name: Deploy GitHub App Private Key
-      k8s:
+      kubernetes.core.k8s:
         namespace: "{{ project }}"
         resource_definition: "{{ lookup('template', '{{ project_dir }}/openshift/github-app-private-key.yml.j2') }}"
         host: "{{ host }}"
@@ -351,14 +351,14 @@
       when: with_flower
       block:
         - name: Create htpasswd file
-          htpasswd:
+          community.general.htpasswd:
             path: "{{ flower_htpasswd_path }}"
             name: "flower-boss"
             password: "{{ vault.flower.basic_auth | regex_replace('flower-boss:', '') }}"
             mode: 0640
         - name: Deploy flower-htpasswd secret
           # Don't use tasks/k8s.yml here because the loop item is always evaluated
-          k8s:
+          kubernetes.core.k8s:
             namespace: "{{ project }}"
             resource_definition: "{{ lookup('template', '{{ project_dir }}/openshift/secret-flower-htpasswd.yml.j2') }}"
             host: "{{ host }}"
