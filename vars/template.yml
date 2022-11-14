@@ -41,6 +41,8 @@ api_key: ""
 
 # with_repository_cache: true
 
+# with_fluentd_sidecar: false
+
 # you can set the sandbox namespace name explicitly like this
 # sandbox_namespace: packit-prod-sandbox
 
