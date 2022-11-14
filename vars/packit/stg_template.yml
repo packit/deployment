@@ -40,6 +40,8 @@ with_flower: true
 # with_repository_cache: true
 # repository_cache_storage: 16Gi
 
+with_fluentd_sidecar: true
+
 # you can set the sandbox namespace name explicitly like this
 # sandbox_namespace: packit-stg-sandbox
 

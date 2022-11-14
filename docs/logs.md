@@ -22,6 +22,7 @@ You can start with [this search ](https://rhcorporate.splunkcloud.com/en-US/app/
 and tune it from there.
 For example:
 
+- change `msgid=packit-prod` to service instance you want to see logs from, e.g. to `msgid=packit-stg` or `msgid=stream-prod`
 - add `| search message!="pidbox*"` to remove the ["pidbox received method" message which Celery pollutes the log with](https://stackoverflow.com/questions/43633914/pidbox-received-method-enable-events-reply-tonone-ticketnone-in-django-cel)
 - add `| reverse` if you want to se the results from oldest to newest
 - add `| fields _time, message | fields - _raw` to leave only time and message fields
