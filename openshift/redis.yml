@@ -27,11 +27,11 @@ spec:
           resources:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
-              memory: "80Mi"
-              cpu: "30m"
+              memory: "32Mi"
+              cpu: "10m"
             limits:
-              memory: "80Mi"
-              cpu: "30m"
+              memory: "32Mi"
+              cpu: "10m"
       volumes:
         - name: redis-pv
           persistentVolumeClaim:

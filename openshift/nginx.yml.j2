@@ -44,11 +44,11 @@ spec:
         resources:
           # requests and limits have to be the same to have Guaranteed QoS
           requests:
-            memory: "80Mi"
-            cpu: "50m"
+            memory: "32Mi"
+            cpu: "10m"
           limits:
-            memory: "80Mi"
-            cpu: "50m"
+            memory: "32Mi"
+            cpu: "10m"
   replicas: 1
   strategy:
     type: Recreate
