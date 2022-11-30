@@ -39,10 +39,10 @@ spec:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
               memory: "80Mi"
-              cpu: "100m"
+              cpu: "20m"
             limits:
               memory: "80Mi"
-              cpu: "100m"
+              cpu: "20m"
   triggers:
     - type: ConfigChange
     - type: ImageChange

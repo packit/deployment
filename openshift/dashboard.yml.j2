@@ -33,10 +33,10 @@ spec:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
               memory: "128Mi"
-              cpu: "100m"
+              cpu: "20m"
             limits:
               memory: "128Mi"
-              cpu: "100m"
+              cpu: "20m"
       volumes:
         - name: packit-secrets
           secret:
