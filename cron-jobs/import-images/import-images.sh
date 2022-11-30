@@ -11,6 +11,7 @@ NAMESPACE="${NAMESPACE:-$DEFAULT_NAMESPACE}"
 
 oc import-image is/packit-service:"${DEPLOYMENT}" -n "${NAMESPACE}"
 oc import-image is/packit-worker:"${DEPLOYMENT}" -n "${NAMESPACE}"
+oc import-image is/fluentd:"${DEPLOYMENT}" -n "${NAMESPACE}"
 
 if [[ "${SERVICE}" == "packit" ]]; then
   oc import-image is/packit-dashboard:"${DEPLOYMENT}" -n "${NAMESPACE}"
