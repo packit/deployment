@@ -43,8 +43,46 @@ command_handler_pvc_volume_specs:
   - For the worker's volume, you can `oc rsh` to the worker pod to get to the
     volume.
   - To populate volumes attached to sandbox pods, you can wait for some action
-    to be executed or create a new pod (e.g. `oc create -f ./openshift/repository-cache-filler.yml` using and adjusting the name of
-    the volume in [this definition](./openshift/repository-cache-filler.yml))
+    to be executed or create a new pod (e.g.
+    `oc create -f ./openshift/repository-cache-filler.yml`
+    using and adjusting the name of
+    the volume in [this definition](../openshift/repository-cache-filler.yml))
     with the volume attached. This will block the creation of the sandbox pods
     because the volume can't be mounted from multiple pods, so don't forget to
     delete the pod after you finished populating the cache.
+
+### Staging instance
+
+Runs on the same cluster as production, but there are a few slight differences.
+
+There are fewer workers and some components (namely `postgres`) have less resources.
+
+The namespace has a default
+[taint toleration](<(https://docs.openshift.com/container-platform/latest/nodes/scheduling/nodes-scheduler-taints-tolerations.html)>)
+
+```yaml
+scheduler.alpha.kubernetes.io/defaultTolerations:
+  [
+    {
+      "key": "environment",
+      "operator": "Equal",
+      "value": "stage",
+      "effect": "NoSchedule",
+    },
+  ]
+```
+
+(see `oc describe namespace packit-stg`) so that the pods can run also on nodes
+with [AWS Spot Instances](https://aws.amazon.com/ec2/spot).
+If you want to explicitly request those nodes for some component (workers),
+you need to add a
+[node selector](<(https://docs.openshift.com/container-platform/latest/nodes/scheduling/nodes-scheduler-node-selectors.html)>)
+to its `StatefulSet`/`Deployment`.
+
+```yaml
+nodeSelector:
+  env: stage
+```
+
+We don't do that by default (as of Nov 30th 22) because those instances
+seem to be too unreliable even for staging workers.

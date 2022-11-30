@@ -3,7 +3,7 @@
 tl;dr: Newer images in registry are automatically imported and re-deployed.
 
 Long story:
-We use [ImageStreams](https://docs.openshift.com/container-platform/4.9/openshift_images/image-streams-manage.html)
+We use [ImageStreams](https://docs.openshift.com/container-platform/latest/openshift_images/image-streams-manage.html)
 as intermediary between an image registry (Quay.io) and a Deployment/StatefulSet.
 It has several significant benefits:
 

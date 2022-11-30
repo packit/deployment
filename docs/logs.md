@@ -1,12 +1,11 @@
 ## [Logs aggregation](https://github.com/packit/research/tree/main/logs-aggregation)
 
-When a worker pod is restarted (due to image or cluster update), the pod logs are gone.
-To work around this, each worker pod has a sidecar container which runs [Fluentd](https://docs.fluentd.org).
-Fluentd is a data collector which allows us to get the logs from a worker via
+Each worker pod has a sidecar container running [Fluentd](https://docs.fluentd.org),
+which is a data collector allowing us to get the logs from a worker via
 [syslog](https://docs.fluentd.org/input/syslog) and send them to Splunk.
 
 We use [our fluentd-splunk-hec image](https://quay.io/repository/packit/fluentd-splunk-hec),
-built via [a workflow](https://github.com/jpopelka/fluent-plugin-splunk-hec/blob/main/.github/workflows/rebuild-and-push-image.yml)
+built via [a workflow](https://github.com/packit/fluent-plugin-splunk-hec/blob/main/.github/workflows/rebuild-and-push-image.yml)
 because we don't want to use [docker.io/splunk/fluentd-hec image](https://hub.docker.com/r/splunk/fluentd-hec).
 
 ### Where do I find the logs?
