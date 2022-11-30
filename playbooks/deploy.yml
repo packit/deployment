@@ -194,12 +194,10 @@
         name: packit-worker
         queues: "short-running,long-running"
         worker_replicas: "{{ workers_all_tasks }}"
-        # cloning repos is memory intensive: glibc needs 300M+, kernel 600M+
-        # during cloning, we need to account for git and celery worker processes
         worker_requests_memory: "384Mi"
-        worker_requests_cpu: "100m"
-        worker_limits_memory: "1024Mi"
-        worker_limits_cpu: "400m"
+        worker_requests_cpu: "20m"
+        worker_limits_memory: "384Mi"
+        worker_limits_cpu: "20m"
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
