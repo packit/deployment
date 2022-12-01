@@ -2,13 +2,6 @@
 
 For the validation of the packit-service we run a validation script every night.
 
-Currently, this is deployed in the cyborg project in [PSI](https://ocp4.psi.redhat.com/).
-
-- [Cron job](./openshift/job-run-validation.yml.j2) - cron job for running of the validation script
-- [Containerfile](./Containerfile) - image used by the job
-- [packit-service-validation.py](./packit-service-validation.py) - script (in the image) to run by the Cron job
-- [Playbook](deploy-validation.yaml) - to deploy the cron job & secrets
-
 The script verifies that Copr builds and Testing farm runs are processed correctly for pull requests in `packit/hello-world` repo:
 
 - comment trigger (each PR with title beginning `Basic test case:` is taken
@@ -17,18 +10,20 @@ The script verifies that Copr builds and Testing farm runs are processed correct
 - opened PR trigger - new PR is created, the branch `test_case_opened_pr` is used as a source branch,
   after running the test the PR is closed
 
-#### How to run the script
+## Deployment
 
-If you want to deploy the script:
+The image is build via a [GitHub workflow](../../.github/workflows/build-and-push-cronjob-image.yaml)
+and pushed to a [Quay.io repository](https://quay.io/repository/packit/packit-service-validation).
 
-- You have to have a directory with secrets and you need to define path to it [here](./deploy-validation.yaml)
-  (by default `./secrets`).
-- The directory with secrets needs to contain:
-  - `github_token` - Github token for `usercont-release-bot` user; take it from 'Release/usercont bot' item in our Bitwarden vault.
-  - `secret_sentry` - Sentry key
-- You have to define your Openshift API token [here](./deploy-validation.yaml) take it from [PSI](https://ocp4.psi.redhat.com/).
-- If you have everything prepared, you just need to run `DEPLOYMENT=production make deploy`
-  or `DEPLOYMENT=staging make deploy` in this directory.
+There is a [Helm Chart](https://github.com/packit/helm/tree/main/helm-charts/packit-service-validation)
+and a CI/CD in [Gitlab repo](https://gitlab.cee.redhat.com/packit/validation-cronjob-script-deployment)
+(internal because PSI is also internal) which installs/upgrades the chart to the
+`cyborg` project in [PSI](https://ocp4.psi.redhat.com) on every push.
+You just have to update the [image tag](https://quay.io/repository/packit/packit-service-validation?tab=tags)
+in [production.yaml](https://gitlab.cee.redhat.com/packit/validation-cronjob-script-deployment/-/blob/main/production.yaml)
+and/or [staging.yaml](https://gitlab.cee.redhat.com/packit/validation-cronjob-script-deployment/-/blob/main/staging.yaml).
+
+## Running manually
 
 If you want to run the script on your own:
 
