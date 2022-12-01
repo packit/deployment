@@ -1,10 +1,8 @@
-FROM fedora:35
+FROM fedora:37
 
-# Remove the git once ogr-0.32.0-fc35 is in stable
-RUN dnf install -y python3-ogr python3-copr python3-pip git && dnf clean all
+RUN dnf install -y python3-ogr python3-copr python3-pip && dnf clean all
 
-# Remove the ogr.git once ogr-0.32.0-fc35 is in stable
-RUN pip3 install --upgrade sentry-sdk git+https://github.com/packit/ogr.git@main && pip3 check
+RUN pip3 install --upgrade sentry-sdk && pip3 check
 
 COPY packit-service-validation.py /usr/bin/
 
