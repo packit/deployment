@@ -23,7 +23,7 @@ copr = Client({"copr_url": "https://copr.fedorainfracloud.org"})
 service = GithubService(token=getenv("GITHUB_TOKEN"))
 project = service.get_project(repo="hello-world", namespace="packit")
 user = InputGitAuthor(name="Release Bot", email="user-cont-team+release-bot@redhat.com")
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 
 
 # Everywhere else in the deployment repo environments are called 'prod' and 'stg'.
@@ -86,7 +86,7 @@ class Testcase:
         self.trigger = trigger
         self.head_commit = pr.head_commit if pr else None
         self._copr_project_name = None
-        self.deployment = deployment if deployment else ProductionInfo()
+        self.deployment = deployment or ProductionInfo()
 
     @property
     def copr_project_name(self):
@@ -118,6 +118,7 @@ class Testcase:
         Trigger the build (by commenting/pushing to the PR/opening a new PR).
         :return:
         """
+        logging.info(f"Triggering a build for {self.pr}")
         if self.trigger == Trigger.comment:
             self.pr.comment(self.deployment.pr_comment)
         elif self.trigger == Trigger.push:
@@ -224,8 +225,8 @@ class Testcase:
 
     def check_pending_check_runs(self):
         """
-        Check whether some check run is set to queued (they are updated in loop
-        so it is enough).
+        Check whether some check run is set to queued
+        (they are updated in loop, so it is enough).
         :return:
         """
         check_runs = [
@@ -247,7 +248,7 @@ class Testcase:
                 for check_run in project.get_check_runs(commit_sha=self.head_commit)
                 if check_run.app.name == self.deployment.app_name
             ]
-
+        logging.info(f"Watching pending check runs for commit {self.head_commit}")
         while True:
             if datetime.now() > watch_end:
                 self.failure_msg += failure_message
@@ -293,6 +294,7 @@ class Testcase:
 
         self.check_pending_check_runs()
 
+        logging.info(f"Watching whether a build has been submitted for {self.pr}")
         while True:
             if datetime.now() > watch_end:
                 self.failure_msg += (
@@ -343,6 +345,7 @@ class Testcase:
         """
         watch_end = datetime.now() + timedelta(seconds=60 * 15)
         state_reported = ""
+        logging.info(f"Watching Copr build {build_id}")
 
         while True:
             if datetime.now() > watch_end:
@@ -379,6 +382,7 @@ class Testcase:
         :return: [CheckRun]
         """
         watch_end = datetime.now() + timedelta(seconds=60 * 20)
+        logging.info(f"Watching check runs for commit {self.head_commit}")
 
         while True:
             check_runs = project.get_check_runs(commit_sha=self.head_commit)
@@ -448,8 +452,7 @@ class Testcase:
 
 
 if __name__ == "__main__":
-    sentry_secret = getenv("SENTRY_SECRET")
-    if sentry_secret:
+    if sentry_secret := getenv("SENTRY_SECRET"):
         import sentry_sdk
 
         sentry_sdk.init(sentry_secret)
@@ -462,14 +465,16 @@ if __name__ == "__main__":
         else StagingInfo()
     )
 
-    # run testcases where the build is triggered by a '/packit build' comment
+    logging.info(
+        "Run testcases where the build is triggered by a '/packit build' comment"
+    )
     prs_for_comment = [
         pr for pr in project.get_pr_list() if pr.title.startswith("Basic test case:")
     ]
     for pr in prs_for_comment:
         Testcase(pr=pr, trigger=Trigger.comment, deployment=deployment).run_test()
 
-    # run testcase where the build is triggered by push
+    logging.info("Run testcase where the build is triggered by push")
     pr_for_push = [
         pr
         for pr in project.get_pr_list()
@@ -480,5 +485,5 @@ if __name__ == "__main__":
             pr=pr_for_push[0], trigger=Trigger.push, deployment=deployment
         ).run_test()
 
-    # run testcase where the build is triggered by opening a new PR
+    logging.info("Run testcase where the build is triggered by opening a new PR")
     Testcase(deployment=deployment).run_test()
