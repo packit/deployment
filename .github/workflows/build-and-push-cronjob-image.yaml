@@ -1,4 +1,5 @@
 name: Build & push cron-job images
+
 on:
   workflow_dispatch:
   push:
@@ -25,9 +26,8 @@ jobs:
       path: cron-jobs/${{ matrix.image }}/
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Add short SHA to the list of tags
         shell: bash
