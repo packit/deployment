@@ -7,7 +7,3 @@ image:
 
 push:
 	$(CONTAINER_ENGINE) push $(IMAGE)
-
-# first: 'oc login', 'oc project packit-${DEPLOYMENT}'
-deploy:
-	oc create -f job-import-images.yaml
