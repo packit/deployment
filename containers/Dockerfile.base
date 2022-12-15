@@ -1,7 +1,7 @@
 # Be aware that this image is used for all stages, so if a dependency is removed be sure that it is
 # not required in anywhere
 
-FROM fedora:35
+FROM fedora:37
 
 ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
     ANSIBLE_STDOUT_CALLBACK=debug
@@ -9,8 +9,5 @@ ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
 RUN dnf update -y \
     && dnf install -y \
       ansible \
-      # this should be removed when the image is upgraded to Fedora 36,
-      # because ansible in F36 already contains the community collection
-      ansible-collection-community-general \
       python3-pip \
     && dnf clean all
