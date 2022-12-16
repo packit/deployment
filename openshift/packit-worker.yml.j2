@@ -143,6 +143,9 @@ spec:
             - name: fluentd-config
               mountPath: /fluentd/etc
               readOnly: true
+          resources:
+            requests: {memory: "128Mi", cpu: "10m"}
+            limits: {memory: "128Mi", cpu: "100m"}
 {% endif %}
 ---
 kind: ImageStream
