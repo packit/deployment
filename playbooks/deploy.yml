@@ -398,20 +398,20 @@
       loop: "{{ deploymentconfigs }}"
 
   handlers:
-    - name: Rollout redis-commander
-      ansible.builtin.command: oc rollout latest deploy/redis-commander
+    - name: Restart redis-commander deployment
+      ansible.builtin.command: oc rollout restart deploy/redis-commander
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not redis_commander.changed
 
-    - name: Rollout tokman
-      ansible.builtin.command: oc rollout latest deploy/tokman
+    - name: Restart tokman deployment
+      ansible.builtin.command: oc rollout restart deploy/tokman
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not tokman.changed
 
-    - name: Rollout flower
-      ansible.builtin.command: oc rollout latest deploy/flower
+    - name: Restart flower deployment
+      ansible.builtin.command: oc rollout restart deploy/flower
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not flower.changed
