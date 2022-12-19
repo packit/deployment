@@ -1,7 +1,10 @@
-FROM fedora:37
+FROM quay.io/centos/centos:stream9
 
-RUN dnf install -y origin-clients && \
-    dnf clean all
+RUN curl -L -o oc.tgz https://mirror.openshift.com/pub/openshift-v4/clients/oc/latest/linux/oc.tar.gz && \
+    tar xvzf oc.tgz && \
+    rm -f oc.tgz && \
+    mv oc /usr/bin/ && \
+    rm -f kubectl README.md
 
 COPY import-images.sh /usr/bin/
 
