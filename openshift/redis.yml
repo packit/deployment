@@ -1,20 +1,19 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
+
 ---
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: redis
-  labels:
-    service: redis
 spec:
   selector:
-    service: redis
+    matchLabels:
+      component: redis
   template:
     metadata:
       labels:
-        service: redis
-        name: redis
+        component: redis
     spec:
       containers:
         - name: redis
@@ -50,7 +49,7 @@ spec:
       port: 6379
       targetPort: 6379
   selector:
-    service: redis
+    component: redis
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

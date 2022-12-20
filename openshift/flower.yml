@@ -2,20 +2,18 @@
 # SPDX-License-Identifier: MIT
 
 ---
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: flower
-  labels:
-    service: flower
 spec:
   selector:
-    service: flower
+    matchLabels:
+      component: flower
   template:
     metadata:
       labels:
-        service: flower
-        name: flower
+        component: flower
     spec:
       containers:
         - name: flower
@@ -42,12 +40,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: flower
-  labels:
-    service: flower
 spec:
   ports:
     - name: "5555"
       port: 5555
       targetPort: 5555
   selector:
-    service: flower
+    component: flower

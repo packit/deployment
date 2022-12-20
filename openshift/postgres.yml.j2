@@ -2,23 +2,18 @@
 # SPDX-License-Identifier: MIT
 
 ---
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: postgres-13
-  labels:
-    service: postgres-13
 spec:
-  replicas: 1
-  strategy:
-    type: Recreate
   selector:
-    service: postgres-13
+    matchLabels:
+      component: postgres-13
   template:
     metadata:
       labels:
-        service: postgres-13
-        name: postgres-13
+        component: postgres-13
     spec:
       containers:
         - name: postgres
@@ -81,6 +76,9 @@ spec:
         - name: postgres-config
           configMap:
             name: postgres-config
+  replicas: 1
+  strategy:
+    type: Recreate
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -108,7 +106,7 @@ spec:
       port: 5432
       targetPort: 5432
   selector:
-    service: postgres-13
+    component: postgres-13
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

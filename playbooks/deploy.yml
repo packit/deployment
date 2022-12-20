@@ -391,27 +391,27 @@
 
     - name: Wait for deploymentconfig rollouts to complete
       # timeout 10min to not wait indefinitely in case of a problem
-      ansible.builtin.command: timeout 10m oc rollout status -w dc/{{ item }}
+      ansible.builtin.command: timeout 10m oc rollout status -w deploy/{{ item }}
       register: oc_rollout_status
       changed_when: false
       failed_when: '"successfully rolled out" not in oc_rollout_status.stdout'
       loop: "{{ deploymentconfigs }}"
 
   handlers:
-    - name: Rollout redis-commander
-      ansible.builtin.command: oc rollout latest dc/redis-commander
+    - name: Restart redis-commander deployment
+      ansible.builtin.command: oc rollout restart deploy/redis-commander
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not redis_commander.changed
 
-    - name: Rollout tokman
-      ansible.builtin.command: oc rollout latest dc/tokman
+    - name: Restart tokman deployment
+      ansible.builtin.command: oc rollout restart deploy/tokman
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not tokman.changed
 
-    - name: Rollout flower
-      ansible.builtin.command: oc rollout latest dc/flower
+    - name: Restart flower deployment
+      ansible.builtin.command: oc rollout restart deploy/flower
       # Run this rollout only if the DeploymentConfig above didn't change,
       # and so it wasn't rolled out yet.
       when: not flower.changed

@@ -2,20 +2,22 @@
 # SPDX-License-Identifier: MIT
 
 ---
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: packit-dashboard
-  labels:
-    service: packit-dashboard
+  annotations:
+    # https://docs.openshift.com/container-platform/4.11/openshift_images/triggering-updates-on-imagestream-changes.html
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"packit-dashboard:{{ deployment }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"packit-dashboard\")].image"}]
 spec:
   selector:
-    service: packit-dashboard
+    matchLabels:
+      component: packit-dashboard
   template:
     metadata:
       labels:
-        service: packit-dashboard
-        name: packit-dashboard
+        component: packit-dashboard
     spec:
       containers:
         - name: packit-dashboard
@@ -41,17 +43,6 @@ spec:
         - name: packit-secrets
           secret:
             secretName: packit-secrets
-
-  triggers:
-    - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-          - packit-dashboard
-        from:
-          kind: ImageStreamTag
-          name: packit-dashboard:{{ deployment }}
   replicas: 1
   strategy:
     type: Recreate
@@ -60,15 +51,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: packit-dashboard
-  labels:
-    service: packit-dashboard
 spec:
   ports:
     - name: packit-dashboard-https
       port: 443
       targetPort: 8443
   selector:
-    service: packit-dashboard
+    component: packit-dashboard
 ---
 kind: Route
 apiVersion: route.openshift.io/v1

@@ -1,19 +1,19 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
+
 ---
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
-  labels:
-    app: packit
-    name: pushgateway
   name: pushgateway
 spec:
+  selector:
+    matchLabels:
+      component: pushgateway
   template:
     metadata:
       labels:
-        name: pushgateway
-        app: packit
+        component: pushgateway
     spec:
       containers:
         - name: pushgateway
@@ -41,11 +41,10 @@ kind: Service
 metadata:
   name: pushgateway
 spec:
-  selector:
-    name: pushgateway
-    app: packit
   ports:
     - name: prometheus-push
       port: 80
       protocol: TCP
       targetPort: 9091
+  selector:
+    component: pushgateway
