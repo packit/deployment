@@ -1,6 +1,9 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+# We call the facts deploymentconfigs even they are not DeploymentConfigs but Deployments
+# because we already use the term 'deployment' for something else (prod/stg).
+
 ---
 - name: Set mandatory_deploymentconfigs fact
   ansible.builtin.set_fact:
