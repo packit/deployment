@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 ---
-- name: Getting pod {{ item }}
+- name: Getting pod for {{ item }}
   k8s_info:
     namespace: "{{ project }}"
     host: "{{ host }}"
@@ -12,7 +12,7 @@
     #    field_selectors:
     #      - status.phase=Running
     label_selectors:
-      - name={{ item }}
+      - component={{ item }}
   register: pods
 - name: Checking resources
   ansible.builtin.assert:
