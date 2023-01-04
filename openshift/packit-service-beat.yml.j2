@@ -64,13 +64,12 @@ spec:
           command:
             - "/usr/bin/run_worker.sh"
           resources:
-            # requests and limits have to be the same to have Guaranteed QoS
             requests:
-              memory: "150Mi"
-              cpu: "10m"
+              memory: "160Mi"
+              cpu: "5m"
             limits:
-              memory: "150Mi"
-              cpu: "10m"
+              memory: "256Mi"
+              cpu: "50m"
   replicas: 1
   strategy:
     type: Recreate

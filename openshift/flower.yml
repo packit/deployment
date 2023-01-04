@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: flower
-          image: mher/flower
+          image: docker.io/mher/flower
           env:
             - name: CELERY_BROKER_URL
               value: redis://redis:6379/0
@@ -28,10 +28,10 @@ spec:
           resources:
             requests:
               memory: "80Mi"
-              cpu: "20m"
+              cpu: "5m"
             limits:
-              memory: "80Mi"
-              cpu: "20m"
+              memory: "128Mi"
+              cpu: "50m"
   replicas: 1
   strategy:
     type: Recreate
