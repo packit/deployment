@@ -9,6 +9,7 @@ import subprocess
 from typing import List, Optional
 
 import click
+from copr.v3 import Client
 from git import Repo
 
 import changelog
@@ -354,22 +355,55 @@ def push_stable_branch(path_to_repository: Path, remote: str, commit_sha: str) -
     subprocess.run(["git", "push", remote, STABLE_BRANCH], cwd=path_to_repository)
 
 
+def print_latest_stable_builds(looking_for: Optional[List] = None):
+    """Print Name-Version of latest stable builds of selected packages, all our 3 by default"""
+    looking_for = looking_for or ["packit", "python-ogr", "python-specfile"]
+    client = Client.create_from_config_file()
+    builds = client.build_proxy.get_list(
+        ownername="packit", projectname="packit-stable"
+    )
+    i = 0
+    while looking_for:
+        build = builds[i]
+        i += 1
+        srpm_info = build["source_package"]
+        package_name = srpm_info["name"]
+        if package_name in looking_for:
+            looking_for.remove(package_name)
+            click.echo(f" - {package_name}-{srpm_info['version']}")
+        else:
+            # already found
+            continue
+
+
 def specific_instructions(repository: str):
     if repository == "packit":
         click.echo(
-            "Please wait for ogr & specfile builds "
-            "https://copr.fedorainfracloud.org/coprs/packit/packit-stable/builds/ "
-            "before you proceed (it's not strictly needed, but better)."
+            click.style(
+                "Please wait for ogr & specfile builds "
+                "https://copr.fedorainfracloud.org/coprs/packit/packit-stable/builds/ "
+                "before you proceed (it's not strictly needed, but better).",
+                fg="yellow",
+            )
         )
+        click.echo("These are the latest stable builds:")
+        print_latest_stable_builds(["python-ogr", "python-specfile"])
 
     elif repository == "packit-service":
         click.echo(
-            "packit-service images install ogr/specfile/packit from "
-            "https://copr.fedorainfracloud.org/coprs/packit/packit-stable/builds/ "
-            "so make sure the builds are done before you proceed!\n"
-            "You can also proceed now and rebuild the stable images later in "
-            "https://github.com/packit/packit-service/actions"
+            click.style(
+                "\n\n====================================================================\n"
+                "packit-service images install ogr/specfile/packit from "
+                "https://copr.fedorainfracloud.org/coprs/packit/packit-stable/builds/ "
+                "so make sure the builds are done before you proceed!\n"
+                "You can also proceed now and rebuild the stable images later in "
+                "https://github.com/packit/packit-service/actions"
+                "\n====================================================================\n",
+                fg="red",
+            )
         )
+        click.echo("Are these the latest builds?")
+        print_latest_stable_builds()
 
 
 if __name__ == "__main__":
