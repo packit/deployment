@@ -47,6 +47,7 @@ COPR_DEPENDENCIES: Dict[str, List[Tuple[str, str]]] = {
     "packit": [("python-ogr", "ogr"), ("python-specfile", "specfile")],
     "packit-service": [("packit", "packit")],
 }
+END_OF_QUEUE = None
 
 
 @click.group()
@@ -127,7 +128,7 @@ def move_repository(repository: str, remote: str, repo_store: str) -> None:
         )
         return
 
-    wait_for_copr_dependencies(repository)
+    wait_for_copr_dependencies(repository, remote, repo_store)
 
     get_git_log(path_to_repository, remote, stable_hash, main_hash)
     click.echo()
@@ -367,9 +368,9 @@ def push_stable_branch(path_to_repository: Path, remote: str, commit_sha: str) -
 
 def wait_for_copr_dependencies(repository: str, remote: str, repo_store: str):
     client = Client.create_from_config_file()
-    dependencies = COPR_DEPENDENCIES.get(repository, ())
+    dependencies = COPR_DEPENDENCIES.get(repository, [])
 
-    queue = deque([*dependencies, None])
+    queue = deque([*dependencies, END_OF_QUEUE])
     with click.progressbar(
         length=len(dependencies),
         label="Waiting for Copr builds",
@@ -380,14 +381,14 @@ def wait_for_copr_dependencies(repository: str, remote: str, repo_store: str):
             item = queue.popleft()
 
             # cooldown to not spam the Copr API while the build is running
-            if item is None:
+            if item is END_OF_QUEUE:
                 # there is nothing else waiting except the cooldown, safe to skip
                 if not queue:
                     continue
-                queue.append(None)
 
-                # execute the cooldown
+                # execute the cooldown and add it back
                 time.sleep(30)
+                queue.append(END_OF_QUEUE)
                 continue
 
             dependency, repo_name = item
