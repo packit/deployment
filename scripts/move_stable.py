@@ -3,10 +3,12 @@
 # Copyright Contributors to the Packit project.
 # SPDX-License-Identifier: MIT
 
+from collections import deque
 from datetime import date, datetime, timedelta
 from pathlib import Path
 import subprocess
-from typing import List, Optional
+import time
+from typing import Dict, List, Optional, Tuple
 
 import click
 from copr.v3 import Client
@@ -27,6 +29,11 @@ REPOSITORIES: List[str] = [
     "packit-service",
     "hardly",
 ]
+# keep dependencies as pairs: first element for the package name, second for repo_name
+COPR_DEPENDENCIES: Dict[str, List[Tuple[str, str]]] = {
+    "packit": [("python-ogr", "ogr"), ("python-specfile", "specfile")],
+    "packit-service": [("packit", "packit")],
+}
 REPOS_FOR_BLOG: List[str] = [
     "packit",
     "packit-service",
@@ -117,10 +124,10 @@ def move_repository(repository: str, remote: str, repo_store: str) -> None:
         )
         return
 
+    wait_for_copr_dependencies(repository)
+
     get_git_log(path_to_repository, remote, stable_hash, main_hash)
     click.echo()
-
-    specific_instructions(repository)
 
     new_stable_hash = click.prompt(
         f"Enter new hash for {STABLE_BRANCH}", default=main_hash
@@ -355,55 +362,79 @@ def push_stable_branch(path_to_repository: Path, remote: str, commit_sha: str) -
     subprocess.run(["git", "push", remote, STABLE_BRANCH], cwd=path_to_repository)
 
 
-def print_latest_stable_builds(looking_for: Optional[List] = None):
-    """Print Name-Version of latest stable builds of selected packages, all our 3 by default"""
-    looking_for = looking_for or ["packit", "python-ogr", "python-specfile"]
+def wait_for_copr_dependencies(repository: str, remote: str, repo_store: str):
     client = Client.create_from_config_file()
-    builds = client.build_proxy.get_list(
-        ownername="packit", projectname="packit-stable"
-    )
-    i = 0
-    while looking_for:
-        build = builds[i]
-        i += 1
-        srpm_info = build["source_package"]
-        package_name = srpm_info["name"]
-        if package_name in looking_for:
-            looking_for.remove(package_name)
-            click.echo(f" - {package_name}-{srpm_info['version']}")
-        else:
-            # already found
-            continue
+    dependencies = COPR_DEPENDENCIES.get(repository, ())
+
+    queue = deque([*dependencies, None])
+    with click.progressbar(
+        length=len(dependencies),
+        label="Waiting for Copr builds",
+        item_show_func=lambda item: item,
+    ) as bar:
+        while queue:
+            item = queue.popleft()
+
+            # cooldown to not spam the Copr API while the build is running
+            if item is None:
+                # there is nothing else waiting except the cooldown, safe to skip
+                if not queue:
+                    continue
+                queue.append(None)
+
+                # notify and execute the cooldown
+                bar.update(0, "30s cooldown")
+                time.sleep(30)
+                continue
+
+            dependency, repo_name = item
+
+            path_to_repository = Path(repo_store, repo_name)
+            stable_ref = get_reference(path_to_repository, remote, STABLE_BRANCH)[:7]
+            built_version = client.package_proxy.get(
+                "packit", "packit-stable", dependency, with_latest_succeeded_build=True
+            ).builds["latest_succeeded"]["source_package"]["version"]
+
+            if stable_ref in built_version:
+                bar.update(1, f"{dependency} has finished")
+            else:
+                bar.update(0, f"{dependency} has not finished yet, requeued")
+                queue.append(item)
 
 
-def specific_instructions(repository: str):
-    if repository == "packit":
-        click.echo(
-            click.style(
-                "Please wait for ogr & specfile builds "
-                "https://copr.fedorainfracloud.org/coprs/packit/packit-stable/builds/ "
-                "before you proceed (it's not strictly needed, but better).",
-                fg="yellow",
-            )
-        )
-        click.echo("These are the latest stable builds:")
-        print_latest_stable_builds(["python-ogr", "python-specfile"])
+@cli.command(
+    short_help=f"Stalks Copr dependencies of a requested repository",
+    help=f"""Wait for the Copr dependencies of REPOSITORY.
 
-    elif repository == "packit-service":
-        click.echo(
-            click.style(
-                "\n\n====================================================================\n"
-                "packit-service images install ogr/specfile/packit from "
-                "https://copr.fedorainfracloud.org/coprs/packit/packit-stable/builds/ "
-                "so make sure the builds are done before you proceed!\n"
-                "You can also proceed now and rebuild the stable images later in "
-                "https://github.com/packit/packit-service/actions"
-                "\n====================================================================\n",
-                fg="red",
-            )
-        )
-        click.echo("Are these the latest builds?")
-        print_latest_stable_builds()
+    REPOSITORY is a Git repository cloned to repo store.
+
+    Example:
+
+    To stalk the dependencies of the 'packit-service' repository, when
+    'packit-service' is cloned in the current directory, and the upstream remote
+    is called 'upstream', call:
+
+    \b
+        $ ./move_stable.py stalk-copr --remote upstream \\
+                                      --repo-store . packit-service
+    """,
+)
+@click.argument("repository", type=click.Path())
+@click.option(
+    "--remote",
+    default="origin",
+    show_default=True,
+    help="Remote that represents upstream",
+)
+@click.option(
+    "--repo-store",
+    default=DEFAULT_REPO_STORE,
+    show_default=True,
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    help="Path to dir where the repositories are stored",
+)
+def stalk_copr(repository: str, remote: str, repo_store: str) -> None:
+    wait_for_copr_dependencies(repository, remote, repo_store)
 
 
 if __name__ == "__main__":
