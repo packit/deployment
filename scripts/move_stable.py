@@ -29,11 +29,6 @@ REPOSITORIES: List[str] = [
     "packit-service",
     "hardly",
 ]
-# keep dependencies as pairs: first element for the package name, second for repo_name
-COPR_DEPENDENCIES: Dict[str, List[Tuple[str, str]]] = {
-    "packit": [("python-ogr", "ogr"), ("python-specfile", "specfile")],
-    "packit-service": [("packit", "packit")],
-}
 REPOS_FOR_BLOG: List[str] = [
     "packit",
     "packit-service",
@@ -44,6 +39,14 @@ REPOS_FOR_BLOG: List[str] = [
 STABLE_BRANCH: str = "stable"
 ROLLING_BRANCH: str = "main"
 DEFAULT_REPO_STORE: str = "move_stable_repositories"
+
+# Copr settings
+COPR_OWNER, COPR_PROJECT = "packit", "packit-stable"
+# keep dependencies as pairs: first element for the package name, second for repo_name
+COPR_DEPENDENCIES: Dict[str, List[Tuple[str, str]]] = {
+    "packit": [("python-ogr", "ogr"), ("python-specfile", "specfile")],
+    "packit-service": [("packit", "packit")],
+}
 
 
 @click.group()
@@ -393,7 +396,7 @@ def wait_for_copr_dependencies(repository: str, remote: str, repo_store: str):
             path_to_repository = Path(repo_store, repo_name)
             stable_ref = get_reference(path_to_repository, remote, STABLE_BRANCH)[:7]
             built_version = client.package_proxy.get(
-                "packit", "packit-stable", dependency, with_latest_succeeded_build=True
+                COPR_OWNER, COPR_PROJECT, dependency, with_latest_succeeded_build=True
             ).builds["latest_succeeded"]["source_package"]["version"]
 
             if stable_ref in built_version:
