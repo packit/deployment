@@ -371,6 +371,7 @@ def wait_for_copr_dependencies(repository: str, remote: str, repo_store: str):
         length=len(dependencies),
         label="Waiting for Copr builds",
         item_show_func=lambda item: item,
+        update_min_steps=0,
     ) as bar:
         while queue:
             item = queue.popleft()
@@ -382,13 +383,13 @@ def wait_for_copr_dependencies(repository: str, remote: str, repo_store: str):
                     continue
                 queue.append(None)
 
-                # notify and execute the cooldown
-                bar.update(0, "30s cooldown")
+                # execute the cooldown
                 time.sleep(30)
                 continue
 
             dependency, repo_name = item
 
+            bar.update(0, f"checking {dependency}")
             path_to_repository = Path(repo_store, repo_name)
             stable_ref = get_reference(path_to_repository, remote, STABLE_BRANCH)[:7]
             built_version = client.package_proxy.get(
