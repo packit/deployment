@@ -24,10 +24,9 @@ spec:
           ports:
             - containerPort: 9091
           resources:
-            # requests and limits have to be the same to have Guaranteed QoS
             requests:
-              memory: "32Mi"
-              cpu: "10m"
+              memory: "16Mi"
+              cpu: "1m"
             limits:
               memory: "32Mi"
               cpu: "10m"

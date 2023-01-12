@@ -39,13 +39,12 @@ spec:
             - name: packit-config
               mountPath: /home/packit/.config
           resources:
-            # requests and limits have to be the same to have Guaranteed QoS
             requests:
-              memory: "80Mi"
-              cpu: "20m"
+              memory: "88Mi"
+              cpu: "5m"
             limits:
-              memory: "80Mi"
-              cpu: "20m"
+              memory: "128Mi"
+              cpu: "50m"
   replicas: 1
   strategy:
     type: Recreate
