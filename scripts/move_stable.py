@@ -367,8 +367,12 @@ def push_stable_branch(path_to_repository: Path, remote: str, commit_sha: str) -
 
 
 def wait_for_copr_dependencies(repository: str, remote: str, repo_store: str):
-    client = Client.create_from_config_file()
     dependencies = COPR_DEPENDENCIES.get(repository, [])
+    if not dependencies:
+        click.secho("No Copr dependencies set.", fg="green")
+        return
+
+    client = Client.create_from_config_file()
 
     queue = deque([*dependencies, END_OF_QUEUE])
     with click.progressbar(
