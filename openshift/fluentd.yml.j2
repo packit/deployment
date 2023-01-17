@@ -1,0 +1,43 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: fluentd-config
+data:
+  fluent.conf: |
+    <system>
+      log_level debug
+    </system>
+    <source>
+      @type syslog
+      <parse>
+        message_format rfc5424
+      </parse>
+      tag packit
+    </source>
+    <match packit.**>
+      @type splunk_hec
+      hec_host "#{ENV['SPLUNK_HEC_HOST']}"
+      hec_port "#{ENV['SPLUNK_HEC_PORT']}"
+      hec_token "#{ENV['SPLUNK_HEC_TOKEN']}"
+    </match>
+---
+kind: ImageStream
+apiVersion: v1
+metadata:
+  name: fluentd
+spec:
+  tags:
+    - name: {{ deployment }}
+      from:
+        kind: DockerImage
+        name: {{ image_fluentd }}
+      importPolicy:
+        # Periodically query registry to synchronize tag and image metadata.
+        scheduled: {{ auto_import_images }}
+  lookupPolicy:
+    # allows all resources pointing to this image stream to use it in the image field
+    local: true
