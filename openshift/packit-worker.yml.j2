@@ -98,6 +98,8 @@ spec:
             - name: SYSLOG_HOST
               # localhost doesn't work
               value: "127.0.0.1"
+            - name: KRB5CCNAME
+              value: "DIR:/home/packit/kerberos/"
           volumeMounts:
             - name: packit-ssh
               mountPath: /packit-ssh
