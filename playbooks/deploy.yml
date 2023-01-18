@@ -168,6 +168,15 @@
       tags:
         - redis
 
+    - name: Deploy fluentd image stream and config
+      ansible.builtin.include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/fluentd.yml.j2') }}"
+      tags:
+        - packit-service
+        - packit-worker
+      when: with_fluentd_sidecar
+
     - name: Deploy packit-service
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:

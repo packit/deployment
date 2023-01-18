@@ -14,6 +14,9 @@ spec:
   selector:
     matchLabels:
       component: packit-service
+  replicas: 1
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -26,6 +29,10 @@ spec:
         - name: packit-config
           secret:
             secretName: packit-config
+{% if with_fluentd_sidecar %}
+        - name: fluentd-config
+          configMap: {name: fluentd-config}
+{% endif %}
       containers:
         - name: packit-service
           image: packit-service:{{ deployment }}
@@ -61,18 +68,16 @@ spec:
           command:
             - /usr/bin/run_httpd.sh
           resources:
-            # requests and limits have to be the same to have Guaranteed QoS
             requests:
               memory: "320Mi"
-              cpu: "{{ '200m' if project == 'packit-prod' else '100m' }}"
+              cpu: "20m"
             limits:
               # run_httpd.sh does 'alembic upgrade head' which might require more memory
               # If you see '/usr/bin/run_httpd.sh: line 16:   Killed     alembic upgrade head'
               # you have to temporarily increase (in webUI/console) the limit
-              # (2Gi@prod, 512Mi@stg was enough last time),
               # and once the alembic upgrade passes, revert.
-              memory: "320Mi"
-              cpu: "{{ '200m' if project == 'packit-prod' else '100m' }}"
+              memory: "{{ '2Gi' if project == 'packit-prod' else '512Mi' }}"
+              cpu: "200m"
           # In TLS world, hostname needs to match whatever is set in the cert
           # in our cause, k8s is doing here something like curl https://172.15.2.4:8443/api/healthz/
           # which will fail TLS validation.
@@ -91,9 +96,28 @@ spec:
           #     scheme: HTTPS
           #     path: /api/healthz/
           #   initialDelaySeconds: 30
-  replicas: 1
-  strategy:
-    type: Recreate
+{% if with_fluentd_sidecar %}
+        # See ../docs/logs.md
+        - name: fluentd-sidecar
+          image: fluentd:{{ deployment }}
+          ports:
+            - containerPort: 5140
+              protocol: UDP
+          env:
+            - name: SPLUNK_HEC_HOST
+              valueFrom: {secretKeyRef: {name: splunk, key: hec-host}}
+            - name: SPLUNK_HEC_PORT
+              valueFrom: {secretKeyRef: {name: splunk, key: hec-port}}
+            - name: SPLUNK_HEC_TOKEN
+              valueFrom: {secretKeyRef: {name: splunk, key: hec-token}}
+          volumeMounts:
+            - name: fluentd-config
+              mountPath: /fluentd/etc
+              readOnly: true
+          resources:
+            requests: {memory: "128Mi", cpu: "10m"}
+            limits: {memory: "128Mi", cpu: "100m"}
+{% endif %}
 ---
 apiVersion: v1
 kind: Service
