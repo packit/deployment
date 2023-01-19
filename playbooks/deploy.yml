@@ -18,7 +18,7 @@
     with_beat: true
     with_pushgateway: true
     with_repository_cache: true
-    repository_cache_storage: 16Gi
+    repository_cache_storage: 4Gi
     with_sandbox: true
     push_dev_images: false
     with_fluentd_sidecar: false
