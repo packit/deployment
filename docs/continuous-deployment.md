@@ -46,22 +46,21 @@ There's also 'import-images' target in the Makefile, so `DEPLOYMENT=prod make im
 
 ### Reverting to older deployment/revision/image
 
-`Deployment`s can be reverted with `oc rollout undo`:
+`Deployment`s can be reverted with `oc rollout undo`, example:
 
     $ oc rollout undo deploy/packit-service [--to-revision=X]
-    $ oc rollout undo deploy/packit-service-fedmsg [--to-revision=X]
 
 where `X` is revision number.
 See also `oc rollout history deploy/packit-service [--revision=X]`.
 
 It's more tricky in case of `StatefulSet` which we use for workers.
-`oc rollout undo` does not seem to work with `StatefulSet`
-(even it [should](https://github.com/kubernetes/kubernetes/pull/49674)).
-So when you happen to deploy broken worker and you want to revert/undo it
+`oc rollout undo` does not work with `StatefulSet` for us
+(the newest image is always used, reason unknown).
+So when you happen to deploy a broken worker, and you want to revert/undo it
 because you don't know what's the cause/fix yet, you have to:
 
-1. `oc describe is/packit-worker` - select older image
-2. `oc tag --source=docker quay.io/packit/packit-worker@sha256:<older-hash> myproject/packit-worker:<deployment>`
+1. `oc describe is/packit-worker` - select older image (hash)
+2. `oc tag --source=docker quay.io/packit/packit-worker@sha256:<older-hash> packit-prod/packit-worker:<deployment>`
    And see the `packit-worker-x` pods being re-deployed from the older image.
 3. Once you've built a fixed image, run
-   `oc tag quay.io/packit/packit-worker:<deployment> myproject/packit-worker:<deployment>`
+   `oc tag quay.io/packit/packit-worker:<deployment> packit-prod/packit-worker:<deployment>`
