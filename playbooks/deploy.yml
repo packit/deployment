@@ -291,7 +291,7 @@
       tags:
         - redis-commander
       notify:
-        - Rollout redis-commander
+        - Restart redis-commander deployment
       when: with_redis_commander
 
     - name: Deploy redis-commander
@@ -332,7 +332,7 @@
       tags:
         - tokman
       notify:
-        - Rollout tokman
+        - Restart tokman deployment
       when: with_tokman
 
     - name: Deploy tokman
@@ -356,6 +356,8 @@
       tags:
         - flower
       when: with_flower
+      notify:
+        - Restart flower deployment
       block:
         - name: Create htpasswd file
           htpasswd:
@@ -409,18 +411,18 @@
   handlers:
     - name: Restart redis-commander deployment
       ansible.builtin.command: oc rollout restart deploy/redis-commander
-      # Run this rollout only if the DeploymentConfig above didn't change,
+      # Run this rollout restart only if the Deployment above didn't change,
       # and so it wasn't rolled out yet.
       when: not redis_commander.changed
 
     - name: Restart tokman deployment
       ansible.builtin.command: oc rollout restart deploy/tokman
-      # Run this rollout only if the DeploymentConfig above didn't change,
+      # Run this rollout restart only if the Deployment above didn't change,
       # and so it wasn't rolled out yet.
       when: not tokman.changed
 
     - name: Restart flower deployment
       ansible.builtin.command: oc rollout restart deploy/flower
-      # Run this rollout only if the DeploymentConfig above didn't change,
+      # Run this rollout restart only if the Deployment above didn't change,
       # and so it wasn't rolled out yet.
       when: not flower.changed

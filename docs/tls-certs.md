@@ -35,14 +35,13 @@ _Note: If certbot is executed against multiple domains, step 3. is repeated for 
 Make sure the DNS is all set up:
 
     $ dig prod.packit.dev
-    ; <<>> DiG 9.16.20-RH <<>> prod.packit.dev
+    ; <<>> DiG 9.18.10 <<>> prod.packit.dev
     ;; QUESTION SECTION:
     ;prod.packit.dev.		IN	A
     ;; ANSWER SECTION:
-    prod.packit.dev.	24	IN	CNAME	elb.e4ff.pro-eu-west-1.openshiftapps.com.
-    elb.e4ff.pro-eu-west-1.openshiftapps.com. 3150 IN CNAME	pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com.
-    pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 60 IN A 18.202.187.210
-    pro-eu-west-1-infra-1781350677.eu-west-1.elb.amazonaws.com. 60 IN A 54.72.5.59
+    prod.packit.dev.	49	IN	CNAME	router-default.apps.auto-prod.gi0n.p1.openshiftapps.com.
+    router-default.apps.auto-prod.gi0n.p1.openshiftapps.com. 49 IN A 52.211.65.65
+    router-default.apps.auto-prod.gi0n.p1.openshiftapps.com. 49 IN A 52.210.199.25
 
 Check if you have access to packit.dev domain in
 [Google Domains](https://domains.google.com/m/registrar/packit.dev).
@@ -99,27 +98,30 @@ Repeat this for all requested domains.
 `fullchain.pem` and `privkey.pem` from `~/.certbot/live/packit.dev/`
 to `secrets-tls-certs` item in our shared `Packit` collection in Bitwarden vault.
 
-### 5.Re-deploy secrets for all services and environments:
+### 5. Re-deploy secrets for all services and environments:
 
-Update `api_key` in `vars/{packit|stream|fedora-source-git}/{prod|stg}.yml` and run:
+`oc login <cluster>; oc project <project>` and
 
-    SERVICE=<service> DEPLOYMENT=<deployment> make deploy TAGS=secrets
+    for cert in fullchain privkey; do scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/packit.dev/${cert}.pem; done
 
-or `oc login <cluster>; oc project <project>` and
+or update `api_key` in `vars/{packit|stream|fedora-source-git}/{prod|stg}.yml` and run:
 
-    scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/packit.dev/{fullchain|privkey}.pem
+    `SERVICE=<service> DEPLOYMENT=<deployment> make deploy TAGS=secrets`
 
 You can also update the `packit-secrets` secret via the web console
 (`Actions` -> `Edit Secret`), but last time it probably (it happened at the same time)
 mangled also the `fedora.keytab`, so just be aware that this might happen.
 
-Restart (scale down and up) `packit-service`, `packit-dashboard` and `nginx` for them to use the new certs.
+Restart (or scale down and up) `packit-service`, `packit-dashboard` and `nginx` for them to use the new certs.
+
+    $ for deploy in packit-service packit-dashboard nginx; do oc rollout restart deploy/${deploy}; done
 
 ### How to inspect a certificate
 
 If you want to inspect local certificates, you can use `certtool` (`gnutls-utils` package)
 to view the cert's metadata:
 
+    $ certtool -i < ~/.certbot/live/packit.dev/fullchain.pem
     X.509 Certificate Information:
         Version: 3
         Serial Number (hex): 04f4864b597f9c0859260d88e04cfabfeeac
