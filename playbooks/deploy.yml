@@ -312,7 +312,6 @@
       when: with_flower
       tags:
         - flower
-      register: flower
 
     - name: Deploy packit-service-fedmsg
       ansible.builtin.include_tasks: tasks/k8s.yml
@@ -356,8 +355,6 @@
       tags:
         - flower
       when: with_flower
-      notify:
-        - Restart flower deployment
       block:
         - name: Create htpasswd file
           htpasswd:
@@ -373,6 +370,8 @@
             host: "{{ host }}"
             api_key: "{{ api_key }}"
             validate_certs: "{{ validate_certs }}"
+          notify:
+            - Restart nginx deployment
 
     - name: Deploy nginx to reverse proxy the pushgateway and flower
       ansible.builtin.include_tasks: tasks/k8s.yml
@@ -380,6 +379,7 @@
         - "{{ lookup('template', '{{ project_dir }}/openshift/nginx.yml.j2') }}"
       tags:
         - pushgateway
+      register: nginx
       when: with_pushgateway and with_flower
 
     - name: Wait for worker-0 to be running
@@ -421,8 +421,8 @@
       # and so it wasn't rolled out yet.
       when: not tokman.changed
 
-    - name: Restart flower deployment
-      ansible.builtin.command: oc rollout restart deploy/flower
+    - name: Restart nginx deployment
+      ansible.builtin.command: oc rollout restart deploy/nginx
       # Run this rollout restart only if the Deployment above didn't change,
       # and so it wasn't rolled out yet.
-      when: not flower.changed
+      when: not nginx.changed
