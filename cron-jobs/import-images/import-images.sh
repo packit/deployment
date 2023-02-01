@@ -15,6 +15,9 @@ oc import-image is/fluentd:"${DEPLOYMENT}" -n "${NAMESPACE}"
 
 if [[ "${SERVICE}" == "packit" ]]; then
   oc import-image is/packit-dashboard:"${DEPLOYMENT}" -n "${NAMESPACE}"
-  oc import-image is/packit-service-fedmsg:"${DEPLOYMENT}" -n "${NAMESPACE}"
   oc import-image is/tokman:"${DEPLOYMENT}" -n "${NAMESPACE}"
+fi
+
+if [[ "${SERVICE}" != "stream" ]]; then
+  oc import-image is/packit-service-fedmsg:"${DEPLOYMENT}" -n "${NAMESPACE}"
 fi
