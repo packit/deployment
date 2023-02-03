@@ -33,14 +33,32 @@ def get_relevant_commits(
     return repository.iter_commits(rev=ref_range, merges=True)
 
 
-def get_pr_id(message: str) -> str:
-    """
-    obtain PR ID
-    """
+def get_pr_id_old(message: str) -> str:
     # Merge pull request #1483 from majamassarini/fix/1357
     first_line = message.split("\n")[0]
     fourth_word = first_line.split(" ")[3]
     return fourth_word.lstrip("#")
+
+
+def get_pr_id_new(message: str) -> str:
+    # Sanitize changelog entry when updating dist-git spec file (#1841)
+    first_line = message.split("\n")[0]
+    if match := re.match(r"^.*\(\#(\d+)\)$", first_line):
+        return match.group(1)
+    return ""
+
+
+def get_pr_id(message: str) -> str:
+    """
+    obtain PR ID
+    """
+    pr_id = get_pr_id_new(message)
+    try:
+        int(pr_id)
+    except (ValueError, TypeError):
+        pr_id = get_pr_id_old(message)
+
+    return pr_id
 
 
 def convert_message(message: str) -> Optional[str]:
