@@ -366,7 +366,6 @@ class Testcase:
                 "importing",
                 "waiting",
             ]:
-
                 if state_reported != "succeeded":
                     self.failure_msg += (
                         f"The build in Copr was not successful. "
