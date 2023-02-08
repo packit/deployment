@@ -29,5 +29,7 @@ If you want to run the script on your own:
 
 - Set a `GITHUB_TOKEN` environment variable holding a [personal access
   token](https://github.com/settings/tokens) with _public_repo_ scope.
+- Set a `GITLAB_TOKEN` environment variable holding a [personal access
+  token](https://gitlab.com/-/profile/personal_access_tokens) with _api_ scope.
 - Optionally, set a `SENTRY_SECRET` environment variable if you want to send
   the validation failures to Sentry.
