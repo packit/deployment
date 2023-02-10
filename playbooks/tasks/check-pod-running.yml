@@ -3,7 +3,7 @@
 
 ---
 - name: Getting pod for {{ item }}
-  k8s_info:
+  kubernetes.core.k8s_info:
     namespace: "{{ project }}"
     host: "{{ host }}"
     api_key: "{{ api_key }}"

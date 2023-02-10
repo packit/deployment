@@ -3,7 +3,7 @@
 
 ---
 - name: Waiting for {{ pod_name }}
-  k8s:
+  kubernetes.core.k8s:
     namespace: "{{ project }}"
     host: "{{ host }}"
     api_key: "{{ api_key }}"
