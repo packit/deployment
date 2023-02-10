@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+set -eu
+
 # Script to
 # - login to Bitwarden and/or unlock the vault
 # - download all files attached to
@@ -16,7 +18,7 @@
 
 # If run via 'make deploy', you can use this (on your own risk) to
 # not download secrets again, if you just did it.
-[[ -n "${SKIP_SECRETS_SYNC}" || -n "${SSS}" ]] && { echo "Not downloading secrets"; exit 0; }
+[[ -n "${SKIP_SECRETS_SYNC:=}" || -n "${SSS:=}" ]] && { echo "Not downloading secrets"; exit 0; }
 
 # Set default values if not set already
 : "${SERVICE:=packit}"

@@ -13,14 +13,6 @@ use `make render-secrets-from-templates`.
 Use `scripts/update_bw_secret.sh` to update secrets, and don't have to click
 through the Bitwarden Web UI, deleting and uploading attachments.
 
-Due to an [issue with Bitwarden
-CLI](https://github.com/bitwarden/clients/issues/2726), set `OPENSSL_CONF` as
-an empty variable if using Fedora Linux, in order to allow older, deprecated
-cryptographic algorithms to be used. Without this
-`scripts/update_bw_secret.sh` will not work.
-
-    $ export OPENSSL_CONF=
-
 Here is the workflow how to do that:
 
 1. Make sure your local copy is up-to-date. For example:
