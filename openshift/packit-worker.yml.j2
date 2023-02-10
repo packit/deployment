@@ -123,6 +123,16 @@ spec:
             limits:
               memory: {{ worker_limits_memory }}
               cpu: {{ worker_limits_cpu }}
+          livenessProbe:
+            exec:
+              command:
+                - bash
+                - '-c'
+                - 'celery -A $APP status | grep "$(uname -n): OK"'
+            # Start after 10m, every 5m with 1m timeout
+            initialDelaySeconds: 600
+            periodSeconds: 300
+            timeoutSeconds: 60
 {% if with_fluentd_sidecar %}
         # See ../docs/logs.md
         - name: fluentd-sidecar

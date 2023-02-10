@@ -203,10 +203,10 @@
         name: packit-worker
         queues: "short-running,long-running"
         worker_replicas: "{{ workers_all_tasks }}"
-        worker_requests_memory: "384Mi"
-        worker_requests_cpu: "20m"
-        worker_limits_memory: "384Mi"
-        worker_limits_cpu: "20m"
+        worker_requests_memory: "320Mi"
+        worker_requests_cpu: "10m"
+        worker_limits_memory: "640Mi"
+        worker_limits_cpu: "200m"
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
@@ -221,9 +221,9 @@
         worker_replicas: "{{ workers_short_running }}"
         # Short-running tasks are just interactions with different services.
         # They should not require a lot of memory/cpu.
-        worker_requests_memory: "200Mi"
+        worker_requests_memory: "320Mi"
         worker_requests_cpu: "50m"
-        worker_limits_memory: "320Mi"
+        worker_limits_memory: "640Mi"
         worker_limits_cpu: "200m"
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
