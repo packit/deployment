@@ -2,12 +2,10 @@
 
 oc login "${HOST}" --token="${TOKEN}" --insecure-skip-tls-verify
 
-set -x
+set -ux
 
-DEFAULT_SERVICE="packit"
-SERVICE="${SERVICE:-$DEFAULT_SERVICE}"
-DEFAULT_NAMESPACE="${SERVICE}-${DEPLOYMENT}"
-NAMESPACE="${NAMESPACE:-$DEFAULT_NAMESPACE}"
+: "${SERVICE:=packit}"
+: "${NAMESPACE:=${SERVICE}-${DEPLOYMENT}}"
 
 oc import-image is/packit-service:"${DEPLOYMENT}" -n "${NAMESPACE}"
 oc import-image is/packit-worker:"${DEPLOYMENT}" -n "${NAMESPACE}"
