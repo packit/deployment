@@ -53,10 +53,10 @@ spec:
 #            timeoutSeconds: 1
           resources:
             requests:
-              memory: "{{ '1Gi' if project == 'packit-prod' else '128Mi' }}"
+              memory: "{{ '2Gi' if project == 'packit-prod' else '128Mi' }}"
               cpu: "30m"
             limits:
-              memory: "{{ '2Gi' if project == 'packit-prod' else '256Mi' }}"
+              memory: "{{ '4Gi' if project == 'packit-prod' else '256Mi' }}"
               cpu: "300m"
           volumeMounts:
             - name: postgres-data
