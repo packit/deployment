@@ -38,7 +38,7 @@ spec:
             - name: LOG_LEVEL
               value: DEBUG
             - name: WORKERS
-              value: "1"
+              value: "{{ tokman.workers }}"
             - name: TOKMAN_CONFIG
               value: /etc/config/config.py
             - name: BIND_ADDR
@@ -54,22 +54,16 @@ spec:
               readOnly: true
             - name: access-tokens
               mountPath: /access_tokens
-          resources:
-            requests:
-              memory: "88Mi"
-              cpu: "5m"
-            limits:
-              memory: "128Mi"
-              cpu: "50m"
+          resources: {{ tokman.resources }}
           ports:
             - containerPort: 8000
               protocol: "TCP"
-          readinessProbe:
+          startupProbe:
             httpGet:
               path: /api/health
               port: 8000
             initialDelaySeconds: 15
-            timeoutSeconds: 2
+            timeoutSeconds: 10
           livenessProbe:
             httpGet:
               path: /api/health

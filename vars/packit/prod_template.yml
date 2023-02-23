@@ -82,3 +82,13 @@ workers_all_tasks: 0
 workers_short_running: 1
 workers_long_running: 2
 # pushgateway_address: http://pushgateway
+
+tokman:
+  workers: 2
+  resources:
+    requests:
+      memory: "160Mi"
+      cpu: "20m"
+    limits:
+      memory: "224Mi"
+      cpu: "50m"
