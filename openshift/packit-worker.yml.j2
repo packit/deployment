@@ -129,10 +129,10 @@ spec:
                 - bash
                 - '-c'
                 - 'celery -A $APP status | grep "$(uname -n): OK"'
-            # Start after 10m, every 5m with 1m timeout
+            # Start after 10m, every 10m with 5m timeout
             initialDelaySeconds: 600
-            periodSeconds: 300
-            timeoutSeconds: 60
+            periodSeconds: 600
+            timeoutSeconds: 300
 {% if with_fluentd_sidecar %}
         # See ../docs/logs.md
         - name: fluentd-sidecar
