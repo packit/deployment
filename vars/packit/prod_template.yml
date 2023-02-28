@@ -84,11 +84,11 @@ workers_long_running: 2
 # pushgateway_address: http://pushgateway
 
 tokman:
-  workers: 2
+  workers: 1
   resources:
     requests:
-      memory: "160Mi"
+      memory: "100Mi"
       cpu: "20m"
     limits:
-      memory: "224Mi"
+      memory: "160Mi"
       cpu: "50m"
