@@ -75,7 +75,7 @@ spec:
           resources:
             requests:
               memory: "320Mi"
-              cpu: "20m"
+              cpu: "10m"
             limits:
               # run_httpd.sh does 'alembic upgrade head' which might require more memory
               # If you see '/usr/bin/run_httpd.sh: line 16:   Killed     alembic upgrade head'
