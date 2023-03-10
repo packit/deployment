@@ -66,7 +66,7 @@ spec:
             - name: DISTGIT_NAMESPACE
               value: {{ distgit_namespace }}
             - name: PACKIT_USER_AGENT
-              value: "packit-ci/{{ project }} ({{ deployment }}+{{ project }}@packit.dev)"
+              value: "packit.dev/{{ service }}-{{ deployment }} ({{ deployment }}+{{ service }}@packit.dev)"
             - name: APP
               value: {{ celery_app }}
             - name: REDIS_SERVICE_HOST
