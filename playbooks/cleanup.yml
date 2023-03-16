@@ -24,3 +24,5 @@
     - name: Delete all
       ansible.builtin.command: oc delete all,cm,pvc --all
       when: deployment != "prod"
+      # on stage this always changes something
+      changed_when: true
