@@ -11,7 +11,7 @@
           - ansible
           - python-openshift
           - python-pip
-          - python3-passlib # for using htpasswd ansible module
+          - python-passlib # for using htpasswd ansible module
           - make
       become: true
 

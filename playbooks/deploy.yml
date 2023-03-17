@@ -344,9 +344,12 @@
       when: with_tokman
 
     - name: Deploy tokman
-      ansible.builtin.include_tasks: tasks/k8s.yml
-      loop:
-        - "{{ lookup('template', '{{ project_dir }}/openshift/tokman.yml.j2') }}"
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/tokman.yml.j2') }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
       tags:
         - tokman
       register: tokman
@@ -383,9 +386,12 @@
             - Restart nginx deployment
 
     - name: Deploy nginx to reverse proxy the pushgateway and flower
-      ansible.builtin.include_tasks: tasks/k8s.yml
-      loop:
-        - "{{ lookup('template', '{{ project_dir }}/openshift/nginx.yml.j2') }}"
+      k8s:
+        namespace: "{{ project }}"
+        definition: "{{ lookup('template', '{{ project_dir }}/openshift/nginx.yml.j2') }}"
+        host: "{{ host }}"
+        api_key: "{{ api_key }}"
+        validate_certs: "{{ validate_certs }}"
       tags:
         - pushgateway
       register: nginx
@@ -420,18 +426,18 @@
   handlers:
     - name: Restart redis-commander deployment
       ansible.builtin.command: oc rollout restart deploy/redis-commander
-      # Run this rollout restart only if the Deployment above didn't change,
-      # and so it wasn't rolled out yet.
+      # Restart/rollout deployment as a reaction to config change
+      # when the deployment hasn't been changed itself.
       when: not redis_commander.changed
 
     - name: Restart tokman deployment
       ansible.builtin.command: oc rollout restart deploy/tokman
-      # Run this rollout restart only if the Deployment above didn't change,
-      # and so it wasn't rolled out yet.
+      # Restart/rollout deployment as a reaction to config change
+      # when the deployment hasn't been changed itself.
       when: not tokman.changed
 
     - name: Restart nginx deployment
       ansible.builtin.command: oc rollout restart deploy/nginx
-      # Run this rollout restart only if the Deployment above didn't change,
-      # and so it wasn't rolled out yet.
+      # Restart/rollout deployment as a reaction to config change
+      # when the deployment hasn't been changed itself.
       when: not nginx.changed
