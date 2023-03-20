@@ -14,7 +14,7 @@
 #   https://docs.ansible.com/ansible/latest/user_guide/playbooks_conditionals.html#loops-and-conditionals
 - name: Create k8s object
   # https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
-  k8s:
+  kubernetes.core.k8s:
     namespace: "{{ project }}"
     resource_definition: "{{ item }}"
     host: "{{ host }}"
