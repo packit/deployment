@@ -30,6 +30,7 @@
         chdir: "{{ project_dir }}"
         # Remove the keys expected to be different and lines specific to the diff-format.
         cmd: >-
+          set -o pipefail;
           diff vars/{{ service }}/{{ deployment }}.yml vars/{{ service }}/{{ deployment }}_template.yml |
           sed '/api_key/d;/[0-9]\+c[0-9]\+/d;/---/d'
       register: diff
