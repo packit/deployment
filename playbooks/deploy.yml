@@ -428,16 +428,19 @@
       ansible.builtin.command: oc rollout restart deploy/redis-commander
       # Restart/rollout deployment as a reaction to config change
       # when the deployment hasn't been changed itself.
+      changed_when: false
       when: not redis_commander.changed
 
     - name: Restart tokman deployment # noqa: no-handler
       ansible.builtin.command: oc rollout restart deploy/tokman
       # Restart/rollout deployment as a reaction to config change
       # when the deployment hasn't been changed itself.
+      changed_when: false
       when: not tokman.changed
 
     - name: Restart nginx deployment # noqa: no-handler
       ansible.builtin.command: oc rollout restart deploy/nginx
       # Restart/rollout deployment as a reaction to config change
       # when the deployment hasn't been changed itself.
+      changed_when: false
       when: not nginx.changed
