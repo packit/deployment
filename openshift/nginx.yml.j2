@@ -112,6 +112,9 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: nginx
+  labels:
+    # used by internal Grafana
+    shard: internal
 spec:
   host: "{{ 'workers.stg.packit.dev' if deployment == 'stg' else 'workers.packit.dev' if deployment == 'prod'}}"
   port:

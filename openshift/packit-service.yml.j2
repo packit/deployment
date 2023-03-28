@@ -141,6 +141,8 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: packit-service
+  labels:
+    shard: ext-waf
 spec:
 # for local deployment (dev) creates default route for testing.
 # e.g https://packit-service-myproject.127.0.0.1.nip.io/

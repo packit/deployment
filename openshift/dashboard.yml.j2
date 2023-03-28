@@ -62,6 +62,8 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: packit-dashboard
+  labels:
+    shard: ext-waf
 spec:
   host: "{{ 'dashboard.stg.packit.dev' if deployment == 'stg' else 'dashboard.packit.dev' if deployment == 'prod'}}"
   port:
