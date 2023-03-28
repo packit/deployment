@@ -5,14 +5,14 @@
 - name: Check that the deployment resources are up-to-date
   when: zuul is not defined and check_up_to_date
   block:
-    - name: Get HEAD from the remote
+    - name: Get HEAD from the remote # noqa: command-instead-of-module
       ansible.builtin.command:
         chdir: "{{ project_dir }}"
         cmd: "git ls-remote {{ deployment_repo_url }} main"
       register: remote_head
       changed_when: remote_head.rc != 0
       failed_when: remote_head.rc != 0
-    - name: Get local HEAD
+    - name: Get local HEAD # noqa: command-instead-of-module
       ansible.builtin.command:
         chdir: "{{ project_dir }}"
         cmd: git show-ref -s refs/heads/main
@@ -30,6 +30,7 @@
         chdir: "{{ project_dir }}"
         # Remove the keys expected to be different and lines specific to the diff-format.
         cmd: >-
+          set -o pipefail;
           diff vars/{{ service }}/{{ deployment }}.yml vars/{{ service }}/{{ deployment }}_template.yml |
           sed '/api_key/d;/[0-9]\+c[0-9]\+/d;/---/d'
       register: diff
