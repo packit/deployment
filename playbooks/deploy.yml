@@ -61,6 +61,7 @@
         limits:
           memory: "128Mi"
           cpu: "50m"
+    appcode: PCKT-002
   tasks:
     - name: Include tasks/project-dir.yml
       ansible.builtin.include_tasks: tasks/project-dir.yml
@@ -173,7 +174,7 @@
         k8s_apply: true
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
-        - "{{ lookup('file', '{{ project_dir }}/openshift/redis.yml') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/redis.yml.j2') }}"
       tags:
         - redis
 
@@ -308,7 +309,7 @@
         k8s_apply: true
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
-        - "{{ lookup('file', '{{ project_dir }}/openshift/redis-commander.yml') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/redis-commander.yml.j2') }}"
       when: with_redis_commander
       tags:
         - redis-commander
@@ -317,7 +318,7 @@
     - name: Deploy flower
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
-        - "{{ lookup('file', '{{ project_dir }}/openshift/flower.yml') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/flower.yml.j2') }}"
       when: with_flower
       tags:
         - flower

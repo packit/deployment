@@ -6,6 +6,8 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: "sandcastle-repository-cache-{{ name }}"
+  labels:
+    paas.redhat.com/appcode: {{ appcode }}
 spec:
   # The only option on OpenShift Online is AWS EBS provisioning
   # supporting only `ReadWriteOnce` access:

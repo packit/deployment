@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         component: pushgateway
+        paas.redhat.com/appcode: {{ appcode }}
     spec:
       containers:
         - name: pushgateway
@@ -39,6 +40,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: pushgateway
+  labels:
+    paas.redhat.com/appcode: {{ appcode }}
 spec:
   ports:
     - name: prometheus-push
