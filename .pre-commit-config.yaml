@@ -20,12 +20,12 @@ repos:
         args:
           - --allow-missing-credentials
   - repo: https://github.com/ansible/ansible-lint.git
-    rev: v6.14.3
+    rev: v6.14.4
     hooks:
       - id: ansible-lint
         files: \.(yaml|yml)$
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black
   - repo: https://github.com/shellcheck-py/shellcheck-py

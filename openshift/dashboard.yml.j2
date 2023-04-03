@@ -18,6 +18,7 @@ spec:
     metadata:
       labels:
         component: packit-dashboard
+        paas.redhat.com/appcode: {{ appcode }}
     spec:
       containers:
         - name: packit-dashboard
@@ -50,6 +51,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: packit-dashboard
+  labels:
+    paas.redhat.com/appcode: {{ appcode }}
 spec:
   ports:
     - name: packit-dashboard-https
@@ -62,6 +65,9 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: packit-dashboard
+  labels:
+    paas.redhat.com/appcode: {{ appcode }}
+    shard: ext-waf
 spec:
   host: "{{ 'dashboard.stg.packit.dev' if deployment == 'stg' else 'dashboard.packit.dev' if deployment == 'prod'}}"
   port:

@@ -18,6 +18,7 @@ spec:
     metadata:
       labels:
         component: packit-service-beat
+        paas.redhat.com/appcode: {{ appcode }}
     spec:
       volumes:
         - name: packit-ssh

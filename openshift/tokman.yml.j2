@@ -18,6 +18,7 @@ spec:
     metadata:
       labels:
         component: tokman
+        paas.redhat.com/appcode: {{ appcode }}
     spec:
       volumes:
         - name: github-app-private-key
@@ -107,6 +108,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tokman
+  labels:
+    paas.redhat.com/appcode: {{ appcode }}
 spec:
   ports:
     - name: tokman
@@ -120,6 +123,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: access-tokens-pvc
+  labels:
+    paas.redhat.com/appcode: {{ appcode }}
 spec:
   accessModes:
     - ReadWriteOnce
