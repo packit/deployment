@@ -14,7 +14,9 @@ spec:
     metadata:
       labels:
         component: nginx
+{% if managed_platform %}
         paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
     spec:
       volumes:
       - name: nginx-config
@@ -100,8 +102,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx
+{% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
 spec:
   ports:
     - name: nginx-https
@@ -115,10 +119,12 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: nginx
+{% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}
     # used by internal Grafana
     shard: internal
+{% endif %}
 spec:
   host: "{{ 'workers.stg.packit.dev' if deployment == 'stg' else 'workers.packit.dev' if deployment == 'prod'}}"
   port:

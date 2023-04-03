@@ -61,6 +61,7 @@
         limits:
           memory: "128Mi"
           cpu: "50m"
+    managed_platform: false
     appcode: PCKT-002
   tasks:
     - name: Include tasks/project-dir.yml

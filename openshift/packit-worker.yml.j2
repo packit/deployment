@@ -22,8 +22,10 @@ spec:
 {% if with_repository_cache and 'long-running' in queues %}
     - metadata:
         name: packit-worker-repository-cache
+{% if managed_platform %}
         labels:
           paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
       spec:
         # The only option on OpenShift Online is AWS EBS provisioning
         # supporting only `ReadWriteOnce` access:
@@ -39,7 +41,9 @@ spec:
     metadata:
       labels:
         component: {{ name }}
+{% if managed_platform %}
         paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
       # https://docs.openshift.com/container-platform/latest/openshift_images/using-imagestreams-with-kube-resources.html
       annotations:
         alpha.image.policy.openshift.io/resolve-names: '*'

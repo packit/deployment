@@ -18,7 +18,9 @@ spec:
     metadata:
       labels:
         component: packit-service-fedmsg
+{% if managed_platform %}
         paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
     spec:
       volumes:
         - name: packit-config
