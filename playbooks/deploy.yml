@@ -425,21 +425,21 @@
       loop: "{{ deploymentconfigs }}"
 
   handlers:
-    - name: Restart redis-commander deployment # noqa: no-handler
+    - name: Restart redis-commander deployment
       ansible.builtin.command: oc rollout restart deploy/redis-commander
       # Restart/rollout deployment as a reaction to config change
       # when the deployment hasn't been changed itself.
       changed_when: false
       when: not redis_commander.changed
 
-    - name: Restart tokman deployment # noqa: no-handler
+    - name: Restart tokman deployment
       ansible.builtin.command: oc rollout restart deploy/tokman
       # Restart/rollout deployment as a reaction to config change
       # when the deployment hasn't been changed itself.
       changed_when: false
       when: not tokman.changed
 
-    - name: Restart nginx deployment # noqa: no-handler
+    - name: Restart nginx deployment
       ansible.builtin.command: oc rollout restart deploy/nginx
       # Restart/rollout deployment as a reaction to config change
       # when the deployment hasn't been changed itself.
