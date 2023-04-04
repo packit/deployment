@@ -14,7 +14,9 @@ spec:
     metadata:
       labels:
         component: redis-commander
+{% if managed_platform %}
         paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
     spec:
       containers:
         - name: redis-commander
@@ -64,9 +66,11 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: redis-commander
+{% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}
     shard: external
+{% endif %}
 spec:
   to:
     kind: Service

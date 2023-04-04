@@ -14,7 +14,9 @@ spec:
     metadata:
       labels:
         component: flower
+{% if managed_platform %}
         paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
     spec:
       containers:
         - name: flower
@@ -41,8 +43,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: flower
+{% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
 spec:
   ports:
     - name: "5555"

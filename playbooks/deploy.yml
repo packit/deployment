@@ -9,6 +9,8 @@
     validate_certs: true
     service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
+    tenant: packit # MP+ tenant
+    # sandbox_namespace: "{{ tenant }}--{{ deployment }}-sandbox"  # MP+
     sandbox_namespace: "{{ service }}-{{ deployment }}-sandbox"
     with_tokman: true
     with_fedmsg: true
@@ -61,6 +63,7 @@
         limits:
           memory: "128Mi"
           cpu: "50m"
+    managed_platform: false
     appcode: PCKT-002
   tasks:
     - name: Include tasks/project-dir.yml
@@ -153,7 +156,7 @@
     - name: Set up sandbox namespace
       when: with_sandbox
       block:
-        - name: Set finalizers to sandbox namespace
+        - name: Create sandbox namespace
           ansible.builtin.include_tasks: tasks/k8s.yml
           loop:
             - "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"

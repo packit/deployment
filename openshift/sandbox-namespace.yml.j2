@@ -2,6 +2,17 @@
 # SPDX-License-Identifier: MIT
 
 ---
+{% if managed_platform %}
+apiVersion: tenant.paas.redhat.com/v1alpha1
+kind: TenantNamespace
+metadata:
+  name: "{{ deployment }}-sandbox"
+  namespace: "{{ tenant }}--config"
+spec:
+  type: runtime
+  network:
+    security-zone: internal
+{% else %}
 apiVersion: project.openshift.io/v1
 kind: Project
 metadata:
@@ -9,3 +20,4 @@ metadata:
 spec:
   finalizers:
     - kubernetes
+{% endif %}
