@@ -35,3 +35,6 @@
     flower_htpasswd_path: "{{ path_to_secrets }}/flower-htpasswd"
   tags:
     - flower
+- name: Set managed_platform
+  ansible.builtin.set_fact:
+    managed_platform: "{{ 'api.mpp' in host }}"
