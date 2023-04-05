@@ -8,6 +8,10 @@ but which are processes and injected with secrets during the deployment process.
 If you want to see them rendered before you run the deployment,
 use `make render-secrets-from-templates`.
 
+## Install `bw` CLI
+
+https://bitwarden.com/help/cli/#download-and-install
+
 ## Update secrets in Bitwarden
 
 Use `scripts/update_bw_secret.sh` to update secrets, and don't have to click
