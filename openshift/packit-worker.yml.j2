@@ -72,6 +72,10 @@ spec:
               value: {{ distgit_url }}
             - name: DISTGIT_NAMESPACE
               value: {{ distgit_namespace }}
+{% if sourcegit_namespace %}
+            - name: SOURCEGIT_NAMESPACE
+              value: {{ sourcegit_namespace }}
+{% endif %}
             - name: PACKIT_USER_AGENT
               value: "packit.dev/{{ service }}-{{ deployment }} ({{ deployment }}+{{ service }}@packit.dev)"
             - name: APP

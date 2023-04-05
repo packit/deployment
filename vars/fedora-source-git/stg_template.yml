@@ -66,4 +66,6 @@ celery_retry_limit: 0
 # distgit_url: https://src.fedoraproject.org/
 # distgit_namespace: rpms
 
+sourcegit_namespace: "SETME"
+
 pushgateway_address: ""

@@ -46,6 +46,7 @@
     workers_long_running: 0
     distgit_url: https://src.fedoraproject.org/
     distgit_namespace: rpms
+    sourcegit_namespace: "" # fedora-source-git only
     pushgateway_address: http://pushgateway
     # Check that the deployment repo is up-to-date
     check_up_to_date: true
