@@ -40,9 +40,6 @@ with_dashboard: false
 
 with_pushgateway: false
 
-# you can set the sandbox namespace name explicitly like this
-# sandbox_namespace: packit-dev-sandbox
-
 # image to use for service
 # image: quay.io/packit/packit-service:{{ deployment }}
 

@@ -10,8 +10,6 @@
     service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
     tenant: packit # MP+ tenant
-    # sandbox_namespace: "{{ tenant }}--{{ deployment }}-sandbox"  # MP+
-    sandbox_namespace: "{{ service }}-{{ deployment }}-sandbox"
     with_tokman: true
     with_fedmsg: true
     with_redis_commander: false
@@ -21,7 +19,6 @@
     with_pushgateway: true
     with_repository_cache: true
     repository_cache_storage: 4Gi
-    with_sandbox: true
     push_dev_images: false
     with_fluentd_sidecar: false
     postgres_version: 13

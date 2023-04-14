@@ -42,9 +42,6 @@ with_flower: true
 
 with_fluentd_sidecar: true
 
-# you can set the sandbox namespace name explicitly like this
-# sandbox_namespace: packit-stg-sandbox
-
 # image to use for service
 # image: quay.io/packit/packit-service:{{ deployment }}
 

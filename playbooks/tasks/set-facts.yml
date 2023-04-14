@@ -30,11 +30,28 @@
     deploymentconfigs: '{{ mandatory_deploymentconfigs + optional_deploymentconfigs | dict2items | selectattr("value", "equalto", true) | list | map(attribute="key") | flatten }}'
   tags:
     - always
+
 - name: Set flower_htpasswd_path
   ansible.builtin.set_fact:
     flower_htpasswd_path: "{{ path_to_secrets }}/flower-htpasswd"
   tags:
     - flower
+
 - name: Set managed_platform
   ansible.builtin.set_fact:
     managed_platform: "{{ 'api.mpp' in host }}"
+
+- name: Set with_sandbox
+  ansible.builtin.set_fact:
+    with_sandbox: "{{ service == 'packit' }}"
+- name: Set sandbox_namespace
+  when: with_sandbox
+  block:
+    - name: Set sandbox_namespace (MP+)
+      ansible.builtin.set_fact:
+        sandbox_namespace: "{{ tenant }}--{{ deployment }}-sandbox"
+      when: managed_platform
+    - name: Set sandbox_namespace
+      ansible.builtin.set_fact:
+        sandbox_namespace: "{{ service }}-{{ deployment }}-sandbox"
+      when: not managed_platform
