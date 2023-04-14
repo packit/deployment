@@ -118,6 +118,8 @@ metadata:
 {% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}
+  annotations:
+    kubernetes.io/reclaimPolicy: Delete
 {% endif %}
 spec:
   accessModes:
@@ -125,3 +127,6 @@ spec:
   resources:
     requests:
       storage: "{{ '4Gi' if deployment == 'prod' else '1Gi' }}"
+{% if managed_platform %}
+  storageClassName: aws-ebs
+{% endif %}
