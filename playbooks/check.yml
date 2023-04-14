@@ -8,6 +8,7 @@
     service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
     path_to_secrets: "{{ project_dir }}/secrets/{{ service }}/{{ deployment }}"
+    postgres_version: 13
   tasks:
     - name: Include tasks/project-dir.yml
       ansible.builtin.include_tasks: tasks/project-dir.yml

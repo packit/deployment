@@ -8,7 +8,7 @@
 - name: Set mandatory_deploymentconfigs fact
   ansible.builtin.set_fact:
     mandatory_deploymentconfigs:
-      - postgres-13
+      - postgres-{{ postgres_version }}
       - redis
       - packit-service
   tags:

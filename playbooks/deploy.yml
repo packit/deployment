@@ -24,6 +24,7 @@
     with_sandbox: true
     push_dev_images: false
     with_fluentd_sidecar: false
+    postgres_version: 13
     image: quay.io/packit/packit-service:{{ deployment }}
     image_worker: quay.io/packit/packit-worker:{{ deployment }}
     image_fedmsg: quay.io/packit/packit-service-fedmsg:{{ deployment }}
