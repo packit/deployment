@@ -10,8 +10,6 @@
     service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
     deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
     tenant: packit # MP+ tenant
-    # sandbox_namespace: "{{ tenant }}--{{ deployment }}-sandbox"  # MP+
-    sandbox_namespace: "{{ service }}-{{ deployment }}-sandbox"
     with_tokman: true
     with_fedmsg: true
     with_redis_commander: false
@@ -21,9 +19,9 @@
     with_pushgateway: true
     with_repository_cache: true
     repository_cache_storage: 4Gi
-    with_sandbox: true
     push_dev_images: false
     with_fluentd_sidecar: false
+    postgres_version: 13
     image: quay.io/packit/packit-service:{{ deployment }}
     image_worker: quay.io/packit/packit-worker:{{ deployment }}
     image_fedmsg: quay.io/packit/packit-service-fedmsg:{{ deployment }}
@@ -64,7 +62,6 @@
         limits:
           memory: "128Mi"
           cpu: "50m"
-    managed_platform: false
     appcode: PCKT-002
   tasks:
     - name: Include tasks/project-dir.yml
@@ -162,7 +159,7 @@
           loop:
             - "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
         - name: Add edit role to service account in sandbox namespace
-          ansible.builtin.command: oc adm -n {{ sandbox_namespace }} policy add-role-to-user edit system:serviceaccount:{{ project }}:default
+          ansible.builtin.command: oc adm policy add-role-to-user edit system:serviceaccount:{{ project }}:default -n {{ sandbox_namespace }}
           register: rolebinding
           changed_when: "'added:' in rolebinding.stdout"
 

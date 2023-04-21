@@ -23,9 +23,6 @@ api_key: ""
 # Check that the current vars file us up to date with the template
 # check_vars_template_diff: true
 
-# you can set the sandbox namespace name explicitly like this
-# sandbox_namespace: packit-prod-sandbox
-
 # with_tokman: true
 
 # if you want to deploy fedmsg, please make sure to

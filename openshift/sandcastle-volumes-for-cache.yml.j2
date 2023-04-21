@@ -9,6 +9,8 @@ metadata:
 {% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}
+  annotations:
+    kubernetes.io/reclaimPolicy: Delete
 {% endif %}
 spec:
   # The only option on OpenShift Online is AWS EBS provisioning
@@ -18,3 +20,6 @@ spec:
   resources:
     requests:
       storage: {{ repository_cache_storage }}
+{% if managed_platform %}
+  storageClassName: aws-ebs
+{% endif %}

@@ -5,22 +5,22 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: postgres-13
+  name: postgres-{{ postgres_version }}
 spec:
   selector:
     matchLabels:
-      component: postgres-13
+      component: postgres-{{ postgres_version }}
   template:
     metadata:
       labels:
-        component: postgres-13
+        component: postgres-{{ postgres_version }}
 {% if managed_platform %}
         paas.redhat.com/appcode: {{ appcode }}
 {% endif %}
     spec:
       containers:
         - name: postgres
-          image: quay.io/sclorg/postgresql-13-c9s
+          image: quay.io/sclorg/postgresql-{{ postgres_version }}-c9s
           imagePullPolicy: IfNotPresent
           env:
             - name: POSTGRESQL_USER
@@ -71,7 +71,7 @@ spec:
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
-            claimName: postgres-13
+            claimName: postgres-{{ postgres_version }}
         - name: postgres-config
           configMap:
             name: postgres-config
@@ -109,15 +109,17 @@ spec:
       port: 5432
       targetPort: 5432
   selector:
-    component: postgres-13
+    component: postgres-{{ postgres_version }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-13
+  name: postgres-{{ postgres_version }}
 {% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}
+  annotations:
+    kubernetes.io/reclaimPolicy: Delete
 {% endif %}
 spec:
   accessModes:
@@ -125,3 +127,6 @@ spec:
   resources:
     requests:
       storage: "{{ '4Gi' if deployment == 'prod' else '1Gi' }}"
+{% if managed_platform %}
+  storageClassName: aws-ebs
+{% endif %}
