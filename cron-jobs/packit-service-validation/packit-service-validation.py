@@ -661,12 +661,17 @@ class Tests:
 class GitlabTests(Tests):
     test_case_kls = GitlabTestcase
 
-    def __init__(self, instance_url="https://gitlab.com"):
+    def __init__(
+        self,
+        instance_url="https://gitlab.com",
+        namespace="packit-service",
+        token_name="GITLAB_TOKEN",
+    ):
         gitlab_service = GitlabService(
-            token=getenv("GITLAB_TOKEN"), instance_url=instance_url
+            token=getenv(token_name), instance_url=instance_url
         )
         self.project: GitlabProject = gitlab_service.get_project(
-            repo="hello-world", namespace="packit-service"
+            repo="hello-world", namespace=namespace
         )
 
 
@@ -699,6 +704,42 @@ if __name__ == "__main__":
         GitlabTests().run()
     else:
         logging.info("GITLAB_TOKEN not set, skipping the validation for GitLab.")
+
+    if getenv("GITLAB_GNOME_TOKEN"):
+        logging.info("Running validation for GitLab (gitlab.gnome.org instance).")
+        GitlabTests(
+            instance_url="https://gitlab.gnome.org/",
+            namespace="packit-validation",
+            token_name="GITLAB_GNOME_TOKEN",
+        ).run()
+    else:
+        logging.info(
+            "GITLAB_GNOME_TOKEN not set, skipping the validation for GitLab (gitlab.gnome.org instance)."
+        )
+
+    if getenv("GITLAB_FREEDESKTOP_TOKEN"):
+        logging.info("Running validation for GitLab (gitlab.freedesktop.org instance).")
+        GitlabTests(
+            instance_url="https://gitlab.freedesktop.org/",
+            namespace="packit-validation",
+            token_name="GITLAB_FREEDESKTOP_TOKEN",
+        ).run()
+    else:
+        logging.info(
+            "GITLAB_FREEDESKTOP_TOKEN not set, skipping the validation for GitLab (gitlab.freedesktop.org instance)."
+        )
+
+    if getenv("GITLAB_SALSA_DEBIAN_TOKEN"):
+        logging.info("Running validation for GitLab (salsa.debian.org instance).")
+        GitlabTests(
+            instance_url="https://salsa.debian.org/",
+            namespace="packit-validation",
+            token_name="GITLAB_SALSA_DEBIAN_TOKEN",
+        ).run()
+    else:
+        logging.info(
+            "GITLAB_SALSA_DEBIAN_TOKEN not set, skipping the validation for GitLab (salsa.debian.org instance)."
+        )
 
     if getenv("GITHUB_TOKEN"):
         logging.info("Running validation for GitHub.")
