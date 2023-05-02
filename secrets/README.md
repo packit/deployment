@@ -99,7 +99,7 @@ Check [generate-secrets role](../roles/generate-secrets/files) to see some pre-f
 - `fedora.keytab` - Fedora kerberos.
 - `fedora.toml` - [fedora-messaging configuration](https://fedora-messaging.readthedocs.io/en/stable/configuration.html).
 - `fullchain.pem` & `privkey.pem`- Let's encrypt TLS certs.
-- `id_rsa[.pub]` - SSH keys, to push to a git forge.
+- `id_ed25519[.pub]` - SSH keys, to push to a git forge.
 - `packit-service.yaml.j2` - Template for the service/bot configuration with secret values to be taken from `extra-vars.yml`.
 - `private-key.pem` - Specified in a GitHub App settings. Used to [sign access token requests](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app).
 - `ssh_config` - SSH configuration to be able to run fedpkg inside the OpenShift pod.
@@ -131,6 +131,6 @@ copy into `dev/` and do some tweaks there - like:
 - `copr`: would be nice to use [your own token](https://copr.fedorainfracloud.org/api/) if you're planning to build in Copr
 - `fedora.toml`: there's (2x) unique queue uuid which needs to be replaced with a new generated (`uuidgen`) one
   (if you'll run [fedmsg](https://github.com/packit/packit-service-fedmsg))
-- `id_rsa[.pub]`: replace with your ssh keys
+- `id_ed25519[.pub]`: replace with your ssh keys
 
 Not all services use all of them. For example `copr` is needed only by `packit` service.
