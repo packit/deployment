@@ -72,7 +72,7 @@ metadata:
 {% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}
-    shard: ext-waf
+    shard: external
 {% endif %}
 spec:
   host: "{{ 'dashboard.stg.packit.dev' if deployment == 'stg' else 'dashboard.packit.dev' if deployment == 'prod'}}"
