@@ -40,12 +40,18 @@
 - name: Set managed_platform
   ansible.builtin.set_fact:
     managed_platform: "{{ 'api.mpp' in host }}"
+  tags:
+    - always
 
 - name: Set with_sandbox
   ansible.builtin.set_fact:
     with_sandbox: "{{ service == 'packit' }}"
+  tags:
+    - always
 - name: Set sandbox_namespace
   when: with_sandbox
+  tags:
+    - always
   block:
     - name: Set sandbox_namespace (MP+)
       ansible.builtin.set_fact:
