@@ -30,7 +30,7 @@ spec:
           secretName: flower-htpasswd
       containers:
       - name: nginx
-        image: nginxinc/nginx-unprivileged
+        image: ghcr.io/nginxinc/nginx-unprivileged
         ports:
         - containerPort: 8443
         volumeMounts:
