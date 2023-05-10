@@ -118,6 +118,10 @@ spec:
               value: "127.0.0.1"
             - name: KRB5CCNAME
               value: "DIR:/home/packit/kerberos/"
+{% if deployment != 'prod' %}
+            - name: SQLALCHEMY_WARN_20
+              value: "1"
+{% endif %}
           volumeMounts:
             - name: packit-ssh
               mountPath: /packit-ssh
