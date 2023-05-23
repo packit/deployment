@@ -5,7 +5,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: "sandcastle-repository-cache-{{ name }}"
+  name: "sandcastle-repository-cache-{{ component }}"
 {% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}

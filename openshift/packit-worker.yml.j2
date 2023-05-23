@@ -6,7 +6,7 @@
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: {{ name }}
+  name: {{ component }}
   annotations:
     # https://docs.openshift.com/container-platform/4.11/openshift_images/triggering-updates-on-imagestream-changes.html
     image.openshift.io/triggers: >-
@@ -15,8 +15,8 @@ spec:
   selector:
     matchLabels:
       # has to match .spec.template.metadata.labels
-      component: {{ name }}
-  serviceName: "{{ name }}"
+      component: {{ component }}
+  serviceName: "{{ component }}"
   replicas: {{ worker_replicas }}
   volumeClaimTemplates:
 {% if with_repository_cache and 'long-running' in queues %}
@@ -45,7 +45,7 @@ spec:
   template:
     metadata:
       labels:
-        component: {{ name }}
+        component: {{ component }}
 {% if managed_platform %}
         paas.redhat.com/appcode: {{ appcode }}
 {% endif %}

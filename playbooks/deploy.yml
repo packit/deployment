@@ -197,7 +197,7 @@
 
     - name: Deploy repository cache PVCs for packit-workers that serves both queues
       vars:
-        name: "packit-worker-{{ item }}"
+        component: "packit-worker-{{ item }}"
       k8s:
         namespace: "{{ sandbox_namespace }}"
         definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandcastle-volumes-for-cache.yml.j2') }}"
@@ -211,7 +211,7 @@
 
     - name: Deploy packit-worker to serve both queues
       vars:
-        name: packit-worker
+        component: packit-worker
         queues: "short-running,long-running"
         worker_replicas: "{{ workers_all_tasks }}"
         worker_requests_memory: "384Mi"
@@ -227,7 +227,7 @@
 
     - name: Deploy packit-worker to serve short-running queue
       vars:
-        name: packit-worker-short-running
+        component: packit-worker-short-running
         queues: "short-running"
         worker_replicas: "{{ workers_short_running }}"
         # Short-running tasks are just interactions with different services.
@@ -245,7 +245,7 @@
 
     - name: Deploy repository cache PVCs for packit-workers that serves long-running queue
       vars:
-        name: "packit-worker-long-running-{{ item }}"
+        component: "packit-worker-long-running-{{ item }}"
       k8s:
         namespace: "{{ sandbox_namespace }}"
         definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandcastle-volumes-for-cache.yml.j2') }}"
@@ -259,7 +259,7 @@
 
     - name: Deploy packit-worker to serve long-running queue
       vars:
-        name: packit-worker-long-running
+        component: packit-worker-long-running
         queues: "long-running"
         worker_replicas: "{{ workers_long_running }}"
         # cloning repos is memory intensive: glibc needs 300M+, kernel 600M+
