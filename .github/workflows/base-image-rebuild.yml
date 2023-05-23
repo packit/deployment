@@ -8,7 +8,8 @@ on:
     branches:
       - main
     paths:
-      - containers/Dockerfile.base
+      - containers/Containerfile.fedora
+      - containers/Containerfile.c9s
 
 jobs:
   build:
@@ -17,6 +18,13 @@ jobs:
 
     name: Build and push image
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - containerfile: containers/Containerfile.fedora
+            tags: "fedora latest"
+          - containerfile: containers/Containerfile.c9s
+            tags: "c9s"
 
     steps:
       - uses: actions/checkout@v3
@@ -25,9 +33,11 @@ jobs:
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
-          containerfiles: containers/Dockerfile.base
+          containerfiles: ${{ matrix.containerfile }}
           image: base
-          oci: true
+          tags: ${{ matrix.tags }}
+          # Uncomment once we stop using oc cluster up for tests
+          #           oci: true
 
       - name: Push To Quay
         uses: redhat-actions/push-to-registry@v2
