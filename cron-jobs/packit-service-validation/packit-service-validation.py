@@ -729,16 +729,16 @@ if __name__ == "__main__":
             "GITLAB_FREEDESKTOP_TOKEN not set, skipping the validation for GitLab (gitlab.freedesktop.org instance)."
         )
 
-    if getenv("GITLAB_SALSA_DEBIAN_TOKEN"):
+    if getenv("SALSA_DEBIAN_TOKEN"):
         logging.info("Running validation for GitLab (salsa.debian.org instance).")
         GitlabTests(
             instance_url="https://salsa.debian.org/",
             namespace="packit-validation",
-            token_name="GITLAB_SALSA_DEBIAN_TOKEN",
+            token_name="SALSA_DEBIAN_TOKEN",
         ).run()
     else:
         logging.info(
-            "GITLAB_SALSA_DEBIAN_TOKEN not set, skipping the validation for GitLab (salsa.debian.org instance)."
+            "SALSA_DEBIAN_TOKEN not set, skipping the validation for GitLab (salsa.debian.org instance)."
         )
 
     if getenv("GITHUB_TOKEN"):
