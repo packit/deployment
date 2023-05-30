@@ -1,0 +1,19 @@
+---
+- name: Set generate_secrets_project_dir (when zuul is not defined)
+  ansible.builtin.set_fact:
+    generate_secrets_project_dir: "{{ playbook_dir }}/.."
+  when: zuul is not defined
+- name: Set generate_secrets_project_dir (when zuul is defined)
+  ansible.builtin.set_fact:
+    generate_secrets_project_dir: "{{ ansible_user_dir }}/{{ zuul.project.src_dir }}"
+  when: zuul is defined
+- name: Stat {{ generate_secrets_project_dir }}
+  ansible.builtin.stat:
+    path: "{{ generate_secrets_project_dir }}"
+  tags:
+    - no-cache
+  register: generate_secrets_project_dir_stat
+- name: Assert generate_secrets_project_dir is a directory
+  ansible.builtin.assert:
+    that:
+      - generate_secrets_project_dir_stat.stat.isdir

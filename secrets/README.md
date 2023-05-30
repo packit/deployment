@@ -92,7 +92,7 @@ they pick up the change.
 ## What secret files the deployment expects
 
 Not all services expect all of them. For example source-git services don't need `copr` & `private-key.pem`.
-Check [generate-secrets role](../roles/generate-secrets/files) to see some pre-filled.
+Check [generate_secrets role](../playbooks/roles/generate_secrets/files) to see some pre-filled.
 
 - `copr` - Your copr credentials.
 - `extra-vars.yml` - tokens, passwords, keys, etc.
@@ -112,7 +112,7 @@ run `SERVICE=the-service DEPLOYMENT=dev make deploy`.
 Local deployment needs some secrets which can be obtained using the steps listed below:
 
 - Create `dev` directory under `secrets/{SERVICE}/`
-- Replace variables with your user specific values in `roles/generate-secrets/vars/main.yml`
+- Replace variables with your user specific values in `playbooks/roles/generate_secrets/vars/main.yml`
 - Generate the secrets either by running `make generate-local-secrets` or manually.
 
 ### How to populate {SERVICE}/dev/ manually

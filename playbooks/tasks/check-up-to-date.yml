@@ -24,25 +24,24 @@
         that:
           - remote_head.stdout.split()[0] == local_head.stdout
         fail_msg: "The main branch of the deployment repo is not up-to-date"
-    - name: Calculate the diff of the current vars file
+    - name: Calculate the diff of the current vars file # noqa: risky-shell-pipe
       when: check_vars_template_diff
       ansible.builtin.shell:
         chdir: "{{ project_dir }}"
         # Remove the keys expected to be different and lines specific to the diff-format.
         cmd: >-
-          set -o pipefail;
           diff vars/{{ service }}/{{ deployment }}.yml vars/{{ service }}/{{ deployment }}_template.yml |
           sed '/api_key/d;/[0-9]\+c[0-9]\+/d;/---/d'
-      register: diff
-      changed_when: diff.rc != 0
-      failed_when: diff.rc != 0
+      register: vars_diff
+      changed_when: vars_diff.rc != 0
+      failed_when: vars_diff.rc != 0
     - name: Check that there are no unexpected lines in the diff
       when: check_vars_template_diff
       ansible.builtin.assert:
         that:
-          - not diff.stdout
+          - not vars_diff.stdout
         fail_msg: >-
           The diff between
           'vars/{{ service }}/{{ deployment }}.yml' and
           'vars/{{ service }}/{{ deployment }}_template.yml' has some
-          unexpected lines: {{ diff.stdout }}
+          unexpected lines: {{ vars_diff.stdout }}
