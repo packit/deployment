@@ -37,12 +37,16 @@ Long story:
 If you need to import (and deploy) newer image(s) before the CronJob does
 (see above), you can do that manually:
 
-    $ oc get is
-    $ oc import-image is/packit-{service|worker|dashboard|service-fedmsg|tokman}:prod
+    oc get is
+    oc import-image is/$NAME:prod
 
-once a new image is pushed/built in registry.
+once a new image is pushed/built in registry. (`$NAME` is name of an image stream from `oc get is`)
 
-There's also 'import-images' target in the Makefile, so `DEPLOYMENT=prod make import-images` does this for you for all images (image streams).
+There's also `import-images` target in the Makefile, so `DEPLOYMENT=prod make import-images` does this for you for all images (image streams).
+
+To see the history of imported images in an image stream:
+
+    oc describe is/$NAME:prod
 
 ### Reverting to older deployment/revision/image
 
