@@ -721,7 +721,7 @@ if __name__ == "__main__":
         logging.info("Running validation for GitLab (gitlab.freedesktop.org instance).")
         GitlabTests(
             instance_url="https://gitlab.freedesktop.org/",
-            namespace="packit-validation",
+            namespace="packit-service",
             token_name="GITLAB_FREEDESKTOP_TOKEN",
         ).run()
     else:
