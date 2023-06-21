@@ -11,6 +11,7 @@ ifneq "$(shell whoami)" "root"
 	ASK_PASS ?= --ask-become-pass
 endif
 
+# Only for Packit team members with access to Bitwarden vault
 download-secrets:
 	./scripts/download_secrets.sh
 

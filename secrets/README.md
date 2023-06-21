@@ -2,7 +2,8 @@
 
 During deployment (`make deploy`), secret files are downloaded from a vault
 into one of the subdirectories and transformed into Kubernetes/Openshift secrets.
-They can also be downloaded independently with `make download-secrets`.
+They can also be downloaded independently with `make download-secrets`
+(only Packit team members with access to Bitwarden vault).
 By default, these subdirectories contain only templates, which don't contain any secret,
 but which are processes and injected with secrets during the deployment process.
 If you want to see them rendered before you run the deployment,
@@ -97,40 +98,33 @@ Check [generate_secrets role](../playbooks/roles/generate_secrets/files) to see 
 - `copr` - Your copr credentials.
 - `extra-vars.yml` - tokens, passwords, keys, etc.
 - `fedora.keytab` - Fedora kerberos.
-- `fedora.toml` - [fedora-messaging configuration](https://fedora-messaging.readthedocs.io/en/stable/configuration.html).
+- `fedora.toml` - [fedora-messaging configuration](https://fedora-messaging.readthedocs.io/en/stable/configuration.html). Generated from `fedora.toml.j2` and `extra-vars.yml` either during deployment or manually with `make render-secrets-from-templates`.
 - `fullchain.pem` & `privkey.pem`- Let's encrypt TLS certs.
 - `id_ed25519[.pub]` - SSH keys, to push to a git forge.
-- `packit-service.yaml.j2` - Template for the service/bot configuration with secret values to be taken from `extra-vars.yml`.
+- `packit-service.yaml` - The service configuration. Generated from `packit-service.yaml.j2` and `extra-vars.yml` either during deployment or manually with `make render-secrets-from-templates`.
 - `private-key.pem` - Specified in a GitHub App settings. Used to [sign access token requests](https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app).
 - `ssh_config` - SSH configuration to be able to run fedpkg inside the OpenShift pod.
 
 ## Running a service/bot locally
 
-To deploy a {SERVICE} into your [local Openshift cluster](../docs/testing-changes.md),
-run `SERVICE=the-service DEPLOYMENT=dev make deploy`.
+Before you can [try the service locally](../docs/testing-changes.md)
+you need to have expected secrets in `secrets/{SERVICE}/dev/`. Either
 
-Local deployment needs some secrets which can be obtained using the steps listed below:
+- generate them with `make generate-local-secrets` or
+- if you're a Packit team member with access to Bitwarden vault, download `stg/` secrets (`DEPLOYMENT=stg make download-secrets`) and copy into `dev/`
 
-- Create `dev` directory under `secrets/{SERVICE}/`
-- Replace variables with your user specific values in `playbooks/roles/generate_secrets/vars/main.yml`
-- Generate the secrets either by running `make generate-local-secrets` or manually.
-
-### How to populate {SERVICE}/dev/ manually
-
-The easiest is to download `stg/` secrets (`DEPLOYMENT=stg make download-secrets`),
-copy into `dev/` and do some tweaks there - like:
+In both cases you have to do some tweaks before using them:
 
 - `packit-service.yaml.j2`:
-  - `deployment: stg` -> `deployment: dev`
-  - `fas_user: packit` -> `fas_user: your-fas-username`
-  - `validate_webhooks: true` -> `validate_webhooks: false`
-  - `server_name: stg.packit.dev` -> `server_name: service.localhost:8443`
+  - `deployment: dev`
+  - `fas_user: your-fas-username`
+  - `validate_webhooks: false`
+  - `server_name: service.localhost:8443`
 - `extra-vars.yml`
   - would be nice to use your tokens/api keys in `packit_service.authentication`, but it's not crucial since it's for staging instances
   - `sentry.dsn`: just empty it to not send your devel bugs to Sentry
+  - `fedora_messaging`: replace with a new generated (`uuidgen`) one (if you'll run [fedmsg](https://github.com/packit/packit-service-fedmsg))
 - `copr`: would be nice to use [your own token](https://copr.fedorainfracloud.org/api/) if you're planning to build in Copr
-- `fedora.toml`: there's (2x) unique queue uuid which needs to be replaced with a new generated (`uuidgen`) one
-  (if you'll run [fedmsg](https://github.com/packit/packit-service-fedmsg))
 - `id_ed25519[.pub]`: replace with your ssh keys
 
 Not all services use all of them. For example `copr` is needed only by `packit` service.
