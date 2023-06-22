@@ -7,6 +7,11 @@ AP := ansible-playbook -vv -c local -i localhost, -e ansible_python_interpreter=
 # https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html#special-tags
 TAGS ?= all
 
+ifneq "$(shell whoami)" "root"
+	ASK_PASS ?= --ask-become-pass
+endif
+
+# Only for Packit team members with access to Bitwarden vault
 download-secrets:
 	./scripts/download_secrets.sh
 
@@ -36,7 +41,7 @@ zuul-secrets:
 	$(AP) playbooks/zuul-secrets.yml
 
 generate-local-secrets:
-	$(AP) playbooks/generate-local-secrets.yml
+	$(AP) $(ASK_PASS) playbooks/generate-local-secrets.yml
 
 # Check whether everything has been deployed OK with 'make deploy'
 check:

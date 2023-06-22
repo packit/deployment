@@ -1,16 +1,21 @@
 ## How do I test my changes?
 
+In all cases, you first need to [get or generate expected secrets in `secrets/{SERVICE}/dev/`](../secrets/README.md#running-a-servicebot-locally).
+
 ### docker-compose (quick & dirty)
 
-There's a [docker-compose.yml in packit-service](https://github.com/packit/packit-service/blob/main/docker-compose.yml).
-See [Running packit-service locally](https://github.com/packit/packit-service/blob/main/CONTRIBUTING.md#running-packit-service-locally) for how to make that work.
+Before you follow [Running packit-service locally](https://github.com/packit/packit-service/blob/main/CONTRIBUTING.md#running-packit-service-locally):
+
+- [get/generate the secrets](../secrets/README.md#running-a-servicebot-locally)
+- run `DEPLOYMENT=dev make render-secrets-from-templates` to create `packit-service.yaml` and `fedora.toml` from their templates and `extra-vars.yml`
+- copy the `secrets/{SERVICE}/dev/*` to `secrets/{SERVICE}/dev/` in cloned `packit-service` repo
 
 ### oc cluster up (slow & better)
 
 Because we run the service in OpenShift the more reliable way to test it
 is to run an Openshift cluster locally and deploy the service there.
-`oc cluster up` spawns the Openshift cluster.
-Create `secrets/packit/dev/` (steal them from our secret repo, see READMEs there).
+`oc cluster up` spawns the Openshift (v3) cluster.
+[Create `secrets/packit/dev/`](../secrets/README.md#running-a-servicebot-locally),
 `cd vars/packit; cp dev_template.yml dev.yml` and
 in `dev.yml` set `api_key` to the output of `oc whoami -t`.
 
@@ -31,10 +36,6 @@ from the minishift environment after you start minishift:
 
 and then build worker & service images (`make worker; make service` in `packit-service` repo)
 with Docker, before you run `DEPLOYMENT=dev make deploy`.
-
-#### Generating secrets for local deployment
-
-See [secrets/README.md](../secrets/README.md)
 
 ### Staging (quick & reliable & but don't break it)
 
