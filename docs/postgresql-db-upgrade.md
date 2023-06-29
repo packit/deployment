@@ -1,11 +1,15 @@
-## PostgreSQL data migration
+---
+title: PostgreSQL Data Migration
+---
+
+# PostgreSQL data migration
 
 To write out the data from the database `pg_dumpall` command can be used (or `pg_dump packit` to dump only packit
 database). The command creates a file with SQL commands for restoring the database. The only impact of running
 `pg_dump`/`pg_dumpall` should be the increased I/O load and the long-running transaction it creates.
 To import the data `psql` command can be used.
 
-### Upgrade
+## Upgrade
 
 When upgrading the database between major versions, the data can be incompatible with the new version.
 
