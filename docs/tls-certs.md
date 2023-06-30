@@ -1,36 +1,40 @@
-## Obtaining a Let's Encrypt TLS cert using `certbot`
+---
+title: Generating TLS Certificates
+---
 
-Certbot manual: https://certbot.eff.org/docs/using.html#manual
+# Obtaining a Let's Encrypt TLS cert using `certbot`
+
+CertBot manual: https://certbot.eff.org/docs/using.html#manual
 
 Please bear in mind this is the easiest process I was able to figure out: there
 is a ton of places for improvements and ideally
 [make it automated 100%](https://github.com/packit/research/tree/main/cert_management_automation).
 
-We are using multi-domain wildcard certificates for following domains:
+We are using multi-domain wildcard certificates for the following domains:
 
-- \*.packit.dev
-- \*.stream.packit.dev
-- \*.fedora-source-git.packit.dev
-- \*.stg.packit.dev
-- \*.stg.stream.packit.dev
-- \*.stg.fedora-source-git.packit.dev
+- `*.packit.dev`
+- `*.stream.packit.dev`
+- `*.fedora-source-git.packit.dev`
+- `*.stg.packit.dev`
+- `*.stg.stream.packit.dev`
+- `*.stg.fedora-source-git.packit.dev`
 
 In case the procedure bellow does not work,
 [previously used http challenge](https://github.com/packit/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot)
 can be used instead.
 Be aware that the http challenge approach is more complex, includes destructive actions and longer downtime.
 
-TL;DR
+tl;dr
 
-1. Check prerequisites.
-2. Run certbot to obtain the challenges.
-3. Configure DNS TXT records based on values requested in 2.
-4. Update secrets repository.
-5. Re-deploy stg&prod.
+> 1. Check prerequisites.
+> 2. Run certbot to obtain the challenges.
+> 3. Configure DNS TXT records based on values requested in 2.
+> 4. Update secrets repository.
+> 5. Re-deploy stg&prod.
 
 _Note: If certbot is executed against multiple domains, step 3. is repeated for each domain._
 
-### 1. Prerequisites
+## Prerequisites
 
 Make sure the DNS is all set up:
 
@@ -48,7 +52,7 @@ Check if you have access to packit.dev domain in
 
 Check/install certbot locally: `dnf install certbot`.
 
-### 2. Run certbot to obtain the challenges
+## Run certbot to obtain the challenges
 
 Run certbot:
 
@@ -66,7 +70,7 @@ You will be asked to set TXT record for every domain requested:
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     Press Enter to Continue
 
-### 3. Update DNS record
+## Update DNS record
 
 Go to [Google Domains](https://domains.google.com/m/registrar/packit.dev/dns)
 and create/set the corresponding value:
@@ -92,31 +96,33 @@ Go to the terminal with certbot command waiting for your action and hit Enter.
 
 Repeat this for all requested domains.
 
-### 4. Update secrets in vault
+## Update secrets in the vault
 
 [Upload](https://bitwarden.com/help/attachments/#upload-a-file)
 `fullchain.pem` and `privkey.pem` from `~/.certbot/live/packit.dev/`
 to `secrets-tls-certs` item in our shared `Packit` collection in Bitwarden vault.
 
-### 5. Re-deploy secrets for all services and environments:
+## Re-deploy secrets for all services and environments
 
-`oc login <cluster>; oc project <project>` and
+`oc login ‹cluster›; oc project ‹project›` and
 
     for cert in fullchain privkey; do scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/packit.dev/${cert}.pem; done
 
 or update `api_key` in `vars/{packit|stream|fedora-source-git}/{prod|stg}.yml` and run:
 
-    `SERVICE=<service> DEPLOYMENT=<deployment> make deploy TAGS=secrets`
+    `SERVICE=‹service› DEPLOYMENT=‹deployment› make deploy TAGS=secrets`
 
 You can also update the `packit-secrets` secret via the web console
-(`Actions` -> `Edit Secret`), but last time it probably (it happened at the same time)
+(`Actions` → `Edit Secret`), but last time it probably (it happened at the same time)
 mangled also the `fedora.keytab`, so just be aware that this might happen.
 
 Restart (or scale down and up) `packit-service`, `packit-dashboard` and `nginx` for them to use the new certs.
 
     $ for deploy in packit-service packit-dashboard nginx; do oc rollout restart deploy/${deploy}; done
 
-### How to inspect a certificate
+---
+
+## How to inspect a certificate
 
 If you want to inspect local certificates, you can use `certtool` (`gnutls-utils` package)
 to view the cert's metadata:

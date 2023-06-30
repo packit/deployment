@@ -1,4 +1,10 @@
-## [Logs aggregation](https://github.com/packit/research/tree/main/logs-aggregation)
+---
+title: Logs
+---
+
+# Logs
+
+See a research for [Logs aggregation](https://github.com/packit/research/tree/main/logs-aggregation).
 
 Each worker pod has a sidecar container running [Fluentd](https://docs.fluentd.org),
 which is a data collector allowing us to get the logs from a worker via
@@ -8,12 +14,12 @@ We use [our fluentd-splunk-hec image](https://quay.io/repository/packit/fluentd-
 built via [a workflow](https://github.com/packit/fluent-plugin-splunk-hec/blob/main/.github/workflows/rebuild-and-push-image.yml)
 because we don't want to use [docker.io/splunk/fluentd-hec image](https://hub.docker.com/r/splunk/fluentd-hec).
 
-### Where do I find the logs?
+## Where do I find the logs?
 
 First, you have to [get access to Splunk](https://source.redhat.com/departments/it/splunk/splunk_wiki/faq#jive_content_id_How_do_I_request_access_to_Splunk)
 (CMDB ID is 'PCKT-002').
 
-Then go to https://rhcorporate.splunkcloud.com -> `Search & Reporting`
+Then go to https://rhcorporate.splunkcloud.com → `Search & Reporting`
 
 [The more specific search, the faster it'll be](https://source.redhat.com/departments/it/splunk/splunk_wiki/splunk_training_search_best_practices#jive_content_id_Be_more_specific).
 At least, specify `index`, `source` and `msgid`.
@@ -35,9 +41,9 @@ For more info, see (Red Hat internal):
 - [demo](https://drive.google.com/file/d/15BIsRl7fP9bPdyLBQvoljF2yHy52ZqHm)
 - [Splunk wiki @ Source](https://source.redhat.com/departments/it/splunk)
 
-### Debugging
+## Debugging
 
-To see the sidecar container logs, select a worker pod -> `Logs` -> `fluentd-sidecar`.
+To see the sidecar container logs, select a worker pod → `Logs` → `fluentd-sidecar`.
 
 To [manually send some event to Splunk](https://docs.splunk.com/Documentation/SplunkCloud/8.2.2203/Data/UsetheHTTPEventCollector#Send_data_to_HTTP_Event_Collector)
 try this (get the host & token from Bitwarden):

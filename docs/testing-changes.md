@@ -1,8 +1,12 @@
-## How do I test my changes?
+---
+title: Testing Changes
+---
+
+# How do I test my changes?
 
 In all cases, you first need to [get or generate expected secrets in `secrets/{SERVICE}/dev/`](../secrets/README.md#running-a-servicebot-locally).
 
-### docker-compose (quick & dirty)
+## `docker-compose` (quick & dirty)
 
 Before you follow [Running packit-service locally](https://github.com/packit/packit-service/blob/main/CONTRIBUTING.md#running-packit-service-locally):
 
@@ -10,7 +14,7 @@ Before you follow [Running packit-service locally](https://github.com/packit/pac
 - run `DEPLOYMENT=dev make render-secrets-from-templates` to create `packit-service.yaml` and `fedora.toml` from their templates and `extra-vars.yml`
 - copy the `secrets/{SERVICE}/dev/*` to `secrets/{SERVICE}/dev/` in cloned `packit-service` repo
 
-### oc cluster up (slow & better)
+## `oc cluster up` (slow & better)
 
 Because we run the service in OpenShift the more reliable way to test it
 is to run an Openshift cluster locally and deploy the service there.
@@ -23,7 +27,7 @@ Run `DEPLOYMENT=dev make deploy`.
 That will also push locally built images (`:dev`) into the cluster's registry
 (make sure you have `push_dev_images: true` in `vars/packit/dev.yml`).
 
-### minishift
+## MiniShift
 
 Similar to above 'oc cluster up' you can run [minishift](https://www.okd.io/minishift/) to get
 a local OpenShift cluster.
@@ -37,7 +41,7 @@ from the minishift environment after you start minishift:
 and then build worker & service images (`make worker; make service` in `packit-service` repo)
 with Docker, before you run `DEPLOYMENT=dev make deploy`.
 
-### Staging (quick & reliable & but don't break it)
+## Staging (quick & reliable, but don't break it)
 
 If you're fairly sure your changes won't do any harm,
 you can temporarily get hold of staging instance for that.
