@@ -32,7 +32,7 @@ This file documents basic usage, for more info see
 1. Configure the deployment by creating a variable file in 'vars/' from a
    template as described in [vars/README](vars/README.md).
 2. Install some dependencies:
-   - `dnf install ansible python3-openshift jq make`
+   - `dnf install ansible python3-openshift python3-passlib jq make`
    - `dnf install origin-clients` or (for a more recent version) download
      `openshift-client-linux` from the [OKD
      releases](https://github.com/openshift/okd/releases) page, unpack it, and
