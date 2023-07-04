@@ -30,7 +30,7 @@ spec:
           secretName: flower-htpasswd
       containers:
       - name: nginx
-        image: nginxinc/nginx-unprivileged
+        image: ghcr.io/nginxinc/nginx-unprivileged
         ports:
         - containerPort: 8443
         volumeMounts:
@@ -46,7 +46,7 @@ spec:
         resources:
           requests:
             memory: "8Mi"
-            cpu: "1m"
+            cpu: "5m"
           limits:
             memory: "32Mi"
             cpu: "10m"
@@ -123,7 +123,7 @@ metadata:
   labels:
     paas.redhat.com/appcode: {{ appcode }}
     # used by internal Grafana
-    shard: internal
+    shard: external
 {% endif %}
 spec:
   host: "{{ 'workers.stg.packit.dev' if deployment == 'stg' else 'workers.packit.dev' if deployment == 'prod'}}"
