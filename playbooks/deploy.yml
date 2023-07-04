@@ -155,9 +155,11 @@
       when: with_sandbox
       block:
         - name: Create sandbox namespace
-          ansible.builtin.include_tasks: tasks/k8s.yml
-          loop:
-            - "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
+          k8s:
+            resource_definition: "{{ lookup('template', '{{ project_dir }}/openshift/sandbox-namespace.yml.j2') }}"
+            host: "{{ host }}"
+            api_key: "{{ api_key }}"
+            validate_certs: "{{ validate_certs }}"
         - name: Add edit role to service account in sandbox namespace
           ansible.builtin.command: oc adm policy add-role-to-user edit system:serviceaccount:{{ project }}:default -n {{ sandbox_namespace }}
           register: rolebinding

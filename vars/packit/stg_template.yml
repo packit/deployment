@@ -7,9 +7,11 @@
 
 # Openshift project/namespace name
 project: packit-stg
+# project: packit--stg # MP+
 
 # Openshift cluster url
 host: https://api.auto-prod.gi0n.p1.openshiftapps.com:6443
+# host: https://api.mpp-e1-preprod.syvu.p1.openshiftapps.com:6443 # MP+
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
@@ -67,6 +69,8 @@ with_fluentd_sidecar: true
 # It's set to "/usr/bin/podman" if there's podman installed, or to 'docker' otherwise.
 # If you still want to use docker even when podman is installed, set:
 # container_engine: docker
+
+# postgres_version: 15 # MP+
 
 # Celery retry parameters
 # celery_retry_limit: 2
