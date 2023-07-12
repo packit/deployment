@@ -22,9 +22,9 @@ jobs:
       matrix:
         include:
           - containerfile: containers/Containerfile.fedora
-            tags: "fedora latest"
+            tags: "fedora"
           - containerfile: containers/Containerfile.c9s
-            tags: "c9s"
+            tags: "c9s latest"
 
     steps:
       - uses: actions/checkout@v3
