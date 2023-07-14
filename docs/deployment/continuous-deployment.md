@@ -78,7 +78,7 @@ because you don't know what's the cause/fix yet, you have to:
 
 1.  Select older image (hash)
 
-    $ oc describe is/packit-worker
+        $ oc describe is/packit-worker
 
 2.  Tag the older image
 
@@ -89,5 +89,5 @@ because you don't know what's the cause/fix yet, you have to:
 
 3.  Once you've built a fixed image, run
 
-    $ oc tag quay.io/packit/packit-worker:‹deployment› \
-     packit-prod/packit-worker:‹deployment›
+        $ oc tag quay.io/packit/packit-worker:‹deployment› \
+            packit-prod/packit-worker:‹deployment›
