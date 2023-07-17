@@ -60,7 +60,7 @@ spec:
               cpu: "30m"
             limits:
               memory: "{{ '4Gi' if project == 'packit-prod' else '256Mi' }}"
-              cpu: "{{ '1Gi' if project == 'packit-prod' else '300m' }}"
+              cpu: "1"
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/pgsql/data
