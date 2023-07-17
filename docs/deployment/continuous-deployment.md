@@ -32,7 +32,7 @@ It has several significant benefits:
 
 1. Trigger `:prod` images builds
 
-   - Run [scripts/move_stable.py](../scripts/move_stable.py) to move `stable` branches to a newer commit.
+   - Run [scripts/move_stable.py](https://github.com/packit/deployment/blob/main/scripts/move_stable.py) to move `stable` branches to a newer commit.
 
 2. Import images -> re-deploy
 

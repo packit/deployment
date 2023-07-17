@@ -11,7 +11,7 @@ Runs on the same cluster as production, but there are a few slight differences.
 There are fewer workers and some components (namely `postgres`) have less resources.
 
 The namespace has a default
-[taint toleration](<(https://docs.openshift.com/container-platform/latest/nodes/scheduling/nodes-scheduler-taints-tolerations.html)>)
+[taint toleration](https://docs.openshift.com/container-platform/latest/nodes/scheduling/nodes-scheduler-taints-tolerations.html)
 
 ```yaml
 scheduler.alpha.kubernetes.io/defaultTolerations:
@@ -29,7 +29,7 @@ scheduler.alpha.kubernetes.io/defaultTolerations:
 with [AWS Spot Instances](https://aws.amazon.com/ec2/spot).
 If you want to explicitly request those nodes for some component (workers),
 you need to add a
-[node selector](<(https://docs.openshift.com/container-platform/latest/nodes/scheduling/nodes-scheduler-node-selectors.html)>)
+[node selector](https://docs.openshift.com/container-platform/latest/nodes/scheduling/nodes-scheduler-node-selectors.html)
 to its `StatefulSet`/`Deployment`.
 
 ```yaml
@@ -90,7 +90,7 @@ To make it work, you need to:
   to be executed or create a new pod (e.g.
   `oc create -f ./openshift/repository-cache-filler.yml`
   using and adjusting the name of
-  the volume in [this definition](../openshift/repository-cache-filler.yml))
+  the volume in [this definition](https://github.com/packit/deployment/blob/main/openshift/repository-cache-filler.yml))
   with the volume attached. This will block the creation of the sandbox pods
   because the volume can't be mounted from multiple pods, so don't forget to
   delete the pod after you finished populating the cache.
