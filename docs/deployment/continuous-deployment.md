@@ -32,7 +32,7 @@ It has several significant benefits:
 
 1. Trigger `:prod` images builds
 
-   - Run [scripts/move_stable.py](../scripts/move_stable.py) to move `stable` branches to a newer commit.
+   - Run [scripts/move_stable.py](https://github.com/packit/deployment/blob/main/scripts/move_stable.py) to move `stable` branches to a newer commit.
 
 2. Import images -> re-deploy
 
@@ -78,7 +78,7 @@ because you don't know what's the cause/fix yet, you have to:
 
 1.  Select older image (hash)
 
-    $ oc describe is/packit-worker
+        $ oc describe is/packit-worker
 
 2.  Tag the older image
 
@@ -89,5 +89,5 @@ because you don't know what's the cause/fix yet, you have to:
 
 3.  Once you've built a fixed image, run
 
-    $ oc tag quay.io/packit/packit-worker:‹deployment› \
-     packit-prod/packit-worker:‹deployment›
+        $ oc tag quay.io/packit/packit-worker:‹deployment› \
+            packit-prod/packit-worker:‹deployment›

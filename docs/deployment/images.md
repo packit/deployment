@@ -19,7 +19,7 @@ We build separate images for
 Separate images are built for staging and production deployment.
 Staging images are `:stg` tagged and built from `main` branches.
 Production images are `:prod` tagged and built from `stable` branches.
-To move `stable` branches to a newer “_stable commit_” we use [`scripts/move_stable.py`](../scripts/move_stable.py)
+To move `stable` branches to a newer “_stable commit_” we use [`scripts/move_stable.py`](https://github.com/packit/deployment/blob/main/scripts/move_stable.py)
 
 ## Image build process
 
