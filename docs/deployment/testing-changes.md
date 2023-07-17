@@ -4,13 +4,13 @@ title: Testing Changes
 
 # How do I test my changes?
 
-In all cases, you first need to [get or generate expected secrets in `secrets/{SERVICE}/dev/`](../secrets/README.md#running-a-servicebot-locally).
+In all cases, you first need to [get or generate expected secrets in `secrets/{SERVICE}/dev/`](secrets#running-a-servicebot-locally).
 
 ## `docker-compose` (quick & dirty)
 
 Before you follow [Running packit-service locally](https://github.com/packit/packit-service/blob/main/CONTRIBUTING.md#running-packit-service-locally):
 
-- [get/generate the secrets](../secrets/README.md#running-a-servicebot-locally)
+- [get/generate the secrets](secrets#running-a-servicebot-locally)
 - run `DEPLOYMENT=dev make render-secrets-from-templates` to create `packit-service.yaml` and `fedora.toml` from their templates and `extra-vars.yml`
 - copy the `secrets/{SERVICE}/dev/*` to `secrets/{SERVICE}/dev/` in cloned `packit-service` repo
 
@@ -19,7 +19,7 @@ Before you follow [Running packit-service locally](https://github.com/packit/pac
 Because we run the service in OpenShift the more reliable way to test it
 is to run an Openshift cluster locally and deploy the service there.
 `oc cluster up` spawns the Openshift (v3) cluster.
-[Create `secrets/packit/dev/`](../secrets/README.md#running-a-servicebot-locally),
+[Create `secrets/packit/dev/`](secrets#running-a-servicebot-locally),
 `cd vars/packit; cp dev_template.yml dev.yml` and
 in `dev.yml` set `api_key` to the output of `oc whoami -t`.
 
@@ -54,7 +54,7 @@ For example, in case of `packit-worker`:
   - `podman push quay.io/packit/packit-worker:stg`
 - in deployment: `DEPLOYMENT=stg make import-images`
 
-Once you're done you should [revert to older image](continuous-deployment.md#reverting-to-older-deploymentrevisionimage).
+Once you're done you should [revert to older image](continuous-deployment#reverting-to-older-deploymentrevisionimage).
 Or it will be automatically replaced once a packit-service PR is merged.
 
 ## Zuul
