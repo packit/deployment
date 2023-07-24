@@ -6,9 +6,8 @@ title: Generating TLS Certificates
 
 CertBot manual: https://certbot.eff.org/docs/using.html#manual
 
-Please bear in mind this is the easiest process I was able to figure out: there
-is a ton of places for improvements and ideally
-[make it automated 100%](https://github.com/packit/research/tree/main/cert_management_automation).
+The process is manual but would be awesome to
+[make it automated 100%](https://github.com/packit/research/blob/main/research/internal-automation/cert-management.md).
 
 We are using multi-domain wildcard certificates for the following domains:
 
@@ -50,23 +49,24 @@ Make sure the DNS is all set up:
 Check if you have access to packit.dev domain in
 [Google Domains](https://domains.google.com/m/registrar/packit.dev).
 
-Check/install certbot locally: `dnf install certbot`.
+Install certbot locally: `dnf install certbot`.
 
 ## Run certbot to obtain the challenges
 
 Run certbot:
 
-    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email hello@packit.dev -d *.packit.dev -d *.stream.packit.dev -d *.fedora-source-git.packit.dev -d *.stg.packit.dev -d *.stg.stream.packit.dev -d *.stg.fedora-source-git.packit.dev
+    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email hello@packit.dev -d prod.packit.dev -d stg.packit.dev -d dashboard.packit.dev -d dashboard.stg.packit.dev -d workers.packit.dev -d workers.stg.packit.dev -d prod.stream.packit.dev -d stg.stream.packit.dev -d prod.fedora-source-git.packit.dev -d stg.fedora-source-git.packit.dev
 
 You will be asked to set TXT record for every domain requested:
 
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    Please deploy a DNS TXT record under the name
-    _acme-challenge.abcxyz.packit.dev with the following value:
+    Please deploy a DNS TXT record under the name:
+
+    _acme-challenge.abcxyz.packit.dev.
+
+    with the following value:
 
     123456abcdef
-
-    Before continuing, verify the record is deployed.
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     Press Enter to Continue
 
@@ -95,18 +95,20 @@ and once it returns the configured value
 Go to the terminal with certbot command waiting for your action and hit Enter.
 
 Repeat this for all requested domains.
+(Or to save time, first change/add all TXT records, then `nslookup`
+the last one and once you have the correct answer, hit Enter )
 
 ## Update secrets in the vault
 
 [Upload](https://bitwarden.com/help/attachments/#upload-a-file)
-`fullchain.pem` and `privkey.pem` from `~/.certbot/live/packit.dev/`
+`fullchain.pem` and `privkey.pem` from `~/.certbot/live/prod.packit.dev/`
 to `secrets-tls-certs` item in our shared `Packit` collection in Bitwarden vault.
 
 ## Re-deploy secrets for all services and environments
 
 `oc login ‹cluster›; oc project ‹project›` and
 
-    for cert in fullchain privkey; do scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/packit.dev/${cert}.pem; done
+    for cert in fullchain privkey; do scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/prod.packit.dev/${cert}.pem; done
 
 or update `api_key` in `vars/{packit|stream|fedora-source-git}/{prod|stg}.yml` and run:
 
