@@ -20,9 +20,9 @@ spec:
     spec:
       containers:
         - name: pushgateway
-          image: weaveworks/prom-aggregation-gateway
+          image: ghcr.io/zapier/prom-aggregation-gateway:v0.7.0
           args:
-            - "--listen=:9091"
+            - "--apiListen=:9091"
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9091
