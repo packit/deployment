@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: flower
-          image: docker.io/mher/flower
+          image: quay.io/packit/flower
           env:
             - name: CELERY_BROKER_URL
               value: redis://redis:6379/0
