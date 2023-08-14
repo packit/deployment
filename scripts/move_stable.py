@@ -306,7 +306,23 @@ def create_blogpost(
         title_text = f"Weeks {since_week_number}–{till_week_number}"
     else:
         title_text = f"Week {since_week_number}"
-    click.echo(f"## {title_text} ({format_date(since)} – {format_date(till)})\n")
+
+    today = datetime.today()
+
+    click.echo(
+        f"Please put it in an according directory: packit.dev/weekly/{today.strftime('%Y/%m/%d')}.md\n"
+    )
+    click.echo(
+        "---\n"
+        f"title: {title_text} in Packit\n"
+        f"date: {today.strftime('%Y-%m-%d')}\n"
+        f"tags:\n"
+        f"  - {since.year}-{since.strftime('%B')}\n"
+        f"  - {since.year}\n"
+        f"  - {since.strftime('%B')}\n"
+        "---\n\n"
+        f"## {title_text} ({format_date(since)} – {format_date(till)})\n"
+    )
     for repo in REPOS_FOR_BLOG:
         path_to_repository = Path(repo_store, repo).absolute()
         git_repo = Repo(path_to_repository)
