@@ -7,7 +7,7 @@ title: Fedora Source-git
 ## Production
 
 Production instance runs in `fedora-source-git-prod` project @ `auto-prod` cluster.
-It serves [`fedora/src/` repos](https://gitlab.com/fedora/src/).
+It serves [gitlab.com/fedora/src/ repos](https://gitlab.com/fedora/src/).
 A group webhook is set to send "Merge request events" to [API](https://prod.fedora-source-git.packit.dev/api/webhooks/gitlab).
 
 Example:
