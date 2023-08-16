@@ -7,7 +7,7 @@ title: CentOS Stream
 ## Production
 
 Production instance runs in `stream-prod` project @ `auto-prod` cluster.
-It serves [`redhat/centos-stream/src` repos](https://gitlab.com/redhat/centos-stream/src/).
+It serves [gitlab.com/redhat/centos-stream/src/ repos](https://gitlab.com/redhat/centos-stream/src/).
 A group webhook is set to send "Merge request events" to the [API](https://prod.stream.packit.dev/api/webhooks/gitlab).
 
 ## `redhat-internal-test-package`
@@ -76,12 +76,12 @@ Now fork packit-service/src/cloud-init, do a change, create an MR.
 
 ## Syncing dist-git MR CI results back to a src-git MR
 
-## prod
+### prod
 
 The notification about a change of a pipeline's status is sent to a group webhook (with "Pipeline events" trigger)
 which is manually added to the [redhat/centos-stream/rpms group](https://gitlab.com/redhat/centos-stream/rpms).
 
-## staging
+### staging
 
 For staging, a project webhook is added to forks in [packit-as-a-service-stg namespace](https://gitlab.com/packit-as-a-service-stg),
 because that's where a pipeline runs in case of non-premium plan (packit-service/rpms/ namespace).
