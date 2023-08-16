@@ -45,21 +45,21 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 10
+# The readinessProbe wasn't reliable after we moved to automotive cluster
+# but you can try again on MP+
 #          readinessProbe:
 #            exec:
 #              command:
 #                - /usr/libexec/check-container
-#            failureThreshold: 3
-#            initialDelaySeconds: 5
-#            periodSeconds: 10
-#            successThreshold: 1
-#            timeoutSeconds: 1
           resources:
             requests:
               memory: "{{ '2Gi' if project == 'packit-prod' else '128Mi' }}"
               cpu: "30m"
             limits:
+# The shared_buffers & effective_cache_size values are set by the container
+# based on this limit, so keep the limit reasonably high.
               memory: "{{ '4Gi' if project == 'packit-prod' else '256Mi' }}"
+# Not utilized most of the time, but useful during migrations and for some queries
               cpu: "1"
           volumeMounts:
             - name: postgres-data
@@ -85,10 +85,11 @@ metadata:
   name: postgres-config
 data:
   packit.conf: |-
-    # Values based on https://pgtune.leopard.in.ua
-    # default is 4.0. Use 1.1 for SSD storage
+    # The following values have been inspired by https://pgtune.leopard.in.ua
+    # Run psql -c 'SHOW ALL' in the pod's terminal to see all values.
+    # Default random_page_cost is 4.0. Use 1.1 for SSD storage.
     random_page_cost = 1.1
-    # default is 1. Use hundreds for SSD storage
+    # Default effective_io_concurrency is 1. Use hundreds for SSD storage.
     effective_io_concurrency = 200
     min_wal_size = 1GB
     max_wal_size = 4GB
