@@ -1,12 +1,21 @@
 ---
-title: PostgreSQL Data Migration
+title: PostgreSQL
 ---
 
-# PostgreSQL data migration
+# Logs
 
-To write out the data from the database `pg_dumpall` command can be used (or `pg_dump packit` to dump only packit
-database). The command creates a file with SQL commands for restoring the database. The only impact of running
-`pg_dump`/`pg_dumpall` should be the increased I/O load and the long-running transaction it creates.
+See `/var/lib/pgsql/data/userdata/log/postgresql-*.log` in the pod's Terminal.
+
+# Data
+
+## What's inside, ER Diagram, backups
+
+See https://github.com/packit/packit-service/tree/main/docs/database
+
+## Move data to another instance
+
+To write out the data from the database `pg_dump packit` can be used.
+The command creates a file with SQL commands for restoring the database.
 To import the data `psql` command can be used.
 
 ## Upgrade
@@ -18,5 +27,7 @@ use a new PVC in this pod) and then dump the data from the old pod and import th
 
     $ oc exec old-postgres-pod -- pg_dumpall -U postgres > dump
     $ oc exec -it new-postgres-pod -- psql -U postgres < dump
+
+Or see instructions in https://github.com/packit/packit-service/tree/main/docs/database#using-live-data-locally
 
 The `postgres` service then needs to be linked to the new pod and the old pod and PVC can be deleted.
