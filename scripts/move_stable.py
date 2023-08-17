@@ -304,13 +304,15 @@ def create_blogpost(
     till_week_number = till.isocalendar().week - 1
     if since_week_number != till_week_number:
         title_text = f"Weeks {since_week_number}–{till_week_number}"
+        file_name = f"week-{since_week_number}–{till_week_number}.md"
     else:
         title_text = f"Week {since_week_number}"
+        file_name = f"week-{since_week_number}.md"
 
     today = datetime.today()
 
     click.echo(
-        f"Please put it in an according directory: packit.dev/weekly/{today.strftime('%Y/%m/%d')}.md\n"
+        f"Please put it in an according directory: packit.dev/weekly/{since.year}/{file_name}\n"
     )
     click.echo(
         "---\n"
