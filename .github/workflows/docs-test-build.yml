@@ -1,0 +1,46 @@
+name: Test deployment of docs
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+
+jobs:
+  test-deploy:
+    name: Test deployment of docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: "packit/packit.dev"
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+
+      - name: Import the nested docs
+        run: make import
+
+      - name: Remove the ‹main› of ‹deployment›
+        run: rm -rf .deployment-docs deployment
+
+      - name: Checkout the PR
+        uses: actions/checkout@v3
+        with:
+          path: ".deployment-docs"
+
+      - name: Move out the ‹deployment›
+        run: mv .deployment-docs/docs/deployment deployment
+
+      - name: Generate newer usage graphs
+        run: |
+          pip3 install click requests pygal
+          python3 files/generate_usage.py
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Test build website
+        run: yarn build
