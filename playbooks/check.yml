@@ -16,6 +16,9 @@
     - name: Include variables
       ansible.builtin.include_vars: "{{ project_dir }}/vars/{{ service }}/{{ deployment }}.yml"
 
+    - name: Include deployment facts
+      ansible.builtin.include_tasks: tasks/set-deployment-facts.yml
+
     - name: Include tasks/set-facts.yml
       ansible.builtin.include_tasks: tasks/set-facts.yml
 

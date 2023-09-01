@@ -1,0 +1,38 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+# We call the facts deploymentconfigs even they are not DeploymentConfigs but Deployments
+# because we already use the term 'deployment' for something else (prod/stg).
+
+---
+- name: Set mandatory_deploymentconfigs fact
+  ansible.builtin.set_fact:
+    mandatory_deploymentconfigs:
+      - postgres-{{ postgres_version }}
+      - redis
+      - packit-service
+  tags:
+    - always
+- name: Set optional_deploymentconfigs fact
+  ansible.builtin.set_fact:
+    optional_deploymentconfigs:
+      tokman: "{{ with_tokman }}"
+      packit-service-fedmsg: "{{ with_fedmsg }}"
+      packit-service-beat: "{{ with_beat }}"
+      packit-dashboard: "{{ with_dashboard }}"
+      pushgateway: "{{ with_pushgateway }}"
+      nginx: "{{ with_pushgateway }}"
+  tags:
+    - always
+- name: Set deploymentconfigs fact
+  ansible.builtin.set_fact:
+    # To know what DCs rollouts to wait for and also to check in tests
+    deploymentconfigs: '{{ mandatory_deploymentconfigs + optional_deploymentconfigs | dict2items | selectattr("value", "equalto", true) | list | map(attribute="key") | flatten }}'
+  tags:
+    - always
+
+- name: Set flower_htpasswd_path
+  ansible.builtin.set_fact:
+    flower_htpasswd_path: "{{ path_to_secrets }}/flower-htpasswd"
+  tags:
+    - flower
