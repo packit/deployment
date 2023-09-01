@@ -79,6 +79,11 @@
       tags:
         - always
 
+    - name: Include deployment facts
+      ansible.builtin.include_tasks: tasks/set-deployment-facts.yml
+      tags:
+        - always
+
     - name: Include tasks/set-facts.yml
       ansible.builtin.include_tasks: tasks/set-facts.yml
       tags:
