@@ -149,6 +149,7 @@ def move_repository(
         )
         return
 
+    click.echo("===> Waiting for Copr dependencies")
     wait_for_copr_dependencies(repository, remote, repo_store)
 
     get_git_log(path_to_repository, remote, stable_hash, main_hash)
