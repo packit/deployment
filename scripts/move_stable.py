@@ -39,6 +39,7 @@ REPOS_FOR_BLOG: List[str] = [
 STABLE_BRANCH: str = "stable"
 ROLLING_BRANCH: str = "main"
 DEFAULT_REPO_STORE: str = "move_stable_repositories"
+MONOREPO: str = "production-monorepo"
 
 # Copr settings
 COPR_OWNER, COPR_PROJECT = "packit", "packit-stable"
@@ -80,6 +81,17 @@ def init(repo_store: str) -> None:
             cwd=repo_store_path,
         )
 
+    # clone the monorepo with references for tracking deployments
+    subprocess.run(
+        [
+            "git",
+            "clone",
+            "--recurse-submodules",
+            f"git@github.com:{NAMESPACE}/{MONOREPO}.git",
+        ],
+        cwd=repo_store_path,
+    )
+
 
 @cli.command(
     short_help=f"Moves {STABLE_BRANCH} of requested repository interactively",
@@ -112,7 +124,16 @@ def init(repo_store: str) -> None:
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
     help="Path to dir where the repositories are stored",
 )
-def move_repository(repository: str, remote: str, repo_store: str) -> None:
+@click.option(
+    "--update-monorepo",
+    default=True,
+    show_default=True,
+    type=click.BOOL,
+    help=f"Update the monorepo with references to all {STABLE_BRANCH} branches",
+)
+def move_repository(
+    repository: str, remote: str, repo_store: str, update_monorepo: bool
+) -> None:
     click.secho(f"==> Moving {repository}", fg="yellow")
     path_to_repository = Path(repo_store, repository).absolute()
 
@@ -139,6 +160,15 @@ def move_repository(repository: str, remote: str, repo_store: str) -> None:
 
     push_stable_branch(path_to_repository, remote, new_stable_hash)
     click.echo()
+
+    if update_monorepo:
+        click.secho(f"===> Updating {repository}'s reference in monorepo", fg="yellow")
+        update_monorepo(
+            repo_store,
+            remote,
+            commit_msg=f"chore: production move of {repository}",
+            repo=repository,
+        )
 
 
 @cli.command(
@@ -188,8 +218,16 @@ def move_all(ctx, remote: str, repo_store: str) -> None:
 
     for repository in REPOSITORIES:
         ctx.invoke(
-            move_repository, repository=repository, remote=remote, repo_store=repo_store
+            move_repository,
+            repository=repository,
+            remote=remote,
+            repo_store=repo_store,
+            update_monorepo=False,
         )
+
+    # update monorepo
+    click.secho(f"==> Updating references to {STABLE_BRANCH} in monorepo", fg="yellow")
+    update_monorepo(repo_store, remote, commit_msg="chore: weekly deployment")
 
     ctx.invoke(create_blogpost, remote=remote, repo_store=repo_store)
 
@@ -427,6 +465,34 @@ def wait_for_copr_dependencies(repository: str, remote: str, repo_store: str):
             else:
                 bar.update(0, f"{dependency} has not finished yet, requeued")
                 queue.append(item)
+
+
+def update_monorepo(
+    repo_store: str, remote: str, commit_msg: str, repository: Optional[str] = None
+):
+    update_command = ["git", "submodule", "update", "--remote"]
+    path_to_monorepo = Path(repo_store, MONOREPO)
+
+    if repository:
+        update_command.append(repository)
+
+    # update the references
+    subprocess.run(
+        update_command,
+        cwd=path_to_monorepo,
+    )
+
+    # commit the changes
+    subprocess.run(
+        ["git", "commit", "-a", "-S", "-m", commit_msg],
+        cwd=path_to_monorepo,
+    )
+
+    # push the change
+    subprocess.run(
+        ["git", "push", remote, "main"],
+        cwd=path_to_monorepo,
+    )
 
 
 @cli.command(
