@@ -477,6 +477,12 @@ def update_monorepo(
     if repository:
         update_command.append(repository)
 
+    # pull changes done by others
+    subprocess.run(
+        ["git", "pull"],
+        cwd=path_to_monorepo,
+    )
+
     # update the references
     subprocess.run(
         update_command,
