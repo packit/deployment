@@ -10,7 +10,7 @@
     with_fedmsg: true
     with_dashboard: true
     with_tokman: true
-    with_fluentd_sidecar: true
+    with_fluentd_sidecar: false
   tasks:
     - name: Include variables
       ansible.builtin.include_vars: ../vars/{{ service }}/{{ deployment }}.yml

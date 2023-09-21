@@ -41,8 +41,7 @@ api_key: ""
 
 # with_repository_cache: true
 
-# with_fluentd_sidecar: false
-
+with_fluentd_sidecar: false
 # image to use for service
 # image: quay.io/packit/packit-service:{{ deployment }}
 
