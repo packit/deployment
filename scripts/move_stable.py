@@ -491,7 +491,7 @@ def update_monorepo(
 
     # commit the changes
     subprocess.run(
-        ["git", "commit", "-a", "-S", "-m", commit_msg],
+        ["git", "commit", "-a", "-m", commit_msg],
         cwd=path_to_monorepo,
     )
 
