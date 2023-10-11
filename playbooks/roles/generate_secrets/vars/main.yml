@@ -1,1 +1,1 @@
-path_to_secrets: "{{ generate_secrets_project_dir }}/secrets/packit/dev"
+generate_secrets_path: "{{ generate_secrets_project_dir }}/secrets/packit/dev"
