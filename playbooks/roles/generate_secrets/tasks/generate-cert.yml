@@ -10,7 +10,7 @@
 
 - name: Generate OpenSSL private keys
   openssl_privatekey:
-    path: "{{ path_to_secrets }}/{{ item }}"
+    path: "{{ generate_secrets_path }}/{{ item }}"
   loop:
     - private-key.pem
     - privkey.pem
@@ -19,24 +19,24 @@
 
 - name: Generate OpenSSL CSR
   openssl_csr:
-    path: "{{ path_to_secrets }}/{{ item.csr }}"
-    privatekey_path: "{{ path_to_secrets }}/{{ item.key }}"
+    path: "{{ generate_secrets_path }}/{{ item.csr }}"
+    privatekey_path: "{{ generate_secrets_path }}/{{ item.key }}"
     common_name: localhost
   loop:
     - { key: privkey.pem, csr: fullchain.csr }
 
 - name: Generate Self Signed OpenSSL certificate
   openssl_certificate:
-    path: "{{ path_to_secrets }}/{{ item.cert }}"
-    privatekey_path: "{{ path_to_secrets }}/{{ item.key }}"
-    csr_path: "{{ path_to_secrets }}/{{ item.csr }}"
+    path: "{{ generate_secrets_path }}/{{ item.cert }}"
+    privatekey_path: "{{ generate_secrets_path }}/{{ item.key }}"
+    csr_path: "{{ generate_secrets_path }}/{{ item.csr }}"
     provider: selfsigned
   loop:
     - { cert: fullchain.pem, key: privkey.pem, csr: fullchain.csr }
 
 - name: Remove CSR
   ansible.builtin.file:
-    path: "{{ path_to_secrets }}/{{ item }}"
+    path: "{{ generate_secrets_path }}/{{ item }}"
     state: absent
   loop:
     - fullchain.csr
