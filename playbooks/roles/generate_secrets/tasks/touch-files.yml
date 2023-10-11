@@ -4,7 +4,7 @@
 ---
 - name: Create empty files
   ansible.builtin.file:
-    path: "{{ path_to_secrets }}/{{ item }}"
+    path: "{{ generate_secrets_path }}/{{ item }}"
     state: touch
     mode: 0644
   loop:

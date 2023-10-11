@@ -5,7 +5,7 @@
 - name: Generate config files
   ansible.builtin.copy:
     src: "{{ item }}"
-    dest: "{{ path_to_secrets }}/{{ item }}"
+    dest: "{{ generate_secrets_path }}/{{ item }}"
     mode: 0644
   loop:
     - packit-service.yaml.j2
