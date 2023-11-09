@@ -164,11 +164,11 @@ def move_repository(
 
     if update_monorepo:
         click.secho(f"===> Updating {repository}'s reference in monorepo", fg="yellow")
-        update_monorepo(
+        update_monorepo_references(
             repo_store,
             remote,
             commit_msg=f"chore: production move of {repository}",
-            repo=repository,
+            repository=repository,
         )
 
 
@@ -228,7 +228,9 @@ def move_all(ctx, remote: str, repo_store: str) -> None:
 
     # update monorepo
     click.secho(f"==> Updating references to {STABLE_BRANCH} in monorepo", fg="yellow")
-    update_monorepo(repo_store, remote, commit_msg="chore: weekly deployment")
+    update_monorepo_references(
+        repo_store, remote, commit_msg="chore: weekly deployment"
+    )
 
     ctx.invoke(create_blogpost, remote=remote, repo_store=repo_store)
 
@@ -468,7 +470,7 @@ def wait_for_copr_dependencies(repository: str, remote: str, repo_store: str):
                 queue.append(item)
 
 
-def update_monorepo(
+def update_monorepo_references(
     repo_store: str, remote: str, commit_msg: str, repository: Optional[str] = None
 ):
     update_command = ["git", "submodule", "update", "--remote"]
@@ -479,7 +481,7 @@ def update_monorepo(
 
     # pull changes done by others
     subprocess.run(
-        ["git", "pull"],
+        ["git", "pull", "--recurse-submodules"],
         cwd=path_to_monorepo,
     )
 
