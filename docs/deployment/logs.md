@@ -27,10 +27,16 @@ You can start with [this search ](https://rhcorporate.splunkcloud.com/en-US/app/
 and tune it from there.
 For example:
 
-- add `| reverse` if you want to se the results from oldest to newest
+- add `| reverse` if you want to see the results from oldest to newest
 - add `| fields _raw | fields - _time` to leave only message field without timestamp duplication
+- you can [search by `host`](https://source.redhat.com/departments/it/devit/it-infrastructure/itcloudservices/itocp/managedplatformplushub/mppluswiki/how_to_search_managed_platform_plus_logs_in_splunk), the query will search a `packit-worker*.log` only on those pods with
+  **Node** value prefix `ip-10-30-46-156` or `ip-10-30-46-157`, in my case the workers in staging instance:
+  `index=rh_paas host=ip-10-30-46-156* OR host=ip-10-30-46-157* sourcetype=crio source="/var/log/containers/packit-worker*.log" | search _raw != "*pidbox*"`
+- or you can search by **cluster** using the _cluster selector macro_; staging cluster is
+  **preprod-spoke-aws-us-east-1** and production cluster is **prod-spoke-aws-us-east-1**
+  `` `mpp_filter_events_by_cluster(preprod-spoke-aws-us-east-1)` sourcetype=crio source="/var/log/containers/packit-worker*.log" | search _raw != "*pidbox*" ``
 
-All in one URL [here](https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20index%3D%22rh_paas%22%20source%3D%22%2Fvar%2Flog%2Fcontainers%2Fpackit-worker-short-running-0_packit--stg_packit-worker-*.log%22%20%7C%20fields%20_raw%20%7C%20fields%20-%20_time%20%7C%20reverse) - now just export it to csv; and you have almost the same log file
+All in one URL [here](<https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20%60mpp_filter_events_by_cluster(preprod-spoke-aws-us-east-1)%60%20sourcetype%3Dcrio%20source%3D%22%2Fvar%2Flog%2Fcontainers%2Fpackit-worker-short-running-0_packit--stg_packit-worker-*.log%22%20%7C%20search%20_raw%20!%3D%20%22*pidbox*%22%20%7C%20fields%20_raw%20%7C%20fields%20-%20_time%20%7C%20reverse&display.page.search.mode=smart&dispatch.sample_ratio=1&workload_pool=standard_perf&earliest=-30m%40m&latest=now&sid=1699952231.1945071_92CE35A7-4398-4081-8153-591D194182B7>) - now just export it to csv; and you have almost the same log file
 as you'd get by exporting logs from a worker pod.
 
 For more info, see (Red Hat internal):
