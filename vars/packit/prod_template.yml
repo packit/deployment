@@ -70,6 +70,9 @@ with_fluentd_sidecar: false
 # If you still want to use docker even when podman is installed, set:
 # container_engine: docker
 
+# We're using 15 on MP+
+postgres_version: 15
+
 # Celery retry parameters
 # celery_retry_limit: 2
 # celery_retry_backoff: 3
