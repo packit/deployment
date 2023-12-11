@@ -31,7 +31,7 @@
     # project_dir is set in tasks/project-dir.yml
     path_to_secrets: "{{ project_dir }}/secrets/{{ service }}/{{ deployment }}"
     # to be used in Image streams as importPolicy:scheduled value
-    auto_import_images: "{{(deployment != 'prod')}}"
+    auto_import_images: true
     # used in dev/zuul deployment to tag & push images to cluster
     # https://github.com/packit/deployment/issues/112#issuecomment-673343049
     # container_engine: "{{ lookup('pipe', 'command -v podman 2> /dev/null || echo docker') }}"
