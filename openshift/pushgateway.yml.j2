@@ -71,7 +71,6 @@ spec:
         name: ghcr.io/zapier/prom-aggregation-gateway:v0.7.0
       importPolicy:
         # Periodically query registry to synchronize tag and image metadata.
-        # DOES NOT WORK on Openshift Online.
         scheduled: {{ auto_import_images }}
   lookupPolicy:
     # allows all resources pointing to this image stream to use it in the image field
