@@ -6,8 +6,8 @@ FROM quay.io/centos/centos:stream9
 ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
     ANSIBLE_STDOUT_CALLBACK=debug
 
-RUN dnf install -y epel-release 'dnf-command(config-manager)' && \
-    dnf config-manager --set-enabled crb && \
+RUN dnf -y install epel-release && \
+    crb enable && \
     dnf module enable postgresql -y && \
     dnf update -y && \
     dnf install -y ansible python3-pip && \
