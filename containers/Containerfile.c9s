@@ -9,6 +9,6 @@ ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
 RUN dnf -y install epel-release && \
     crb enable && \
     dnf module enable postgresql -y && \
-    dnf update -y && \
-    dnf install -y ansible python3-pip && \
+    dnf -y upgrade && \
+    dnf -y install ansible python3-pip && \
     dnf clean all
