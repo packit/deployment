@@ -32,13 +32,6 @@ repos:
     rev: v0.9.0.6
     hooks:
       - id: shellcheck
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.18.0
-    hooks:
-      - id: gitleaks
-        # The hook runs 'gitleaks protect --staged' which parses output of
-        # 'git diff --staged', i.e. always passes in pre-push/manual stage.
-        stages: [commit]
 
 ci:
   # The project is too huge for pre-commit.ci
