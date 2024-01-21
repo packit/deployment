@@ -9,7 +9,8 @@
 project: packit-prod
 
 # Openshift cluster url
-host: https://api.auto-prod.gi0n.p1.openshiftapps.com:6443
+# For the URL of the MP+ API endpoint, see Bitwarden Secure note
+host: ‹TODO›
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
