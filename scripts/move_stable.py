@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Tuple
 
 import click
 from copr.v3 import Client
-from git import Repo
+from git import Repo, GitConfigParser
 
 import changelog
 
@@ -350,6 +350,15 @@ def create_blogpost(
         title_text = f"Week {since_week_number}"
         file_name = f"week-{since_week_number}.md"
 
+    try:
+        git_config_mail = GitConfigParser().get_value("user", "email")
+        author = git_config_mail.split("@")[0]
+        author_string = f"authors: {author}"
+    except Exception:
+        author_string = (
+            "# TODO replace <login> with your kerberos login\nauthors: <login>"
+        )
+
     today = datetime.today()
 
     click.echo(
@@ -359,6 +368,7 @@ def create_blogpost(
         "---\n"
         f"title: {title_text} in Packit\n"
         f"date: {today.strftime('%Y-%m-%d')}\n"
+        f"{author_string}\n"
         f"tags:\n"
         f"  - {since.year}-{since.strftime('%B')}\n"
         f"  - {since.year}\n"
