@@ -52,6 +52,7 @@ class ProductionInfo:
     name: str = "prod"
     app_name: str = "Packit-as-a-Service"
     pr_comment: str = "/packit build"
+    pr_comment_vm_image_build: str = "/packit vm-image-build"
     opened_pr_trigger__packit_yaml_fix: YamlFix = None
     copr_user = "packit"
     push_trigger_tests_prefix = "Basic test case - push trigger"
@@ -64,6 +65,7 @@ class StagingInfo:
     name: str = "stg"
     app_name = "Packit-as-a-Service-stg"
     pr_comment = "/packit-stg build"
+    pr_comment_vm_image_build: str = "/packit-stg vm-image-build"
     opened_pr_trigger__packit_yaml_fix = YamlFix(
         "---", '---\npackit_instances: ["stg"]', "Build using Packit-stg"
     )
@@ -89,6 +91,7 @@ class Testcase:
         pr: PullRequest = None,
         trigger: Trigger = Trigger.pr_opened,
         deployment: DeploymentInfo = None,
+        comment: str = None,
     ):
         self.project = project
         self.pr = pr
@@ -98,6 +101,7 @@ class Testcase:
         self.head_commit = pr.head_commit if pr else None
         self._copr_project_name = None
         self.deployment = deployment or ProductionInfo()
+        self.comment = comment
 
     @property
     def copr_project_name(self):
@@ -133,7 +137,8 @@ class Testcase:
         """
         logging.info(f"Triggering a build for {self.pr if self.pr else 'new PR'}")
         if self.trigger == Trigger.comment:
-            self.pr.comment(self.deployment.pr_comment)
+            comment = self.deployment.pr_comment if not self.comment else self.comment
+            self.pr.comment(comment)
         elif self.trigger == Trigger.push:
             self.push_to_pr()
         else:
@@ -624,6 +629,23 @@ class Tests:
     test_case_kls: Type
 
     def run(self):
+        logging.info(
+            "Run testcases where the build is triggered by a '/packit vm-image-build' comment"
+        )
+        prs_for_comment = [
+            pr
+            for pr in self.project.get_pr_list()
+            if pr.title.startswith("Test VM Image builds")
+        ]
+        for pr in prs_for_comment:
+            self.test_case_kls(
+                project=self.project,
+                pr=pr,
+                trigger=Trigger.comment,
+                deployment=deployment,
+                comment=deployment.pr_comment_vm_image_build,
+            ).run_test()
+
         logging.info(
             "Run testcases where the build is triggered by a '/packit build' comment"
         )
