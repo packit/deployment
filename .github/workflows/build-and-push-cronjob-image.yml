@@ -7,7 +7,6 @@ on:
       - main
     paths:
       - cron-jobs/import-images/**
-      - cron-jobs/packit-service-validation/**
 
 jobs:
   build-and-push:
@@ -20,7 +19,6 @@ jobs:
       matrix:
         include:
           - image: import-images
-          - image: packit-service-validation
 
     env:
       path: cron-jobs/${{ matrix.image }}/
