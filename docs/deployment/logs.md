@@ -21,6 +21,12 @@ You should be able to see some logs using [this query](https://rhcorporate.splun
 
 If the above query doesn't return any results, [request access](https://source.redhat.com/departments/it/splunk/splunk_wiki/faq#jive_content_id_How_do_I_request_access_to_additional_data_sets_in_Splunk) to `rh_paas` index.
 
+:::caution
+
+If you cannot see _Access to Additional Datasets_ (as suggested by the instructions), use _Update Permissions_ as the _Request Type_ and ask to access the `rh_paas` index in the additional details.
+
+:::
+
 [The more specific search, the faster it'll be](https://source.redhat.com/departments/it/splunk/splunk_wiki/splunk_training_search_best_practices#jive_content_id_Be_more_specific).
 At least, specify `index`, `source`.
 You can start with [this search ](https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20index%3D%22rh_paas%22%20source%3D%22%2Fvar%2Flog%2Fcontainers%2Fpackit-worker*.log%22%20NOT%20pidbox)
