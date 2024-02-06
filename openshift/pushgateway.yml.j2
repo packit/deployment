@@ -6,6 +6,10 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: pushgateway
+  annotations:
+    # https://docs.openshift.com/container-platform/4.11/openshift_images/triggering-updates-on-imagestream-changes.html
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"pushgateway:{{ deployment }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"pushgateway\")].image"}]
 spec:
   selector:
     matchLabels:
@@ -20,7 +24,7 @@ spec:
     spec:
       containers:
         - name: pushgateway
-          image: ghcr.io/zapier/prom-aggregation-gateway:v0.7.0
+          image: pushgateway:{{ deployment }}
           args:
             - "--apiListen=:9091"
           imagePullPolicy: IfNotPresent
@@ -54,3 +58,20 @@ spec:
       targetPort: 9091
   selector:
     component: pushgateway
+---
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: pushgateway
+spec:
+  tags:
+    - name: {{ deployment }}
+      from:
+        kind: DockerImage
+        name: ghcr.io/zapier/prom-aggregation-gateway:v0.7.0
+      importPolicy:
+        # Periodically query registry to synchronize tag and image metadata.
+        scheduled: {{ auto_import_images }}
+  lookupPolicy:
+    # allows all resources pointing to this image stream to use it in the image field
+    local: true

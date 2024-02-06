@@ -6,6 +6,10 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: nginx
+  annotations:
+    # https://docs.openshift.com/container-platform/4.11/openshift_images/triggering-updates-on-imagestream-changes.html
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"nginx:{{ deployment }}"},"fieldPath":"spec.template.spec.containers[?(@.name==\"nginx\")].image"}]
 spec:
   selector:
     matchLabels:
@@ -30,7 +34,7 @@ spec:
           secretName: flower-htpasswd
       containers:
       - name: nginx
-        image: ghcr.io/nginxinc/nginx-unprivileged
+        image: nginx:{{ deployment }}
         ports:
         - containerPort: 8443
         volumeMounts:
@@ -135,3 +139,20 @@ spec:
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: passthrough
+---
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: nginx
+spec:
+  tags:
+    - name: {{ deployment }}
+      from:
+        kind: DockerImage
+        name: ghcr.io/nginxinc/nginx-unprivileged
+      importPolicy:
+        # Periodically query registry to synchronize tag and image metadata.
+        scheduled: {{ auto_import_images }}
+  lookupPolicy:
+    # allows all resources pointing to this image stream to use it in the image field
+    local: true

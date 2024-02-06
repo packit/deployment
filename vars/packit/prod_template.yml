@@ -9,7 +9,8 @@
 project: packit-prod
 
 # Openshift cluster url
-host: https://api.auto-prod.gi0n.p1.openshiftapps.com:6443
+# For the URL of the MP+ API endpoint, see Bitwarden Secure note
+host: ‹TODO›
 
 # oc login <the above host value>, oc whoami -t
 # OR via Openshift web GUI: click on your login in top right corner, 'Copy Login Command', take the part after --token=
@@ -42,7 +43,7 @@ with_flower: true
 # with_repository_cache: true
 # repository_cache_storage: 4Gi
 
-with_fluentd_sidecar: true
+with_fluentd_sidecar: false
 
 # image to use for service
 # image: quay.io/packit/packit-service:{{ deployment }}
@@ -69,6 +70,9 @@ with_fluentd_sidecar: true
 # It's set to "/usr/bin/podman" if there's podman installed, or to 'docker' otherwise.
 # If you still want to use docker even when podman is installed, set:
 # container_engine: docker
+
+# We're using 15 on MP+
+postgres_version: 15
 
 # Celery retry parameters
 # celery_retry_limit: 2
