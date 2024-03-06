@@ -8,7 +8,8 @@ ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
 
 RUN dnf -y install epel-release && \
     crb enable && \
-    dnf -y module enable postgresql:16 && \  # TODO: revert this change after psql:15 works fine
+    # TODO: revert this change after psql:15 works fine
+    dnf -y module enable postgresql:16 && \
     dnf -y upgrade && \
     dnf -y install ansible python3-pip && \
     dnf clean all
