@@ -6,7 +6,9 @@
 # -------------------------------------------------------------------
 
 # Openshift project/namespace name
-project: packit-prod
+# [WARNING] Be careful when changing this value as it is explicitly checked in
+# the Packit Service (API) and postgresql deployments
+project: packit--prod
 
 # Openshift cluster url
 # For the URL of the MP+ API endpoint, see Bitwarden Secure note
