@@ -149,7 +149,7 @@ spec:
     - name: {{ deployment }}
       from:
         kind: DockerImage
-        name: ghcr.io/nginxinc/nginx-unprivileged
+        name: quay.io/nginx/nginx-unprivileged:latest
       importPolicy:
         # Periodically query registry to synchronize tag and image metadata.
         scheduled: {{ auto_import_images }}
