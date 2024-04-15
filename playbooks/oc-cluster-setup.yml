@@ -1,0 +1,52 @@
+---
+- name: Install an Openshift Local cluster
+  hosts: all
+  vars:
+    crc_download_link: https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/crc/latest/crc-linux-amd64.tar.xz
+  tasks:
+    - name: Add vagrant user to sudoers
+      become: True
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        line: "vagrant ALL=(ALL) NOPASSWD: ALL"
+        validate: /usr/sbin/visudo -cf %s
+    - name: Download CRC
+      ansible.builtin.get_url:
+        url: "{{ crc_download_link }}"
+        dest: /tmp
+        mode: "0664"
+      register: download
+    - name: Unarchive tarball
+      ansible.builtin.unarchive:
+        src: "{{ download.dest }}"
+        dest: /tmp
+        list_files: True
+        remote_src: True
+      register: unarchive
+    - name: Show crc executable path
+      ansible.builtin.debug:
+        msg: "/tmp/{{ unarchive.files[0] }}crc"
+    - name: Create ~/.local/bin if it does not exist
+      ansible.builtin.file:
+        path: ~/.local/bin
+        state: directory
+        mode: "0755"
+    - name: Create symbolic link to crc
+      ansible.builtin.file:
+        src: "/tmp/{{ unarchive.files[0] }}/crc"
+        dest: ~/.local/bin/crc
+        state: link
+        force: True
+    - name: Setup consent-telemetry no
+      ansible.builtin.command: crc config set consent-telemetry no
+      changed_when: False
+    - name: Setup minimum packit-service memory requirements
+      ansible.builtin.command: crc config set memory 13312 MiB
+      changed_when: False
+    - name: Setup minimum packit-service disk space requirements
+      ansible.builtin.command: crc config set disk-size 60 Gi
+      changed_when: False
+    - name: Setup cluster
+      ansible.builtin.command: crc setup
+      changed_when: False

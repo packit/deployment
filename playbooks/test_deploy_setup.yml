@@ -1,0 +1,80 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- name: Ensure crc is started, create openshift project and vars/packit/dev.yml
+  hosts: all
+  vars:
+    test_project_name: myproject
+    crc_url: https://api.crc.testing:6443
+    image: quay.io/packit/packit-service:stg
+    image_worker: quay.io/packit/packit-worker:stg
+    image_fedmsg: quay.io/packit/packit-service-fedmsg:stg
+    image_dashboard: quay.io/packit/dashboard:stg
+    image_tokman: quay.io/packit/tokman:stg
+  tasks:
+    - name: Ensure crc is started
+      ansible.builtin.command: crc start
+      changed_when: False
+
+    - name: Get token
+      ansible.builtin.command: oc whoami -t
+      register: kubeconfig_token
+      changed_when: false
+
+    - name: Delete test project namespace if already exist
+      kubernetes.core.k8s:
+        name: "{{ test_project_name }}"
+        api_version: v1
+        kind: Namespace
+        state: absent
+
+    - name: Create test project namespace
+      kubernetes.core.k8s:
+        name: "{{ test_project_name }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: |
+        Get packit stage images to be used as dev images,
+        if you want to use local dev images change var values
+        and point to them
+      ansible.builtin.command: podman pull "{{ item }}"
+      loop:
+        - "{{ image }}"
+        - "{{ image_worker }}"
+        - "{{ image_fedmsg }}"
+        - "{{ image_dashboard }}"
+        - "{{ image_tokman }}"
+      loop_control:
+        pause: 1 # otherwise getting 500 Internal Server Error from registry
+      changed_when: False
+
+    - name: Create packit/dev.yml
+      ansible.builtin.copy:
+        content: |
+          # See https://github.com/packit/deployment/blob/main/vars/packit/dev_template.yml
+          project: {{ test_project_name }}
+          host: {{ crc_url }}
+          api_key: {{ kubeconfig_token.stdout }}
+          validate_certs: false
+          check_up_to_date: false
+          # Whether to deploy and check that pod
+          # Let's preserve some resources
+          with_tokman: true
+          with_beat: true
+          with_fedmsg: true
+          with_dashboard: true
+          with_flower: false
+          with_fluentd_sidecar: false
+          with_pushgateway: false
+          # Use stg images
+          push_dev_images: true
+          image: {{ image }}
+          image_worker: {{ image_worker }}
+          image_fedmsg: {{ image_fedmsg }}
+          image_dashboard: {{ image_dashboard }}
+          image_tokman: {{ image_tokman }}
+        dest: "{{ src_dir }}/vars/packit/dev.yml"
+        mode: 0644

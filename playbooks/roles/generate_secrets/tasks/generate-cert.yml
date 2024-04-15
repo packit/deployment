@@ -7,6 +7,14 @@
     name:
       - python-cryptography
   become: true
+  when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "7")
+
+- name: Install Python cryptography module
+  ansible.builtin.package:
+    name:
+      - python3-cryptography
+  become: true
+  when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "8")
 
 - name: Generate OpenSSL private keys
   openssl_privatekey:

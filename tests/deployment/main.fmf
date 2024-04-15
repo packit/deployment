@@ -1,0 +1,12 @@
+test:
+  cd /vagrant && make test-deploy
+
+duration: 10m
+
+/deployment:
+  summary: Run packit-service deployment test
+  tags: [deployment]
+  duration: 60m
+  tier: 1
+  environment+:
+    DEPLOYMENT: dev

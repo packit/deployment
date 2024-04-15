@@ -1,0 +1,45 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- name: Create vars/packit/dev.yml and deploy
+  hosts: all
+  vars:
+    oc_download_link: https://mirror.openshift.com/pub/openshift-v4/amd64/clients/ocp/stable/openshift-client-linux.tar.gz
+    test_project_name: myproject
+    crc_url: https://api.crc.testing:6443
+    image: quay.io/packit/packit-service:stg
+    image_worker: quay.io/packit/packit-worker:stg
+    image_fedmsg: quay.io/packit/packit-service-fedmsg:stg
+    image_dashboard: quay.io/packit/dashboard:stg
+    image_tokman: quay.io/packit/tokman:stg
+  tasks:
+    - name: Enable EPEL repositories
+      ansible.builtin.package:
+        name:
+          - epel-release
+      become: true
+    - name: Install packages for deployment
+      ansible.builtin.package:
+        name:
+          - ansible
+          - python3-openshift
+          - python3-pip
+          - python3-passlib # for using htpasswd ansible module
+          - make
+          - podman
+      become: true
+
+    - name: Download OC
+      ansible.builtin.get_url:
+        url: "{{ oc_download_link }}"
+        dest: /tmp
+        mode: "0644"
+      register: download
+    - name: Unarchive tarball in /usr/bin
+      become: True
+      ansible.builtin.unarchive:
+        src: "{{ download.dest }}"
+        dest: /usr/bin
+        list_files: True
+        remote_src: True
