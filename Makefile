@@ -6,12 +6,22 @@ AP := ansible-playbook -vv -c local -i localhost, -e ansible_python_interpreter=
 # "By default, Ansible runs as if --tags all had been specified."
 # https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html#special-tags
 TAGS ?= all
+VAGRANT_SSH_PORT = "$(shell cd containers && vagrant ssh-config | awk '/Port/{print $$2}')"
+VAGRANT_SSH_USER = "$(shell cd containers && vagrant ssh-config | awk '/User/{print $$2}')"
+VAGRANT_SSH_GUEST = "$(shell cd containers && vagrant ssh-config | awk '/HostName/{print $$2}')"
+VAGRANT_SSH_IDENTITY_FILE = "$(shell cd containers && vagrant ssh-config | awk '/IdentityFile/{print $$2}')"
+VAGRANT_SSH_CONFIG = $(shell cd containers && vagrant ssh-config | awk 'NR>1 {print " -o "$$1"="$$2}')
+VAGRANT_SHARED_DIR = "/vagrant"
+
+CENTOS_VAGRANT_BOX = CentOS-Stream-Vagrant-8-latest.x86_64.vagrant-libvirt.box
+CENTOS_VAGRANT_URL = https://cloud.centos.org/centos/8-stream/x86_64/images/$(CENTOS_VAGRANT_BOX)
 
 ifneq "$(shell whoami)" "root"
 	ASK_PASS ?= --ask-become-pass
 endif
 
 # Only for Packit team members with access to Bitwarden vault
+# if not working prepend OPENSSL_CONF=/dev/null to script invocation
 download-secrets:
 	./scripts/download_secrets.sh
 
@@ -50,3 +60,31 @@ check:
 move-stable:
 	[[ -d move_stable_repositories ]] || scripts/move_stable.py init
 	scripts/move_stable.py move-all
+
+oc-cluster-create:
+# vagrant pointer is broken...
+	[[ -f $(CENTOS_VAGRANT_BOX) ]] || wget $(CENTOS_VAGRANT_URL)
+	cd containers && vagrant up
+
+oc-cluster-destroy:
+	cd containers && vagrant destroy
+
+oc-cluster-up:
+	cd containers && vagrant up
+	cd containers && vagrant ssh -c "cd $(VAGRANT_SHARED_DIR) && $(AP) playbooks/oc-cluster-run.yml"
+
+oc-cluster-down:
+	cd containers && vagrant halt
+
+oc-cluster-ssh: oc-cluster-up
+	ssh $(VAGRANT_SSH_CONFIG) localhost
+
+test-deploy:
+# to be run inside VM where the oc cluster is running! Call make tmt-tests instead.
+	DEPLOYMENT=dev $(AP) playbooks/generate-local-secrets.yml
+	DEPLOYMENT=dev $(AP) -e '{"src_dir": $(VAGRANT_SHARED_DIR)}' playbooks/test_deploy_setup.yml
+	DEPLOYMENT=dev $(AP) -e '{"container_engine": "podman", "registry": "default-route-openshift-image-registry.apps-crc.testing", "registry_user": "kubeadmin", "src_dir": $(VAGRANT_SHARED_DIR)}' playbooks/deploy.yml
+	DEPLOYMENT=dev $(AP) -e '{"container_engine": "podman", "registry": "default-route-openshift-image-registry.apps-crc.testing", "registry_user": "kubeadmin", "src_dir": $(VAGRANT_SHARED_DIR)}' playbooks/check.yml
+
+tmt-tests:
+	tmt run --all provision --how connect --user vagrant --guest $(VAGRANT_SSH_GUEST) --port $(VAGRANT_SSH_PORT) --key $(VAGRANT_SSH_IDENTITY_FILE)

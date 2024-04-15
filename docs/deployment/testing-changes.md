@@ -68,3 +68,38 @@ This repository provides helpful playbook to do this with one command:
 
 Zuul provides a public key for every project. The ansible playbook downloads Zuul repository and pass the project tenant and name as parameters to encryption script. This script then encrypts files with public key of the project.
 For more information please refer to [official docs](https://ansible.softwarefactory-project.io/docs/user/zuul_user.html#create-a-secret-to-be-used-in-jobs).
+
+### Test Deployment locally with OpenShift Local
+
+For using OpenShift Local you need a _pull secret_, download it here: https://console.redhat.com/openshift/create/local. Save it in a file called `secrets\openshift-local-pull-secret.yml` following this format:
+
+```
+---
+pull_secret: <<< DOWNLOADED PULL SECRET CONTENT >>>
+```
+
+Populate the `secrets` dir with all the other secrets.
+You _should use_ your own secrets but if you have access to `stg` secrets
+you can also do:
+
+```
+DEPLOYMENT=stg make download-secrets
+```
+
+Now you can create and start the OpenShift Local cluster (it take as long as an hour) in a Vagrant Virtual Machine with:
+
+```
+make oc-cluster-create
+```
+
+And once it is up and running you can test the `packit-service` deployment with the command:
+
+```
+make tmt-tests
+```
+
+This command will sshed the virtual machine and run the tests there (`make test-deploy`),
+you can run the tests as many time you want as long as the virtual machine is up and running and the `crc cluster` is started (`make oc-cluster-up` after every `make oc-cluster-down`).
+You can skip the `tmt` environment and run the test directly inside the VM using `make oc-cluster-ssh` and `cd /vagrant && make test-deploy`.
+
+You can destroy the `libvirt` machine with `make oc-cluster-destroy` and re-create it again with `make oc-cluster-create`.
