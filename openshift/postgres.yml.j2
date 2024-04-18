@@ -58,12 +58,12 @@ spec:
 #                - /usr/libexec/check-container
           resources:
             requests:
-              memory: "{{ '2Gi' if project == 'packit--prod' else '256Mi' }}"
+              memory: "{{ '1Gi' if project == 'packit--prod' else '256Mi' }}"
               cpu: "30m"
             limits:
 # The shared_buffers & effective_cache_size values are set by the container
 # based on this limit, so keep the limit reasonably high.
-              memory: "{{ '4Gi' if project == 'packit--prod' else '512Mi' }}"
+              memory: "{{ '1536Mi' if project == 'packit--prod' else '512Mi' }}"
 # Not utilized most of the time, but useful during migrations and for some queries
               cpu: "1"
           volumeMounts:

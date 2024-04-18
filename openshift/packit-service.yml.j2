@@ -84,7 +84,7 @@ spec:
               # If you see '/usr/bin/run_httpd.sh: line 16:   Killed     alembic upgrade head'
               # you have to temporarily increase (in webUI/console) the limit
               # and once the alembic upgrade passes, revert.
-              memory: "{{ '4Gi' if project == 'packit--prod' else '512Mi' }}"
+              memory: "{{ '1Gi' if project == 'packit--prod' else '512Mi' }}"
               cpu: "200m"
           # In TLS world, hostname needs to match whatever is set in the cert
           # in our cause, k8s is doing here something like curl https://172.15.2.4:8443/api/healthz/
