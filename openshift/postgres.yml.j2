@@ -35,6 +35,11 @@ spec:
           ports:
             - containerPort: 5432
               protocol: TCP
+          # increase shm size, default is 64M
+          # dashboard usage page requires around 100MB
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: cache-volume
           livenessProbe:
             exec:
               command:
@@ -53,12 +58,12 @@ spec:
 #                - /usr/libexec/check-container
           resources:
             requests:
-              memory: "{{ '2Gi' if project == 'packit--prod' else '128Mi' }}"
+              memory: "{{ '1Gi' if project == 'packit--prod' else '256Mi' }}"
               cpu: "30m"
             limits:
 # The shared_buffers & effective_cache_size values are set by the container
 # based on this limit, so keep the limit reasonably high.
-              memory: "{{ '4Gi' if project == 'packit--prod' else '256Mi' }}"
+              memory: "{{ '1536Mi' if project == 'packit--prod' else '512Mi' }}"
 # Not utilized most of the time, but useful during migrations and for some queries
               cpu: "1"
           volumeMounts:
@@ -75,6 +80,11 @@ spec:
         - name: postgres-config
           configMap:
             name: postgres-config
+        - name: cache-volume
+          emptyDir:
+            medium: Memory
+            sizeLimit: 128Mi
+
   replicas: 1
   strategy:
     type: Recreate
