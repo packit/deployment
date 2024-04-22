@@ -17,3 +17,5 @@ ansible-playbook -v -c local -i localhost, \
                  -e path_to_secrets="$(realpath "${PATH_TO_SECRETS}")" \
                  -e service="${SERVICE}" \
                  playbooks/render_secrets_from_templates.yml
+
+echo "[WARNING] Please make sure your ‹vars/› are up-to-date, since the rendered secrets may depend on it."
