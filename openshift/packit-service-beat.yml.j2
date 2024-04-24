@@ -41,7 +41,7 @@ spec:
             - name: APP
               value: {{ celery_app }}
             - name: REDIS_SERVICE_HOST
-              value: redis
+              value: {{ redis_hostname }}
             - name: POSTGRESQL_USER
               valueFrom: {secretKeyRef: {name: postgres-secret, key: database-user}}
             - name: POSTGRESQL_PASSWORD

@@ -27,3 +27,22 @@
       ansible.builtin.set_fact:
         sandbox_namespace: "{{ service }}-{{ deployment }}-sandbox"
       when: not managed_platform
+
+- name: Set redis hostname
+  tags:
+    - always
+  block:
+    - name: Set redict as the redis hostname
+      ansible.builtin.set_fact:
+        redis_hostname: redict
+      when: with_redict
+
+    - name: Set redis as the redis hostname (backward compatibility)
+      ansible.builtin.set_fact:
+        redis_hostname: redis
+      when: with_redis
+
+    - name: Warn if neither is set
+      ansible.builtin.assert:
+        that: with_redict or with_redis
+        fail_msg: "[FAIL] Neither redict or redis is set to be deployed!"

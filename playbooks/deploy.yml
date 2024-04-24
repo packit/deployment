@@ -12,6 +12,8 @@
     tenant: packit # MP+ tenant
     with_tokman: true
     with_fedmsg: true
+    with_redis: false
+    with_redict: true
     with_redis_commander: false
     with_flower: false
     with_dashboard: true
@@ -183,8 +185,19 @@
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/redis.yml.j2') }}"
+      when: with_redis
       tags:
         - redis
+
+    - name: Deploy redict
+      vars:
+        k8s_apply: true
+      ansible.builtin.include_tasks: tasks/k8s.yml
+      loop:
+        - "{{ lookup('template', '{{ project_dir }}/openshift/redict.yml.j2') }}"
+      when: with_redict
+      tags:
+        - redict
 
     - name: Deploy fluentd image stream and config
       ansible.builtin.include_tasks: tasks/k8s.yml
