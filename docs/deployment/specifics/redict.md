@@ -8,6 +8,22 @@ We have tested a seamless migration from Redis to Redict on our production
 deployment. To reproduce:
 
 1. We have deployed Redict to our production cluster.
+
+   - Defaults have been changed to:
+
+     ```yaml
+     with_redis: false
+     with_redict: true
+     ```
+
+     These can be changed in their respective `vars/` files.
+
+   - Run
+
+     ```
+     DEPLOYMENT=prod TAGS=redict make deploy
+     ```
+
 2. Using remote shell and `redict-cli` run:
 
    ```sh
@@ -18,6 +34,13 @@ deployment. To reproduce:
 
 3. After the data exchange is done, change **all** references in variables to
    redis to point to the new hostname, in this case `redis → redict`.
+
+   - Run
+
+     ```
+     DEPLOYMENT=prod TAGS=packit-service-beat,fedmsg,packit-worker,packit-service make deploy
+     ```
+
 4. Simultaneously run the deployment with the changed hostnames and via
    `redict-cli` run:
 
