@@ -23,7 +23,7 @@ spec:
           image: quay.io/packit/flower
           env:
             - name: CELERY_BROKER_URL
-              value: redis://redis:6379/0
+              value: redis://{{ redis_hostname }}:6379/0
             - name: FLOWER_PORT
               value: "5555"
           ports:

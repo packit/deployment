@@ -1,0 +1,79 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: redict
+spec:
+  selector:
+    matchLabels:
+      component: redict
+  template:
+    metadata:
+      labels:
+        component: redict
+{% if managed_platform %}
+        paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
+    spec:
+      containers:
+        - name: redict
+          image: registry.redict.io/redict:7
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - mountPath: /data
+              name: redict-pv
+          resources:
+            # requests and limits have to be the same to have Guaranteed QoS
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "256Mi"
+              cpu: "10m"
+      volumes:
+        - name: redict-pv
+          persistentVolumeClaim:
+            claimName: redict-pvc
+  replicas: 1
+  strategy:
+    type: Recreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redict
+{% if managed_platform %}
+  labels:
+    paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
+spec:
+  ports:
+    - name: "6379"
+      port: 6379
+      targetPort: 6379
+  selector:
+    component: redict
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redict-pvc
+{% if managed_platform %}
+  labels:
+    paas.redhat.com/appcode: {{ appcode }}
+  annotations:
+    kubernetes.io/reclaimPolicy: Delete
+{% endif %}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+{% if managed_platform %}
+  storageClassName: aws-ebs
+{% endif %}

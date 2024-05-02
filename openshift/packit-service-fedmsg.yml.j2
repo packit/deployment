@@ -33,7 +33,7 @@ spec:
             - name: FEDORA_MESSAGING_CONF
               value: /home/packit/.config/fedora.toml
             - name: REDIS_SERVICE_HOST
-              value: redis
+              value: {{ redis_hostname }}
             - name: PROJECT
               value: {{ project }}
             - name: DEPLOYMENT

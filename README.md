@@ -57,10 +57,10 @@ To only disable comparing the variable file to the template, set
 
 To run only the tasks related to some of the services, this way doing a
 partial deployment, you can set the `TAGS` environment variable before calling
-`make`. For example, to run only the tasks to deploy Redis and Redis
+`make`. For example, to run only the tasks to deploy Redict and Redis
 Commander, run:
 
-    $ DEPLOYMENT=dev TAGS="redis,redis-commander" make deploy
+    $ DEPLOYMENT=dev TAGS="redict,redis-commander" make deploy
 
 Use `make tags` to list the currently available tags.
 

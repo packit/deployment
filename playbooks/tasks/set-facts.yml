@@ -27,3 +27,31 @@
       ansible.builtin.set_fact:
         sandbox_namespace: "{{ service }}-{{ deployment }}-sandbox"
       when: not managed_platform
+
+- name: Set Redis-like hostname
+  tags:
+    - always
+  block:
+    # Needed for nice message of the sanity check
+    - name: Set default for the hostname
+      ansible.builtin.set_fact:
+        redis_hostname: None
+
+    - name: Set Redict as the hostname
+      ansible.builtin.set_fact:
+        redis_hostname: redict
+      when: with_redict
+
+    - name: Set Redis as the hostname (backward compatibility)
+      ansible.builtin.set_fact:
+        redis_hostname: redis
+      when: with_redis
+
+    - name: Sanity check for deploying exactly one of Redis or Redict
+      ansible.builtin.assert:
+        that: with_redict != with_redis
+        success_msg: |
+          [INFO] Deploying {{ redis_hostname }}
+        fail_msg: |
+          [FAIL] Check vars (‹with_redict› and ‹with_redis›).
+          Cannot deploy none or both of Redis and Redict!

@@ -23,7 +23,7 @@ spec:
           image: rediscommander/redis-commander
           env:
             - name: REDIS_HOST
-              value: redis
+              value: {{ redis_hostname }}
             - name: REDIS_PORT
               value: "6379"
             - name: HTTP_USER
