@@ -13,5 +13,8 @@ secrets/fedora-source-git/stg/*
 !secrets/**/*.j2
 !secrets/**/ssh_config
 
+# Ignore any ‹dev› secrets
+secrets/*/dev/*
+
 # used in move_stable script
 move_stable_repositories
