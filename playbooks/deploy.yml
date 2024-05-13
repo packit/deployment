@@ -253,7 +253,7 @@
         # Short-running tasks are just interactions with different services.
         # They should not require a lot of memory/cpu.
         worker_requests_memory: "320Mi"
-        worker_requests_cpu: "200m"
+        worker_requests_cpu: "80m"
         worker_limits_memory: "640Mi"
         worker_limits_cpu: "400m"
       ansible.builtin.include_tasks: tasks/k8s.yml
@@ -285,7 +285,7 @@
         # cloning repos is memory intensive: glibc needs 300M+, kernel 600M+
         # during cloning, we need to account for git and celery worker processes
         worker_requests_memory: "384Mi"
-        worker_requests_cpu: "400m"
+        worker_requests_cpu: "100m"
         worker_limits_memory: "1024Mi"
         worker_limits_cpu: "600m"
       ansible.builtin.include_tasks: tasks/k8s.yml
