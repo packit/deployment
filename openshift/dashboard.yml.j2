@@ -34,6 +34,8 @@ spec:
           env:
             - name: DEPLOYMENT
               value: {{ deployment }}
+            - name: VITE_SENTRY_DSN
+              valueFrom: {secretKeyRef: {name: sentry, key: dsn}}
           resources:
             requests:
               memory: "128Mi"
