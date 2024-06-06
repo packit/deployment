@@ -1,0 +1,22 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- name: Deploy as tmt user
+  hosts: all
+  become: true
+  become_user: tmt
+  become_flags: -i
+  vars:
+    test_project_name: myproject
+
+  roles:
+    - role: deploy
+
+  post_tasks:
+    - name: Delete test project namespace if already exist
+      kubernetes.core.k8s:
+        name: "{{ test_project_name }}"
+        api_version: v1
+        kind: Namespace
+        state: absent

@@ -4,7 +4,11 @@
 ---
 - name: Ensure crc is started, create openshift project and vars/packit/dev.yml
   hosts: all
+  become: true
+  become_user: tmt
+  become_flags: -i
   vars:
+    dest_pull_secret_file: /tmp/openshift-local-pull-secret.txt
     test_project_name: myproject
     crc_url: https://api.crc.testing:6443
     image: quay.io/packit/packit-service:stg
@@ -12,9 +16,24 @@
     image_fedmsg: quay.io/packit/packit-service-fedmsg:stg
     image_dashboard: quay.io/packit/dashboard:stg
     image_tokman: quay.io/packit/tokman:stg
+    tmt_tree: "{{ lookup('env', 'TMT_TREE') }}"
   tasks:
+    - name: Find user uid
+      ansible.builtin.command: "id -u tmt"
+      register: user_uid
+      changed_when: false
+
+    - name: Determine XDG_RUNTIME_DIR
+      ansible.builtin.set_fact:
+        xdg_runtime_dir: "/run/user/{{ user_uid.stdout }}"
+      changed_when: false
+
     - name: Ensure crc is started
-      ansible.builtin.command: crc start
+      ansible.builtin.command: "crc start -c 6 -m 12000 -p {{ dest_pull_secret_file }}"
+      changed_when: False
+
+    - name: Login into cluster as kubeadmin
+      ansible.builtin.command: oc login -u kubeadmin {{ crc_url }}
       changed_when: False
 
     - name: Get token
@@ -47,9 +66,14 @@
         - "{{ image_fedmsg }}"
         - "{{ image_dashboard }}"
         - "{{ image_tokman }}"
-      loop_control:
-        pause: 1 # otherwise getting 500 Internal Server Error from registry
       changed_when: False
+
+    - name: Copy tmt_tree in tmt home (otherwise I can't write on it...) # noqa risky-file-permissions # this is a recursive copy
+      ansible.builtin.copy:
+        src: "{{ tmt_tree }}/"
+        dest: /home/tmt/deployment
+        owner: tmt
+        directory_mode: "0755"
 
     - name: Create packit/dev.yml
       ansible.builtin.copy:
@@ -76,5 +100,5 @@
           image_fedmsg: {{ image_fedmsg }}
           image_dashboard: {{ image_dashboard }}
           image_tokman: {{ image_tokman }}
-        dest: "{{ src_dir }}/vars/packit/dev.yml"
+        dest: "/home/tmt/deployment/vars/packit/dev.yml"
         mode: 0644
