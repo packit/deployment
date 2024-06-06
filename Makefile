@@ -11,7 +11,8 @@ VAGRANT_SSH_USER = "$(shell cd containers && vagrant ssh-config | awk '/User/{pr
 VAGRANT_SSH_GUEST = "$(shell cd containers && vagrant ssh-config | awk '/HostName/{print $$2}')"
 VAGRANT_SSH_IDENTITY_FILE = "$(shell cd containers && vagrant ssh-config | awk '/IdentityFile/{print $$2}')"
 VAGRANT_SSH_CONFIG = $(shell cd containers && vagrant ssh-config | awk 'NR>1 {print " -o "$$1"="$$2}')
-VAGRANT_SHARED_DIR = "/vagrant"
+#VAGRANT_SHARED_DIR = "/vagrant"
+VAGRANT_SHARED_DIR = "/home/tmt/deployment"
 
 CENTOS_VAGRANT_BOX = CentOS-Stream-Vagrant-8-latest.x86_64.vagrant-libvirt.box
 CENTOS_VAGRANT_URL = https://cloud.centos.org/centos/8-stream/x86_64/images/$(CENTOS_VAGRANT_BOX)
@@ -80,11 +81,23 @@ oc-cluster-ssh: oc-cluster-up
 	ssh $(VAGRANT_SSH_CONFIG) localhost
 
 test-deploy:
-# to be run inside VM where the oc cluster is running! Call make tmt-tests instead.
+# to be run inside VM where the oc cluster is running! Call make tmt-vagrant-tests instead from outside the vagrant machine.
 	DEPLOYMENT=dev $(AP) playbooks/generate-local-secrets.yml
 	DEPLOYMENT=dev $(AP) -e '{"src_dir": $(VAGRANT_SHARED_DIR)}' playbooks/test_deploy_setup.yml
-	DEPLOYMENT=dev $(AP) -e '{"container_engine": "podman", "registry": "default-route-openshift-image-registry.apps-crc.testing", "registry_user": "kubeadmin", "src_dir": $(VAGRANT_SHARED_DIR)}' playbooks/deploy.yml
-	DEPLOYMENT=dev $(AP) -e '{"container_engine": "podman", "registry": "default-route-openshift-image-registry.apps-crc.testing", "registry_user": "kubeadmin", "src_dir": $(VAGRANT_SHARED_DIR)}' playbooks/check.yml
+	cd $(VAGRANT_SHARED_DIR); DEPLOYMENT=dev $(AP) -e '{"container_engine": "podman", "registry": "default-route-openshift-image-registry.apps-crc.testing", "registry_user": "kubeadmin", "src_dir": $(VAGRANT_SHARED_DIR)}' playbooks/test_deploy.yml
 
-tmt-tests:
+tmt-vagrant-test:
 	tmt run --all provision --how connect --user vagrant --guest $(VAGRANT_SSH_GUEST) --port $(VAGRANT_SSH_PORT) --key $(VAGRANT_SSH_IDENTITY_FILE)
+
+tf-deploy:
+	 testing-farm request --compose Fedora-Rawhide --git-url https://github.com/majamassarini/deployment --git-ref tf-openshift-tests --plan deployment
+
+# tmt run --id packit-service-deployment --until execute
+# tmt run --id packit-service-deployment prepare --force
+# tmt run --id packit-service-deployment login --step prepare:start
+# tmt run --id packit-service-deployment execute --force
+# tmt run --id packit-service-deployment login --step execute:start
+# tmt run --id packit-service-deployment finish
+# tmt run --id packit-service-deployment clean
+
+# virsh list --all
