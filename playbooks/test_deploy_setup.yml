@@ -75,6 +75,13 @@
         owner: tmt
         directory_mode: "0755"
 
+    - name: Copy secrets that are already been generated in tmt home # noqa risky-file-permissions # this is a recursive copy
+      ansible.builtin.copy:
+        src: "../secrets"
+        dest: /home/tmt/deployment
+        owner: tmt
+        directory_mode: "0755"
+
     - name: Create packit/dev.yml
       ansible.builtin.copy:
         content: |

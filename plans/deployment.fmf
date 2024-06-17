@@ -15,6 +15,22 @@ discover:
   test:
     - deployment
 
+/remote:
+  summary: Run packit-service deployment test on a remote testing-farm machine (details are defined in the GitHub action)
+  prepare:
+    - how: ansible
+      playbook: playbooks/oc-cluster-user.yml
+      extra-args: '-vvv'
+    - how: ansible
+      playbook: playbooks/oc-cluster-setup.yml
+      extra-args: '-vvv'
+    - how: ansible
+      playbook: playbooks/oc-cluster-run.yml
+      extra-args: '-vvv'
+    - how: ansible
+      playbook: playbooks/oc-cluster-tests-setup.yml
+      extra-args: '-vvv'
+
 /local:
   summary: Run packit-service deployment test on a local machine managed by tmt
   discover:
