@@ -5,10 +5,13 @@
   become_user: tmt
   gather_facts: False
   vars:
-    pull_secret: "!!!TAKEN FROM ANSIBLE ENV!!!"
     dest_pull_secret_file: /tmp/openshift-local-pull-secret.txt
     crc_path: /home/tmt/.local/bin
   tasks:
+    - name: Look for pull_secret in env vars if it is not already defined
+      ansible.builtin.set_fact:
+        pull_secret: "{{ lookup('env', 'CRC_PULL_SECRET') }}"
+      when: pull_secret is undefined
     - name: Show pull secret
       ansible.builtin.debug:
         msg: "{{ pull_secret }}"
