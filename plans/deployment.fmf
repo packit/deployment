@@ -5,6 +5,8 @@ execute:
 
 environment:
   DEPLOYMENT: dev
+  SHARED_DIR: /home/tmt/deployment
+  USER: tmt
   #ANSIBLE_DEBUG: 1
 
 report:
@@ -16,20 +18,20 @@ discover:
     - deployment
 
 /remote:
-  summary: Run packit-service deployment test on a remote testing-farm machine (details are defined in the GitHub action)
+  summary: Run packit-service deployment test on a remote testing-farm machine (provisioning details are defined in the GitHub action)
   prepare:
     - how: ansible
       playbook: playbooks/oc-cluster-user.yml
-      extra-args: '-vvv'
+      extra-args: "-vvv --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-setup.yml
-      extra-args: '-vvv'
+      extra-args: "-vvv --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-run.yml
-      extra-args: '-vvv'
+      extra-args: "-vvv --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-tests-setup.yml
-      extra-args: '-vvv'
+      extra-args: "-vvv"
 
 /local:
   summary: Run packit-service deployment test on a local machine managed by tmt
@@ -48,32 +50,29 @@ discover:
   prepare:
     - how: ansible
       playbook: playbooks/oc-cluster-user.yml
-      extra-args: '-vvv'
+      extra-args: "-vvv --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-setup.yml
-      extra-args: '-vvv'
+      extra-args: "-vvv --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-run.yml
-      extra-args: '-vvv --extra-vars @./secrets/openshift-local-pull-secret.yml'
+      extra-args: "-vvv --extra-vars @./secrets/openshift-local-pull-secret.yml --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-tests-setup.yml
-      extra-args: '-vvv'
-    #- how: ansible
-    #  playbook: playbooks/generate-local-secrets.yml
-    #  extra-args: '-vvv --extra-vars generate_secrets_project_dir="./"'
-    #- how: ansible
-    #  playbook: playbooks/test_deploy_setup.yml
-    #  extra-args: '-vvv'
+      extra-args: "-vvv"
 
-#/vagrant:
-#  summary: Run packit-service deployment test on a vagrant machine already up and running
-#
-#  description:
-#    guest, port and key details are taken from the tmt-vagrant-test Makefile target.
-#    This provision is meant to be used just locally with the Vagrant machine already up
-#    and running. To start the Vagrant machine use the oc-cluster-up Makefile target.
-#    To access the Vagrant machine use the oc-cluster-ssh Makefile target.
-#
-#  provision:
-#    how: connect
-#    user: vagrant
+/vagrant:
+  summary: Run packit-service deployment test on a vagrant machine already up and running
+  environment+:
+    SHARED_DIR: /vagrant
+    USER: vagrant
+
+  description:
+    guest, port and key details are taken from the tmt-vagrant-test Makefile target.
+    This provision is meant to be used just locally with the Vagrant machine already up
+    and running. To start the Vagrant machine use the oc-cluster-up Makefile target.
+    To access the Vagrant machine use the oc-cluster-ssh Makefile target.
+
+  provision:
+    how: connect
+    user: vagrant

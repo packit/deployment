@@ -1,12 +1,11 @@
 ---
 - name: Install an Openshift Local cluster
   become: true
-  become_user: tmt
+  become_user: "{{ user }}"
   hosts: all
   vars:
     crc_download_link: https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/crc/latest/crc-linux-amd64.tar.xz
-    crc_path: /home/tmt/.local/bin
-    user: tmt
+    crc_path: "/home/{{ user }}/.local/bin"
   tasks:
     - name: Download CRC
       ansible.builtin.get_url:
@@ -20,7 +19,7 @@
         dest: /tmp
         list_files: True
         remote_src: True
-        owner: tmt
+        owner: "{{ user }}"
       register: unarchive
     - name: Create ~/.local/bin if it does not exist
       ansible.builtin.file:
@@ -30,7 +29,7 @@
     - name: Show crc executable path
       ansible.builtin.debug:
         msg: "/tmp/{{ unarchive.files[0] }}crc"
-    - name: Copy crc to tmt usr
+    - name: Copy crc to user dir
       ansible.builtin.copy:
         src: "/tmp/{{ unarchive.files[0] }}/crc"
         remote_src: true
@@ -55,7 +54,7 @@
       changed_when: False
 
     - name: Find user uid
-      ansible.builtin.command: "id -u tmt"
+      ansible.builtin.command: "id -u {{ user }}"
       register: user_uid
       changed_when: false
 

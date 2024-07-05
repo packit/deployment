@@ -2,13 +2,11 @@
 # vi: set ft=ruby :
 
 VAGRANTFILE_API_VERSION = "2"
-# export VAGRANT_EXPERIMENTAL="1"
-# export VAGRANT_EXPERIMENTAL="disks"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
- config.vm.box = "centos/stream8"
- #config.vm.box_url = "https://cloud.centos.org/centos/8-stream/x86_64/images/CentOS-Stream-Vagrant-8-latest.x86_64.vagrant-libvirt.box" gives 404
- config.vm.box_url = "file:///$VagrantProjectHome/../CentOS-Stream-Vagrant-8-latest.x86_64.vagrant-libvirt.box"
+ config.vm.box = "centos/stream9"
+ config.vm.box_url = "https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-Vagrant-9-latest.x86_64.vagrant-libvirt.box"
+ #config.vm.box_url = "file:///$VagrantProjectHome/../CentOS-Stream-Vagrant-8-latest.x86_64.vagrant-libvirt.box"
 
 
  # Forward traffic on the host to the development server on the guest
@@ -44,30 +42,33 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  #   sshfs_opts_append: "-o nonempty"
 
  # Comment this line if you would like to disable the automatic update during provisioning
- config.vm.provision "shell", inline: "sudo dnf -y --disablerepo '*' --enablerepo=extras swap centos-linux-repos centos-stream-repos"
+ # config.vm.provision "shell", inline: "sudo dnf -y --disablerepo '*' --enablerepo=extras swap centos-linux-repos centos-stream-repos"
 
  # !!!!!!! resize disk image !!!!!!!!!
  config.vm.provision "shell", inline: "sudo dnf install -y cloud-utils-growpart"
  config.vm.provision "shell", inline: "sudo growpart /dev/vda 1"
- config.vm.provision "shell", inline: "sudo xfs_growfs /dev/vda1"
+ config.vm.provision "shell", inline: "sudo resize2fs /dev/vda1"
+ # config.vm.provision "shell", inline: "sudo xfs_growfs /dev/vda1" # this was for CentOS Stream 8
 
  # bootstrap and run with ansible
  config.vm.provision "ansible" do |ansible|
      # ansible.verbose = "-vvv"
      ansible.verbose = true
      ansible.playbook = "../playbooks/oc-cluster-setup.yml"
+     ansible.extra_vars = {"user": "vagrant"}
  end
  config.vm.provision "ansible" do |ansible|
      # ansible.verbose = "-vvv"
      ansible.verbose = true
      ansible.playbook = "../playbooks/oc-cluster-run.yml"
-     ansible.extra_vars = "../secrets/openshift-local-pull-secret.yml"
+     ansible.raw_arguments = ['--extra-vars', 'user=vagrant', '--extra-vars', '@../secrets/openshift-local-pull-secret.yml']
  end
  config.vm.provision "ansible" do |ansible|
      # ansible.verbose = "-vvv"
+     ansible.become = true
+     ansible.become_user = "root"
      ansible.verbose = true
      ansible.playbook = "../playbooks/oc-cluster-tests-setup.yml"
-     ansible.extra_vars = {"src_dir": "/vagrant"}
  end
 
  # Create the box
