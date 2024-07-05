@@ -1,6 +1,6 @@
 duration: 60m
 
-environment:
+environment+:
   DEPLOYMENT: dev
 
 require:

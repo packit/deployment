@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 ---
-- name: Deploy as tmt user
+- name: Deploy as tmt/vagrant user
   hosts: all
   become: true
-  become_user: tmt
+  become_user: "{{ user }}"
   become_flags: -i
   vars:
     test_project_name: myproject

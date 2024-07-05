@@ -2,18 +2,17 @@
 - name: Configure a user able to run a Openshift Local Cluster
   hosts: all
   tasks:
-    - name: Add tmt user
+    - name: Add user
       ansible.builtin.user:
-        name: tmt
+        name: "{{ user }}"
         append: true
         groups: wheel
     - name: Add tmt user to sudoers
       ansible.builtin.lineinfile:
         path: /etc/sudoers
         state: present
-        #line: "{{ user }} ALL=(ALL) NOPASSWD: ALL"
-        line: "tmt ALL=(ALL) NOPASSWD: ALL"
+        line: "{{ user }} ALL=(ALL) NOPASSWD: ALL"
         validate: /usr/sbin/visudo -cf %s
-    - name: Enable lingering for tmt
-      ansible.builtin.command: loginctl enable-linger tmt
+    - name: Enable lingering for user
+      ansible.builtin.command: "loginctl enable-linger {{ user }}"
       changed_when: False

@@ -5,7 +5,7 @@
 - name: Ensure crc is started, create openshift project and vars/packit/dev.yml
   hosts: all
   become: true
-  become_user: tmt
+  become_user: "{{ user }}"
   become_flags: -i
   vars:
     dest_pull_secret_file: /tmp/openshift-local-pull-secret.txt
@@ -19,7 +19,7 @@
     tmt_tree: "{{ lookup('env', 'TMT_TREE') }}"
   tasks:
     - name: Find user uid
-      ansible.builtin.command: "id -u tmt"
+      ansible.builtin.command: "id -u {{ user }}"
       register: user_uid
       changed_when: false
 
@@ -74,6 +74,7 @@
         dest: /home/tmt/deployment
         owner: tmt
         directory_mode: "0755"
+      when: src_dir == "/home/tmt/deployment"
 
     - name: Copy secrets that are already been generated in tmt home # noqa risky-file-permissions # this is a recursive copy
       ansible.builtin.copy:
@@ -81,6 +82,7 @@
         dest: /home/tmt/deployment
         owner: tmt
         directory_mode: "0755"
+      when: src_dir == "/home/tmt/deployment"
 
     - name: Create packit/dev.yml
       ansible.builtin.copy:
@@ -107,5 +109,5 @@
           image_fedmsg: {{ image_fedmsg }}
           image_dashboard: {{ image_dashboard }}
           image_tokman: {{ image_tokman }}
-        dest: "/home/tmt/deployment/vars/packit/dev.yml"
+        dest: "{{ src_dir }}/vars/packit/dev.yml"
         mode: 0644
