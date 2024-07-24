@@ -73,6 +73,17 @@ resource requirements.
    | postgres   |     `2Gi` | `4Gi` |
    | service    |    `320m` | `4Gi` |
 
+   With the current setup (2× short and long-running workers), we would need
+
+   | Resource |  Request |     Limit |
+   | -------- | -------: | --------: |
+   | CPU      |   `460m` |   `3480m` |
+   | Memory   | `4484Mi` | `12768Mi` |
+
+   Requesting the memory quotas to be multiplied by 3 results in having ~`11Gi`
+   memory left which should be enough to scale up for few more workers if
+   needed.
+
 1. Request adjustments of the quotas such that we can have some buffer (database
    migrations, higher load on service, etc.), but also could **permanently**
    scale up the workers if we find service to be more reliable that way
