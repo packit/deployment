@@ -82,7 +82,7 @@ resource requirements.
 
    Requesting the memory quotas to be multiplied by 3 results in having ~`11Gi`
    memory left which should be enough to scale up for few more workers if
-   needed.
+   needed. This setup would also allow scaling up to 8 workers per each queue.
 
 1. Request adjustments of the quotas such that we can have some buffer (database
    migrations, higher load on service, etc.), but also could **permanently**
