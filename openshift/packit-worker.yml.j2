@@ -60,7 +60,15 @@ spec:
         - name: packit-secrets
           secret: {secretName: packit-secrets}
         - name: packit-config
-          secret: {secretName: packit-config}
+          projected:
+            sources:
+                - secret:
+                    name: packit-config
+                - configMap:
+                    name: osh-config
+                    items:
+                      - key: client.conf
+                        path: osh/client.conf
 {% if with_fluentd_sidecar %}
         - name: fluentd-config
           configMap: {name: fluentd-config}
@@ -190,3 +198,12 @@ spec:
   lookupPolicy:
     # allows all resources pointing to this image stream to use it in the image field
     local: true
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: osh-config
+data:
+  client.conf: |
+    [General]
+    defaultmockconfig =
