@@ -41,10 +41,6 @@ resource requirements.
 | worker (short)   |                          `320Mi` |                            `640Mi` |
 | worker (long)    |                          `384Mi` |                           `1024Mi` |
 
-## Reasoning for the requirements
-
-**\[TODO\]**
-
 ## Currently allowed requirements / limits
 
 | Resource | Allowed to request | Limit |
@@ -91,13 +87,16 @@ resource requirements.
    - Based on the calculations above, 2× the current quotas on memory would be
      sufficient, but if we were to scale the workers up too (and account for
      possible adjustments, e.g., Redict) we should probably go for 3×
-     - **\[TODO\]** Also check how such changes affect the CPU requests/limits
 
 1. Migrate tokman to different toolchain, it's a small self-contained app, so it
    is easy to migrate to either Rust or Go that should leave smaller footprint.
-   - **\[TODO\]** Also research the possibility of dropping it, since GitHub
-     might've changed their policy about GitHub App tokens; this was discovered
-     by Hunor, but we haven't tried dropping it…
+
+   - Opened an issue for testing out running without Tokman deployment
+     https://github.com/packit/tokman/issues/72
+
+   - Opened an issue for migrating in case we need the tokman
+     To be opened, if the previous issue “fails” (i.e. tokman is still needed,
+     or dropping affects the amount of requests to GitHub in a negative way)
 
 [^1]:
     includes non-scalable deployments, i.e., each runs just one pod, e.g.,
