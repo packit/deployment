@@ -1,0 +1,17 @@
+duration: 60m
+
+environment+:
+  DEPLOYMENT: dev
+
+require:
+  - type: file
+    pattern:
+      - /openshift
+      - /playbooks
+      - /scripts
+      - /secrets
+      - /vars
+      - /Makefile
+
+path: /
+test: make test-deploy

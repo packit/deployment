@@ -1,0 +1,22 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- name: Install packit-service dependencies
+  hosts: all
+  vars:
+    oc_download_link: https://mirror.openshift.com/pub/openshift-v4/amd64/clients/ocp/stable/openshift-client-linux.tar.gz
+  tasks:
+    - name: Enable EPEL repositories
+      ansible.builtin.package:
+        name:
+          - epel-release
+    - name: Install packages for deployment
+      ansible.builtin.package:
+        name:
+          - ansible
+          - python3-openshift
+          - python3-pip
+          - python3-passlib # for using htpasswd ansible module
+          - make
+          - podman

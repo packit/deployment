@@ -1,0 +1,47 @@
+---
+- name: Start Openshift Local cluster
+  hosts: all
+  become: true
+  become_user: "{{ user }}"
+  gather_facts: False
+  vars:
+    dest_pull_secret_file: /tmp/openshift-local-pull-secret.txt
+    crc_path: "/home/{{ user }}/.local/bin"
+  tasks:
+    - name: Look for pull_secret in env vars if it is not already defined
+      ansible.builtin.set_fact:
+        pull_secret: "{{ lookup('env', 'CRC_PULL_SECRET') }}"
+      when: pull_secret is undefined
+    - name: Show pull secret
+      ansible.builtin.debug:
+        msg: "{{ pull_secret }}"
+    - name: Create secret file from pull request var
+      ansible.builtin.copy:
+        content: "{{ pull_secret }}"
+        dest: "{{ dest_pull_secret_file }}"
+        mode: "0640"
+        owner: "{{ user }}"
+
+    - name: Find user uid
+      ansible.builtin.command: "id -u {{ user }}"
+      register: user_uid
+      changed_when: false
+
+    - name: Determine XDG_RUNTIME_DIR
+      ansible.builtin.set_fact:
+        xdg_runtime_dir: "/run/user/{{ user_uid.stdout }}"
+      changed_when: false
+
+    - name: Start cluster
+      ansible.builtin.command: "{{ crc_path }}/crc start -c 6 -m 12000 -p {{ dest_pull_secret_file }}"
+      #ansible.builtin.command: "crc start -p {{ dest_pull_secret_file }}"
+      changed_when: False
+
+    - name: Create symbolic link to oc
+      ansible.builtin.file:
+        #    src: "/tmp/{{ unarchive.files[0] }}/crc"
+        src: "/home/{{ user }}/.crc/bin/oc/oc"
+        #    dest: "{{ crc_path }}/crc"
+        dest: "/home/{{ user }}/.local/bin/oc"
+        state: link
+        force: True

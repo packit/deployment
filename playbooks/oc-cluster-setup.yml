@@ -1,0 +1,68 @@
+---
+- name: Install an Openshift Local cluster
+  become: true
+  become_user: "{{ user }}"
+  hosts: all
+  vars:
+    crc_download_link: https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/crc/latest/crc-linux-amd64.tar.xz
+    crc_path: "/home/{{ user }}/.local/bin"
+  tasks:
+    - name: Download CRC
+      ansible.builtin.get_url:
+        url: "{{ crc_download_link }}"
+        dest: /tmp
+        mode: "0777"
+      register: download
+    - name: Unarchive tarball
+      ansible.builtin.unarchive:
+        src: "{{ download.dest }}"
+        dest: /tmp
+        list_files: True
+        remote_src: True
+        owner: "{{ user }}"
+      register: unarchive
+    - name: Create ~/.local/bin if it does not exist
+      ansible.builtin.file:
+        path: "{{ crc_path }}"
+        state: directory
+        mode: "0755"
+    - name: Show crc executable path
+      ansible.builtin.debug:
+        msg: "/tmp/{{ unarchive.files[0] }}crc"
+    - name: Copy crc to user dir
+      ansible.builtin.copy:
+        src: "/tmp/{{ unarchive.files[0] }}/crc"
+        remote_src: true
+        dest: "{{ crc_path }}/crc"
+        mode: "0755"
+        force: True
+
+    - name: Setup consent-telemetry no
+      ansible.builtin.command: "{{ crc_path }}/crc config set consent-telemetry no"
+      changed_when: False
+    - name: Setup disable-update-check true
+      ansible.builtin.command: "{{ crc_path }}/crc config set disable-update-check true"
+      changed_when: False
+    - name: Setup monitoring no
+      ansible.builtin.command: "{{ crc_path }}/crc config set enable-cluster-monitoring false"
+      changed_when: False
+    - name: Setup minimum packit-service memory requirements
+      ansible.builtin.command: "{{ crc_path }}/crc config set memory 13312 MiB"
+      changed_when: False
+    - name: Setup minimum packit-service disk space requirements
+      ansible.builtin.command: "{{ crc_path }}/crc config set disk-size 60 Gi"
+      changed_when: False
+
+    - name: Find user uid
+      ansible.builtin.command: "id -u {{ user }}"
+      register: user_uid
+      changed_when: false
+
+    - name: Determine XDG_RUNTIME_DIR
+      ansible.builtin.set_fact:
+        xdg_runtime_dir: "/run/user/{{ user_uid.stdout }}"
+      changed_when: false
+
+    - name: Setup cluster
+      ansible.builtin.command: "{{ crc_path }}/crc setup"
+      changed_when: False
