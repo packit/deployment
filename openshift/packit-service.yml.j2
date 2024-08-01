@@ -36,6 +36,9 @@ spec:
         - name: fluentd-config
           configMap: {name: fluentd-config}
 {% endif %}
+        - name: gh-secrets
+          secret:
+            secretName: github-app-private-key
       containers:
         - name: packit-service
           image: packit-service:{{ deployment }}
@@ -72,6 +75,9 @@ spec:
               readOnly: true
             - name: packit-config
               mountPath: /home/packit/.config
+              readOnly: true
+            - name: gh-secrets
+              mountPath: /gh-secrets
               readOnly: true
           command:
             - /usr/bin/run_httpd.sh
