@@ -73,6 +73,9 @@ spec:
         - name: fluentd-config
           configMap: {name: fluentd-config}
 {% endif %}
+        - name: gh-secrets
+          secret:
+            secretName: github-app-private-key
       containers:
         - name: packit-worker
           image: packit-worker:{{ deployment }}
@@ -140,6 +143,9 @@ spec:
             - name: packit-worker-repository-cache
               mountPath: /repository-cache
 {% endif %}
+            - name: gh-secrets
+              mountPath: /gh-secrets
+              readOnly: true
           command:
             - "/usr/bin/run_worker.sh"
           resources:
