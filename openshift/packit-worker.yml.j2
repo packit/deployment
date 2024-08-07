@@ -76,6 +76,9 @@ spec:
         - name: gh-secrets
           secret:
             secretName: github-app-private-key
+        - name: centpkg-sig
+          secret:
+            secretName: centpkg-sig
       containers:
         - name: packit-worker
           image: packit-worker:{{ deployment }}
@@ -146,6 +149,9 @@ spec:
             - name: gh-secrets
               mountPath: /gh-secrets
               readOnly: true
+            - name: centpkg-sig
+              mountPath: /etc/rpkg/centpkg-sig.conf
+              subPath: centpkg-sig.conf
           command:
             - "/usr/bin/run_worker.sh"
           resources:
