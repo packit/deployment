@@ -441,7 +441,7 @@
       when: workers_long_running > 0
 
     - name: Wait for deploymentconfig rollouts to complete
-      # timeout 10min to not wait indefinitely in case of a problem
+      # timeout 15min to not wait indefinitely in case of a problem
       ansible.builtin.command: timeout 15m oc rollout status -w deploy/{{ item }}
       register: oc_rollout_status
       changed_when: false

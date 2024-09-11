@@ -95,7 +95,7 @@
           check_up_to_date: false
           # Whether to deploy and check that pod
           # Let's preserve some resources
-          with_tokman: true
+          with_tokman: false
           with_beat: true
           with_fedmsg: true
           with_dashboard: true
