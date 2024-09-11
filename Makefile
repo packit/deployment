@@ -54,10 +54,11 @@ move-stable:
 	[[ -d move_stable_repositories ]] || scripts/move_stable.py init
 	scripts/move_stable.py move-all
 
-# to be run inside VM where the oc cluster && tmt is running!
-# cd containers; make tmt-vagrant-tests instead for testing in the vagrant machine.
+# To be run inside VM where the oc cluster is running!
+# `cd /vagrant; SHARED_DIR=/vagrant make test-deploy` for using it inside the vagrant VM.
+# `SHARED_DIR=/home/tmt/deployment make test-deploy` for using it inside the tmt VM.
 # SHARED_DIR could be /vagrant or /home/tmt/deployment, it depends on the VM where tmt is being run
-# look inside deployment.fmf to find out the value of SHARED_DIR
+# look inside deployment.fmf to find out the value of SHARED_DIR set through tmt
 test-deploy:
 	DEPLOYMENT=dev $(AP) playbooks/generate-local-secrets.yml
 	DEPLOYMENT=dev $(AP) -e '{"user": $(USER), "src_dir": $(SHARED_DIR)}' playbooks/test_deploy_setup.yml
