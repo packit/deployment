@@ -116,6 +116,7 @@
     - "{{ lookup('template', '{{ project_dir }}/openshift/secret-aws.yml.j2') }}"
     - "{{ lookup('template', '{{ project_dir }}/openshift/secret-splunk.yml.j2') }}"
     - "{{ lookup('template', '{{ project_dir }}/openshift/secret-centpkg-sig.yml.j2') }}"
+    - "{{ lookup('template', '{{ project_dir }}/openshift/github-app-private-key.yml.j2') }}"
   tags:
     - secrets
 
