@@ -3,7 +3,7 @@
     check:
       jobs:
         - pre-commit
-        - deployment-tests
+        # - deployment-tests
     gate:
       jobs:
         - pre-commit

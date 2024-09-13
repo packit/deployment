@@ -1,4 +1,4 @@
-name: Schedule test on Testing Farm
+name: Schedule tests on Testing Farm
 on:
   pull_request:
 
@@ -11,7 +11,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Schedule test on Testing Farm
+      - name: Schedule tests on Testing Farm
         uses: sclorg/testing-farm-as-github-action@v2
         with:
           compose: CentOS-Stream-9
