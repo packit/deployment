@@ -71,18 +71,18 @@
     - name: Copy tmt_tree in tmt home (otherwise I can't write on it...) # noqa risky-file-permissions # this is a recursive copy
       ansible.builtin.copy:
         src: "{{ tmt_tree }}/"
-        dest: /home/tmt/deployment
+        dest: "{{ src_dir }}"
         owner: tmt
         directory_mode: "0755"
-      when: src_dir == "/home/tmt/deployment"
+      when: user == "tmt"
 
     - name: Copy secrets that are already been generated in tmt home # noqa risky-file-permissions # this is a recursive copy
       ansible.builtin.copy:
         src: "../secrets"
-        dest: /home/tmt/deployment
+        dest: "{{ src_dir }}"
         owner: tmt
         directory_mode: "0755"
-      when: src_dir == "/home/tmt/deployment"
+      when: user == "tmt"
 
     - name: Create packit/dev.yml
       ansible.builtin.copy:
