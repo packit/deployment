@@ -39,6 +39,10 @@ discover:
     how: fmf
     test:
       - deployment
+  adjust:
+    enabled: false
+    when: initiator != human
+    because: this plan is used to test the deployment locally via vagrant
   provision:
     how: virtual
     image: centos-stream
@@ -66,6 +70,10 @@ discover:
   environment+:
     SHARED_DIR: /vagrant
     USER: vagrant
+  adjust:
+    enabled: false
+    when: initiator != human
+    because: this plan is used to set up vagrant locally
 
   description:
     guest, port and key details are taken from the tmt-vagrant-test Makefile target.
