@@ -13,3 +13,4 @@
     - fedora.toml.j2
     - copr
     - ssh_config
+    - centpkg-sig.conf.j2

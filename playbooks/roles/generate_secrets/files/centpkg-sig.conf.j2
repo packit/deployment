@@ -1,0 +1,32 @@
+[centpkg-sig]
+lookaside = https://git.centos.org/sources
+lookasidehash = sha512
+lookaside_cgi = https://git.centos.org/sources/upload_sig.cgi
+# lookaside_cgi = https://git.centos.org/sources/upload.cgi
+distgit_namespaced = True
+distgit_namespaces = rpms
+gitbaseurl = git+ssh://git@gitlab.com/CentOS/%(repo)s.git
+anongiturl = https://gitlab.com/CentOS/%(repo)s.git
+branchre = c\d+s?-sig-.+|master$
+kojiprofile = cbs
+build_client = cbs
+lookaside_namespaced = True
+git_excludes =
+  i386/
+  i686/
+  x86_64/
+  ppc/
+  ppc64/
+  ia64/
+  mips/
+  arm/
+  noarch/
+  /*.src.rpm
+  /build*.log
+  /.build-*.log
+  results_*/
+  clog
+
+[centpkg-sig.distgit]
+apibaseurl = https://gitlab.com
+token = 111aaaAAA

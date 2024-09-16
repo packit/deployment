@@ -65,6 +65,8 @@
           memory: "128Mi"
           cpu: "50m"
     appcode: PCKT-002
+    registry: 172.30.1.1:5000
+    registry_user: developer
   tasks:
     - name: Include tasks/project-dir.yml
       ansible.builtin.include_tasks: tasks/project-dir.yml
@@ -124,25 +126,25 @@
             tls_verify_false: "{{ '--tls-verify=false' if 'podman' in container_engine else '' }}"
           changed_when: false
         - name: Login to local cluster
-          ansible.builtin.shell: "{{ container_engine }} login -u developer -p $(oc whoami -t) 172.30.1.1:5000 {{ tls_verify_false }}"
+          ansible.builtin.shell: "{{ container_engine }} login -u {{ registry_user }} -p $(oc whoami -t) {{ registry }} {{ tls_verify_false }}"
           changed_when: false
         - name: Inspect service image
           ansible.builtin.command: "{{ container_engine }} inspect {{ image }}"
           changed_when: false
         - name: Tag the image with :dev
-          ansible.builtin.command: "{{ container_engine }} tag {{ image }} 172.30.1.1:5000/myproject/packit-service:dev"
+          ansible.builtin.command: "{{ container_engine }} tag {{ image }} {{ registry }}/myproject/packit-service:dev"
           changed_when: true
         - name: Push the image
-          ansible.builtin.command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-service:dev {{ tls_verify_false }}"
+          ansible.builtin.command: "{{ container_engine }} push {{ registry }}/myproject/packit-service:dev {{ tls_verify_false }}"
           changed_when: true
         - name: Inspect worker image
           ansible.builtin.command: "{{ container_engine }} inspect {{ image_worker }}"
           changed_when: false
         - name: Tag the image with :dev
-          ansible.builtin.command: "{{ container_engine }} tag {{ image_worker }} 172.30.1.1:5000/myproject/packit-worker:dev"
+          ansible.builtin.command: "{{ container_engine }} tag {{ image_worker }} {{ registry }}/myproject/packit-worker:dev"
           changed_when: true
         - name: Push the image
-          ansible.builtin.command: "{{ container_engine }} push 172.30.1.1:5000/myproject/packit-worker:dev {{ tls_verify_false }}"
+          ansible.builtin.command: "{{ container_engine }} push {{ registry }}/myproject/packit-worker:dev {{ tls_verify_false }}"
           changed_when: true
 
     - name: Deploy secrets
@@ -156,6 +158,7 @@
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-aws.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-splunk.yml.j2') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/secret-centpkg-sig.yml.j2') }}"
+        - "{{ lookup('template', '{{ project_dir }}/openshift/github-app-private-key.yml.j2') }}"
       tags:
         - secrets
 
@@ -439,8 +442,8 @@
       when: workers_long_running > 0
 
     - name: Wait for deploymentconfig rollouts to complete
-      # timeout 10min to not wait indefinitely in case of a problem
-      ansible.builtin.command: timeout 10m oc rollout status -w deploy/{{ item }}
+      # timeout 15min to not wait indefinitely in case of a problem
+      ansible.builtin.command: timeout 15m oc rollout status -w deploy/{{ item }}
       register: oc_rollout_status
       changed_when: false
       failed_when: '"successfully rolled out" not in oc_rollout_status.stdout'

@@ -1,0 +1,86 @@
+tier: 1
+
+execute:
+  how: tmt
+
+environment:
+  DEPLOYMENT: dev
+  SHARED_DIR: /home/tmt/deployment
+  USER: tmt
+  #ANSIBLE_DEBUG: 1
+
+report:
+  how: display
+
+discover:
+  how: fmf
+  test:
+    - deployment
+
+/remote:
+  summary: Run packit-service deployment test on a remote testing-farm machine (provisioning details are defined in the GitHub action)
+  prepare:
+    - how: ansible
+      playbook: playbooks/oc-cluster-user.yml
+      extra-args: "-vvv --extra-vars user=tmt"
+    - how: ansible
+      playbook: playbooks/oc-cluster-setup.yml
+      extra-args: "-vvv --extra-vars user=tmt"
+    - how: ansible
+      playbook: playbooks/oc-cluster-run.yml
+      extra-args: "-vvv --extra-vars user=tmt"
+    - how: ansible
+      playbook: playbooks/oc-cluster-tests-setup.yml
+      extra-args: "-vvv"
+
+/local:
+  summary: Run packit-service deployment test on a local machine managed by tmt
+  discover:
+    how: fmf
+    test:
+      - deployment
+  adjust:
+    enabled: false
+    when: initiator != human
+    because: this plan is used to test the deployment locally via vagrant
+  provision:
+    how: virtual
+    image: centos-stream
+    disk: 100
+    memory: 14336
+    # cpu.cores: 6 # I can not customize cpu cores in virtual testcloud prepare plugin
+    # but OpenShift Cluster will not start without 4 cores at least
+    # change DEFAULT_CPU_COUNT in tmt/steps/provision/testcloud.py to 6
+  prepare:
+    - how: ansible
+      playbook: playbooks/oc-cluster-user.yml
+      extra-args: "-vvv --extra-vars user=tmt"
+    - how: ansible
+      playbook: playbooks/oc-cluster-setup.yml
+      extra-args: "-vvv --extra-vars user=tmt"
+    - how: ansible
+      playbook: playbooks/oc-cluster-run.yml
+      extra-args: "-vvv --extra-vars @./secrets/openshift-local-pull-secret.yml --extra-vars user=tmt"
+    - how: ansible
+      playbook: playbooks/oc-cluster-tests-setup.yml
+      extra-args: "-vvv"
+
+/vagrant:
+  summary: Run packit-service deployment test on a vagrant machine already up and running
+  environment+:
+    SHARED_DIR: /vagrant
+    USER: vagrant
+  adjust:
+    enabled: false
+    when: initiator != human
+    because: this plan is used to set up vagrant locally
+
+  description:
+    guest, port and key details are taken from the tmt-vagrant-test Makefile target.
+    This provision is meant to be used just locally with the Vagrant machine already up
+    and running. To start the Vagrant machine use the oc-cluster-up Makefile target.
+    To access the Vagrant machine use the oc-cluster-ssh Makefile target.
+
+  provision:
+    how: connect
+    user: vagrant

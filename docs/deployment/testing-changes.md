@@ -68,3 +68,86 @@ This repository provides helpful playbook to do this with one command:
 
 Zuul provides a public key for every project. The ansible playbook downloads Zuul repository and pass the project tenant and name as parameters to encryption script. This script then encrypts files with public key of the project.
 For more information please refer to [official docs](https://ansible.softwarefactory-project.io/docs/user/zuul_user.html#create-a-secret-to-be-used-in-jobs).
+
+### Test Deployment locally with OpenShift Local
+
+For using OpenShift Local you need a _pull secret_, download it here: https://console.redhat.com/openshift/create/local. Save it in a file called `secrets/openshift-local-pull-secret.yml` following this format:
+
+```
+---
+pull_secret: <<< DOWNLOADED PULL SECRET CONTENT >>>
+```
+
+[Populate the `secrets` dir (`secrets/{SERVICE}/dev/`) with the other secrets.](secrets#running-a-servicebot-locally)
+
+You can choose if you want to use a Virtual Machine created by Vagrant or one created by tmt.
+
+Calling a test multiple times, modifyng and debugging it is simpler in a Vagrant VM.
+
+The tmt environment ensure a more reproducible test.
+
+#### Using Vagrant
+
+Create and start the OpenShift Local cluster in a Vagrant VM with (it takes as long as an hour in my X1 ThinkPad):
+
+```
+cd containers; make oc-cluster-create
+```
+
+Once OC is up and running you can test the `packit-service` deployment with the command:
+
+```
+cd containers; make tmt-vagrant-test
+```
+
+This command will connect tmt to the Vagrant virtual machine and run the deploy test there (`make test-deploy`).
+You can run the test as many times as you want as long as the virtual machine is up and running and the `crc cluster` is started (`make oc-cluster-up` after every `make oc-cluster-down`).
+You can skip the `tmt` environment and run the test directly inside the VM:
+
+```
+cd containers;
+make oc-cluster-ssh
+```
+
+Inside the Vagrant VM as vagrant user you do:
+
+```
+cd /vagrant
+SHARED_DIR=/vagrant make test-deploy
+```
+
+You can directly work on the cluster:
+
+```
+oc login -u kubeadmin https://api.crc.testing:6443
+oc project myproject
+oc describe node
+oc describe pods
+oc describe pod packit-worker-0
+...
+```
+
+You can destroy the `libvirt` machine with `cd containers; make oc-cluster-destroy` and re-create it again with `cd containers; make oc-cluster-create`.
+
+#### Using tmt
+
+You can test the packit-service deployment using a tmt created local VM with the command:
+
+```
+make tmt-local-test
+```
+
+It is quite hard to change a test inside a tmt created VM and debug it.
+But, in case you need it this is a list of commands that can be handy:
+
+```
+tmt run --id deployment --until execute
+tmt run --id deployment prepare --force
+tmt run --id deployment login --step prepare:start
+tmt run --id deployment execute --force
+tmt run --id deployment login --step execute:start
+tmt run --id deployment finish
+tmt clean runs
+tmt clean guests
+virsh list --all
+```

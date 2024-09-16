@@ -5,7 +5,7 @@
 - name: Install Python cryptography module
   ansible.builtin.package:
     name:
-      - python-cryptography
+      - python3-cryptography
   become: true
 
 - name: Generate OpenSSL private keys

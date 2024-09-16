@@ -1,0 +1,113 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+- name: Ensure crc is started, create openshift project and vars/packit/dev.yml
+  hosts: all
+  become: true
+  become_user: "{{ user }}"
+  become_flags: -i
+  vars:
+    dest_pull_secret_file: /tmp/openshift-local-pull-secret.txt
+    test_project_name: myproject
+    crc_url: https://api.crc.testing:6443
+    image: quay.io/packit/packit-service:stg
+    image_worker: quay.io/packit/packit-worker:stg
+    image_fedmsg: quay.io/packit/packit-service-fedmsg:stg
+    image_dashboard: quay.io/packit/dashboard:stg
+    image_tokman: quay.io/packit/tokman:stg
+    tmt_tree: "{{ lookup('env', 'TMT_TREE') }}"
+  tasks:
+    - name: Find user uid
+      ansible.builtin.command: "id -u {{ user }}"
+      register: user_uid
+      changed_when: false
+
+    - name: Determine XDG_RUNTIME_DIR
+      ansible.builtin.set_fact:
+        xdg_runtime_dir: "/run/user/{{ user_uid.stdout }}"
+      changed_when: false
+
+    - name: Ensure crc is started
+      ansible.builtin.command: "crc start -c 6 -m 12000 -p {{ dest_pull_secret_file }}"
+      changed_when: False
+
+    - name: Login into cluster as kubeadmin
+      ansible.builtin.command: oc login -u kubeadmin {{ crc_url }}
+      changed_when: False
+
+    - name: Get token
+      ansible.builtin.command: oc whoami -t
+      register: kubeconfig_token
+      changed_when: false
+
+    - name: Delete test project namespace if already exist
+      kubernetes.core.k8s:
+        name: "{{ test_project_name }}"
+        api_version: v1
+        kind: Namespace
+        state: absent
+
+    - name: Create test project namespace
+      kubernetes.core.k8s:
+        name: "{{ test_project_name }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: |
+        Get packit stage images to be used as dev images,
+        if you want to use local dev images change var values
+        and point to them
+      ansible.builtin.command: podman pull "{{ item }}"
+      loop:
+        - "{{ image }}"
+        - "{{ image_worker }}"
+        - "{{ image_fedmsg }}"
+        - "{{ image_dashboard }}"
+        - "{{ image_tokman }}"
+      changed_when: False
+
+    - name: Copy tmt_tree in tmt home (otherwise I can't write on it...) # noqa risky-file-permissions # this is a recursive copy
+      ansible.builtin.copy:
+        src: "{{ tmt_tree }}/"
+        dest: "{{ src_dir }}"
+        owner: tmt
+        directory_mode: "0755"
+      when: user == "tmt"
+
+    - name: Copy secrets that are already been generated in tmt home # noqa risky-file-permissions # this is a recursive copy
+      ansible.builtin.copy:
+        src: "../secrets"
+        dest: "{{ src_dir }}"
+        owner: tmt
+        directory_mode: "0755"
+      when: user == "tmt"
+
+    - name: Create packit/dev.yml
+      ansible.builtin.copy:
+        content: |
+          # See https://github.com/packit/deployment/blob/main/vars/packit/dev_template.yml
+          project: {{ test_project_name }}
+          host: {{ crc_url }}
+          api_key: {{ kubeconfig_token.stdout }}
+          validate_certs: false
+          check_up_to_date: false
+          # Whether to deploy and check that pod
+          # Let's preserve some resources
+          with_tokman: false
+          with_beat: true
+          with_fedmsg: true
+          with_dashboard: true
+          with_flower: false
+          with_fluentd_sidecar: false
+          with_pushgateway: false
+          # Use stg images
+          push_dev_images: true
+          image: {{ image }}
+          image_worker: {{ image_worker }}
+          image_fedmsg: {{ image_fedmsg }}
+          image_dashboard: {{ image_dashboard }}
+          image_tokman: {{ image_tokman }}
+        dest: "{{ src_dir }}/vars/packit/dev.yml"
+        mode: 0644
