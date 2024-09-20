@@ -32,7 +32,7 @@ api_key: ""
 # edit the queue name in secrets/*/fedora.toml
 # with_fedmsg: true
 
-# kv_database: redict
+# kv_database: valkey
 # with_kv_database: true
 
 # with_redis_commander: false

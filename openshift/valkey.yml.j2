@@ -1,0 +1,79 @@
+# Copyright Contributors to the Packit project.
+# SPDX-License-Identifier: MIT
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: valkey
+spec:
+  selector:
+    matchLabels:
+      component: valkey
+  template:
+    metadata:
+      labels:
+        component: valkey
+{% if managed_platform %}
+        paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
+    spec:
+      containers:
+        - name: valkey
+          image: valkey/valkey:8.0.0
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - mountPath: /data
+              name: valkey-pv
+          resources:
+            # requests and limits have to be the same to have Guaranteed QoS
+            requests:
+              memory: "128Mi"
+              cpu: "10m"
+            limits:
+              memory: "256Mi"
+              cpu: "10m"
+      volumes:
+        - name: valkey-pv
+          persistentVolumeClaim:
+            claimName: valkey-pvc
+  replicas: 1
+  strategy:
+    type: Recreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: valkey
+{% if managed_platform %}
+  labels:
+    paas.redhat.com/appcode: {{ appcode }}
+{% endif %}
+spec:
+  ports:
+    - name: "6379"
+      port: 6379
+      targetPort: 6379
+  selector:
+    component: valkey
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: valkey-pvc
+{% if managed_platform %}
+  labels:
+    paas.redhat.com/appcode: {{ appcode }}
+  annotations:
+    kubernetes.io/reclaimPolicy: Delete
+{% endif %}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+{% if managed_platform %}
+  storageClassName: aws-ebs
+{% endif %}
