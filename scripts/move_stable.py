@@ -25,9 +25,7 @@ REPOSITORIES: List[str] = [
     "packit-service-fedmsg",
     "sandcastle",
     "dashboard",
-    "tokman",
     "packit-service",
-    "hardly",
 ]
 REPOS_FOR_BLOG: List[str] = [
     "packit",
