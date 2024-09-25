@@ -37,7 +37,7 @@ explicitly denied.
 1. Search for “egress firewall rules OSD” on Source
 2. Shiny link _opening a ticket_
 3. You can take an inspiration from RITM1861658; almost all of our tickets for
-   firewall rules follow a template below.
+   firewall rules follow the template below.
 
 #### Template and notes
 
@@ -50,7 +50,7 @@ explicitly denied.
 ```
 
 If you want to include subdomains, I would recommend typing it as
-`.example.com`, e.g., `.kde.org`.
+`.example.com`, e.g. `.kde.org`.
 
 Don't forget to replace the `N`, `M`, and `P` with their respective values, it
 is used just as a check. You can also link the original issue with the waiting
