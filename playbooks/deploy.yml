@@ -54,7 +54,7 @@
     check_vars_template_diff: true
     deployment_repo_url: https://github.com/packit/deployment.git
     # used by a few tasks below
-    k8s_apply: false
+    k8s_apply: true
     tokman:
       workers: 1
       resources:
@@ -184,8 +184,6 @@
         - postgres
 
     - name: Deploy redis
-      vars:
-        k8s_apply: true
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/redis.yml.j2') }}"
@@ -194,8 +192,6 @@
         - redis
 
     - name: Deploy redict
-      vars:
-        k8s_apply: true
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/redict.yml.j2') }}"
