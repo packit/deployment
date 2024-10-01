@@ -47,7 +47,7 @@ check_up_to_date: true # noqa: var-naming[no-role-prefix]
 check_vars_template_diff: true # noqa: var-naming[no-role-prefix]
 deployment_repo_url: https://github.com/packit/deployment.git # noqa: var-naming[no-role-prefix]
 # used by a few tasks below
-k8s_apply: false # noqa: var-naming[no-role-prefix]
+k8s_apply: true # noqa: var-naming[no-role-prefix]
 tokman: # noqa: var-naming[no-role-prefix]
   workers: 1
   resources:
