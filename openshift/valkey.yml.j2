@@ -21,11 +21,15 @@ spec:
       containers:
         - name: valkey
           image: valkey/valkey:8.0.0
+          args:
+            - "/etc/redislike/redis.conf"
           ports:
             - containerPort: 6379
           volumeMounts:
             - mountPath: /data
               name: valkey-pv
+            - mountPath: /etc/redislike
+              name: redis-like-config
           resources:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
@@ -38,6 +42,8 @@ spec:
         - name: valkey-pv
           persistentVolumeClaim:
             claimName: valkey-pvc
+        - name: redis-like-config
+          configMap: {name: redis-like-config}
   replicas: 1
   strategy:
     type: Recreate

@@ -186,6 +186,7 @@
     - name: Deploy key-value database ({{ kv_database }})
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
+        - "{{ lookup('file', '{{ project_dir }}/openshift/configmap-redis_like_config.yml') }}"
         - "{{ lookup('template', '{{ project_dir }}/openshift/{{ kv_database }}.yml.j2') }}"
       when: with_kv_database
       tags:

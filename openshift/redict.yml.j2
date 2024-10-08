@@ -21,11 +21,15 @@ spec:
       containers:
         - name: redict
           image: registry.redict.io/redict:7
+          args:
+            - "/etc/redislike/redis.conf"
           ports:
             - containerPort: 6379
           volumeMounts:
             - mountPath: /data
               name: redict-pv
+            - mountPath: /etc/redislike
+              name: redis-like-config
           resources:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
@@ -38,6 +42,8 @@ spec:
         - name: redict-pv
           persistentVolumeClaim:
             claimName: redict-pvc
+        - name: redis-like-config
+          configMap: {name: redis-like-config}
   replicas: 1
   strategy:
     type: Recreate
