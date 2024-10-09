@@ -22,8 +22,9 @@
       packit-dashboard: "{{ with_dashboard }}"
       pushgateway: "{{ with_pushgateway }}"
       nginx: "{{ with_pushgateway }}"
-      redis: "{{ with_redis }}"
-      redict: "{{ with_redict }}"
+      redis: "{{ with_kv_database and kv_database == 'redis' }}"
+      redict: "{{ with_kv_database and kv_database == 'redict' }}"
+      valkey: "{{ with_kv_database and kv_database == 'valkey' }}"
   tags:
     - always
 

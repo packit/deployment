@@ -141,21 +141,14 @@
   tags:
     - postgres
 
-- name: Deploy redis
+- name: Deploy key-value database ({{ kv_database }})
   ansible.builtin.include_tasks: tasks/k8s.yml
   loop:
-    - "{{ lookup('template', '{{ project_dir }}/openshift/redis.yml.j2') }}"
-  when: with_redis
+    - "{{ lookup('file', '{{ project_dir }}/openshift/configmap-redis_like_config.yml') }}"
+    - "{{ lookup('template', '{{ project_dir }}/openshift/{{ kv_database }}.yml.j2') }}"
+  when: with_kv_database
   tags:
-    - redis
-
-- name: Deploy redict
-  ansible.builtin.include_tasks: tasks/k8s.yml
-  loop:
-    - "{{ lookup('template', '{{ project_dir }}/openshift/redict.yml.j2') }}"
-  when: with_redict
-  tags:
-    - redict
+    - kv_database
 
 - name: Deploy fluentd image stream and config
   ansible.builtin.include_tasks: tasks/k8s.yml

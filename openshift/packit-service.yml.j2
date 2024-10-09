@@ -91,7 +91,7 @@ spec:
             requests:
               memory: "320Mi"
               cpu: "10m"
-              epehemeral-storage: "300Ki"
+              ephemeral-storage: "300Ki"
             limits:
               # run_httpd.sh does 'alembic upgrade head' which might require more memory
               # If you see '/usr/bin/run_httpd.sh: line 16:   Killed     alembic upgrade head'

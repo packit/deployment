@@ -5,8 +5,8 @@ deployment: "{{ lookup('env', 'DEPLOYMENT') }}" # noqa: var-naming[no-role-prefi
 tenant: packit # noqa: var-naming[no-role-prefix] # MP+ tenant
 with_tokman: true # noqa: var-naming[no-role-prefix]
 with_fedmsg: true # noqa: var-naming[no-role-prefix]
-with_redis: false # noqa: var-naming[no-role-prefix]
-with_redict: true # noqa: var-naming[no-role-prefix]
+kv_database: "redict" # noqa: var-naming[no-role-prefix]
+with_kv_database: true # noqa: var-naming[no-role-prefix]
 with_redis_commander: false # noqa: var-naming[no-role-prefix]
 with_flower: false # noqa: var-naming[no-role-prefix]
 with_dashboard: true # noqa: var-naming[no-role-prefix]

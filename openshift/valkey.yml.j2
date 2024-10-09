@@ -5,29 +5,29 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: redict
+  name: valkey
 spec:
   selector:
     matchLabels:
-      component: redict
+      component: valkey
   template:
     metadata:
       labels:
-        component: redict
+        component: valkey
 {% if managed_platform %}
         paas.redhat.com/appcode: {{ appcode }}
 {% endif %}
     spec:
       containers:
-        - name: redict
-          image: registry.redict.io/redict:7
+        - name: valkey
+          image: valkey/valkey:8.0.0
           args:
             - "/etc/redislike/redis.conf"
           ports:
             - containerPort: 6379
           volumeMounts:
             - mountPath: /data
-              name: redict-pv
+              name: valkey-pv
             - mountPath: /etc/redislike
               name: redis-like-config
           resources:
@@ -39,9 +39,9 @@ spec:
               memory: "256Mi"
               cpu: "10m"
       volumes:
-        - name: redict-pv
+        - name: valkey-pv
           persistentVolumeClaim:
-            claimName: redict-pvc
+            claimName: valkey-pvc
         - name: redis-like-config
           configMap: {name: redis-like-config}
   replicas: 1
@@ -51,7 +51,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: redict
+  name: valkey
 {% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}
@@ -62,12 +62,12 @@ spec:
       port: 6379
       targetPort: 6379
   selector:
-    component: redict
+    component: valkey
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: redict-pvc
+  name: valkey-pvc
 {% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}

@@ -30,6 +30,11 @@ check_up_to_date: false
 # edit the queue name in secrets/*/fedora.toml
 with_fedmsg: false
 
+# kv_database options: redis redict valkey
+# Current default on both deployments: valkey
+kv_database: valkey
+with_kv_database: true
+
 with_redis_commander: false
 
 with_flower: true
