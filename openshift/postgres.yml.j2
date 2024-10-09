@@ -137,7 +137,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: "{{ '4Gi' if deployment == 'prod' else '1Gi' }}"
+      storage: "{{ '8Gi' if deployment == 'prod' else '2Gi' }}"
 {% if managed_platform %}
   storageClassName: aws-ebs
 {% endif %}
