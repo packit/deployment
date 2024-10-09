@@ -24,6 +24,7 @@
       nginx: "{{ with_pushgateway }}"
       redis: "{{ with_kv_database and kv_database == 'redis' }}"
       redict: "{{ with_kv_database and kv_database == 'redict' }}"
+      valkey: "{{ with_kv_database and kv_database == 'valkey' }}"
   tags:
     - always
 

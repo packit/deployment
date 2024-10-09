@@ -149,8 +149,6 @@
   when: with_kv_database
   tags:
     - kv_database
-    - redis
-    - redict
 
 - name: Deploy fluentd image stream and config
   ansible.builtin.include_tasks: tasks/k8s.yml
