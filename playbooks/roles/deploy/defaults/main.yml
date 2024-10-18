@@ -58,5 +58,7 @@ tokman: # noqa: var-naming[no-role-prefix]
       memory: "128Mi"
       cpu: "50m"
 appcode: PCKT-002 # noqa: var-naming[no-role-prefix]
+servicephase: lab # noqa: var-naming[no-role-prefix]
+costcenter: "700" # noqa: var-naming[no-role-prefix]
 registry: 172.30.1.1:5000 # noqa: var-naming[no-role-prefix]
 registry_user: developer # noqa: var-naming[no-role-prefix]

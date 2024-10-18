@@ -65,6 +65,8 @@
           memory: "128Mi"
           cpu: "50m"
     appcode: PCKT-002
+    servicephase: lab
+    costcenter: "700"
     registry: 172.30.1.1:5000
     registry_user: developer
   tasks:
