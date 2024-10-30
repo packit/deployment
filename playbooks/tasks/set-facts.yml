@@ -28,6 +28,20 @@
         sandbox_namespace: "{{ service }}-{{ deployment }}-sandbox"
       when: not managed_platform
 
+- name: Set servicephase
+  when: managed_platform
+  tags:
+    - always
+  block:
+    - name: Set servicephase for staging
+      ansible.builtin.set_fact:
+        servicephase: preprod
+      when: deployment == "stg"
+    - name: Set servicephase for production
+      ansible.builtin.set_fact:
+        servicephase: prod
+      when: deployment == "prod"
+
 - name: Set Redis-like hostname
   tags:
     - always

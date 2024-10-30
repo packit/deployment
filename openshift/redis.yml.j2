@@ -6,6 +6,12 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: redis
+{% if managed_platform %}
+  labels:
+    app-code: "{{ appcode }}"
+    service-phase: "{{ servicephase }}"
+    cost-center: "{{ costcenter }}"
+{% endif %}
 spec:
   selector:
     matchLabels:
