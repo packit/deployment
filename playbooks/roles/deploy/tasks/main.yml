@@ -235,9 +235,9 @@
     worker_replicas: "{{ workers_long_running }}"
     # cloning repos is memory intensive: glibc needs 300M+, kernel 600M+
     # during cloning, we need to account for git and celery worker processes
-    worker_requests_memory: "384Mi"
+    worker_requests_memory: "768Mi"
     worker_requests_cpu: "100m"
-    worker_limits_memory: "1024Mi"
+    worker_limits_memory: "2048Mi"
     worker_limits_cpu: "600m"
   ansible.builtin.include_tasks: tasks/k8s.yml
   loop:
