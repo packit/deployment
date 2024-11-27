@@ -250,7 +250,7 @@
         worker_requests_memory: "320Mi"
         worker_requests_cpu: "80m"
         worker_limits_memory: "640Mi"
-        worker_limits_cpu: "400m"
+        worker_limits_cpu: "700m"
       ansible.builtin.include_tasks: tasks/k8s.yml
       loop:
         - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
