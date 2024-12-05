@@ -33,6 +33,7 @@ jobs:
           containerfiles: ${{ matrix.containerfile }}
           image: base
           tags: ${{ matrix.tags }}
+          archs: amd64, arm64, ppc64le
           # Uncomment once we stop using oc cluster up for tests
           #           oci: true
 
@@ -41,7 +42,6 @@ jobs:
         with:
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.build-image.outputs.tags }}
-          archs: amd64, arm64, ppc64le
           registry: quay.io/packit
           username: ${{ secrets.QUAY_IMAGE_BUILDER_USERNAME }}
           password: ${{ secrets.QUAY_IMAGE_BUILDER_TOKEN }}
