@@ -8,7 +8,7 @@ on:
     branches:
       - main
     paths:
-      - containers/Containerfile.c9s
+      - containers/Containerfile
 
 jobs:
   build:
@@ -20,8 +20,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - containerfile: containers/Containerfile.c9s
-            tags: "c9s latest"
+          - containerfile: containers/Containerfile
+            tags: "fedora latest"
+            archs: "amd64"
+          - containerfile: containers/Containerfile
+            tags: "fedora latest"
+            archs: "arm64"
+          - containerfile: containers/Containerfile
+            tags: "fedora latest"
+            archs: "ppc64le"
 
     steps:
       - uses: actions/checkout@v3
@@ -38,7 +45,7 @@ jobs:
           containerfiles: ${{ matrix.containerfile }}
           image: base
           tags: ${{ matrix.tags }}
-          archs: amd64, arm64, ppc64le
+          archs: ${{ matrix.archs }}
           # Uncomment once we stop using oc cluster up for tests
           #           oci: true
 
