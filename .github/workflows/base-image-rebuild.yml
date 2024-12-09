@@ -8,7 +8,7 @@ on:
     branches:
       - main
     paths:
-      - containers/Containerfile.c9s
+      - containers/Containerfile
 
 jobs:
   build:
@@ -20,8 +20,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - containerfile: containers/Containerfile.c9s
-            tags: "c9s latest"
+          - containerfile: containers/Containerfile
+            tags: "fedora latest"
 
     steps:
       - uses: actions/checkout@v3
