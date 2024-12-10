@@ -1,15 +1,11 @@
 # Be aware that this image is used for all stages, so if a dependency is removed be sure that it is
 # not required in anywhere
 
-FROM quay.io/centos/centos:stream9
+FROM registry.fedoraproject.org/fedora:41
 
 ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
     ANSIBLE_STDOUT_CALLBACK=debug
 
-RUN dnf -y install epel-release && \
-    crb enable && \
-    # TODO: revert this change after psql:15 works fine
-    dnf -y module enable postgresql:16 && \
-    dnf -y upgrade && \
+RUN dnf -y upgrade && \
     dnf -y install ansible python3-pip && \
     dnf clean all
