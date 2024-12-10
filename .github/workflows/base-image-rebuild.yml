@@ -18,18 +18,10 @@ jobs:
     name: Build and push image
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         include:
           - containerfile: containers/Containerfile
             tags: "fedora latest"
-            archs: "amd64"
-          - containerfile: containers/Containerfile
-            tags: "fedora latest"
-            archs: "arm64"
-          - containerfile: containers/Containerfile
-            tags: "fedora latest"
-            archs: "ppc64le"
 
     steps:
       - uses: actions/checkout@v3
@@ -46,7 +38,9 @@ jobs:
           containerfiles: ${{ matrix.containerfile }}
           image: base
           tags: ${{ matrix.tags }}
-          archs: ${{ matrix.archs }}
+          # for some reason building ppc64le image fails on F41 OpenSSL
+          # not being able to verify certificates, keep it disabled for now
+          archs: amd64, arm64
           # Uncomment once we stop using oc cluster up for tests
           #           oci: true
 
