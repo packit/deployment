@@ -15,9 +15,13 @@ First, you have to [get access to Splunk](https://source.redhat.com/departments/
 
 Then go to https://rhcorporate.splunkcloud.com → `Search & Reporting`
 
-You should be able to see some logs using [this query](https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20index%3D%22rh_paas%22%20source%3D%22%2Fvar%2Flog%2Fcontainers%2Fpackit-worker*.log"):
+You should be able to see production logs using [this query](https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20index%3D"rh_paas"%20kubernetes.namespace_name%3D"packit--prod"):
 
-    index="rh_paas" source="/var/log/containers/packit-worker*.log"
+    index="rh_paas" kubernetes.namespace_name="packit--prod"
+
+and staging logs using [this query](https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20index%3D"rh_paas_preprod"%20kubernetes.namespace_name%3D"packit--stg"):
+
+    index="rh_paas_preprod" kubernetes.namespace_name="packit--stg"
 
 If the above query doesn't return any results, [request access](https://source.redhat.com/departments/it/splunk/splunk_wiki/faq#jive_content_id_How_do_I_request_access_to_additional_data_sets_in_Splunk) to `rh_paas` index.
 
@@ -28,18 +32,18 @@ If you cannot see _Access to Additional Datasets_ (as suggested by the instructi
 :::
 
 [The more specific search, the faster it'll be](https://source.redhat.com/departments/it/splunk/splunk_wiki/splunk_training_search_best_practices#jive_content_id_Be_more_specific).
-At least, specify `index`, `source`.
-You can start with [this search ](https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20index%3D%22rh_paas%22%20source%3D%22%2Fvar%2Flog%2Fcontainers%2Fpackit-worker*.log%22%20NOT%20pidbox)
-and tune it from there.
+You should specify at least `index` and `kubernetes.namespace_name`, but if you want to export the results then you'll have to exclude the `_raw` field containing the complete JSON structure and include only fields you need, such as `message` or `kubernetes.pod_name`, otherwise you'll most likely hit quota.
+You can start with the examples above and tune it from there.
 For example:
 
 - add `| reverse` if you want to se the results from oldest to newest
-- add `| fields _raw | fields - _time` to leave only message field without timestamp duplication
+- add `| fields - _time, _raw | fields message` to leave only message field without timestamp duplication
 
-All in one URL [here](https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20index%3D%22rh_paas%22%20source%3D%22%2Fvar%2Flog%2Fcontainers%2Fpackit-worker-short-running-0_packit--stg_packit-worker-*.log%22%20%7C%20fields%20_raw%20%7C%20fields%20-%20_time%20%7C%20reverse) - now just export it to csv; and you have almost the same log file
+All in one URL [here](https://rhcorporate.splunkcloud.com/en-US/app/search/search?q=search%20index%3D%22rh_paas%22%20kubernetes.namespace_name%3D%22packit--prod%22%20%7C%20fields%20-%20_time%2C%20_raw%20%7C%20fields%20message%20%7C%20reverse) - now just export it to csv; and you have almost the same log file
 as you'd get by exporting logs from a worker pod.
 
 For more info, see (Red Hat internal):
 
 - [demo](https://drive.google.com/file/d/15BIsRl7fP9bPdyLBQvoljF2yHy52ZqHm)
 - [Splunk wiki @ Source](https://source.redhat.com/departments/it/splunk)
+- [Searching Logs in Splunk using Unified Logging @ Source](https://source.redhat.com/departments/it/datacenter_infrastructure/itcloudservices/itocp/itocp_wiki/searching_logs_in_splunk_using_unified_logging)
