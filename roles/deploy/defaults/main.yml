@@ -1,0 +1,64 @@
+---
+validate_certs: true
+service: "{{ lookup('env', 'SERVICE') | default('packit', True) }}"
+deployment: "{{ lookup('env', 'DEPLOYMENT') }}"
+tenant: packit # MP+ tenant
+with_tokman: true
+with_fedmsg: true
+kv_database: "redict"
+with_kv_database: true
+with_redis_commander: false
+with_flower: false
+with_dashboard: true
+with_beat: true
+with_pushgateway: true
+with_repository_cache: true
+repository_cache_storage: 4Gi
+push_dev_images: false
+with_fluentd_sidecar: false
+postgres_version: 13
+image: quay.io/packit/packit-service:{{ deployment }}
+image_worker: quay.io/packit/packit-worker:{{ deployment }}
+image_fedmsg: quay.io/packit/packit-service-fedmsg:{{ deployment }}
+image_dashboard: quay.io/packit/dashboard:{{ deployment }}
+image_tokman: quay.io/packit/tokman:{{ deployment }}
+image_fluentd: quay.io/packit/fluentd-splunk-hec:latest
+# project_dir is set in tasks/project-dir.yml
+path_to_secrets: "{{ project_dir }}/secrets/{{ service }}/{{ deployment }}"
+# to be used in Image streams as importPolicy:scheduled value
+auto_import_images: true
+# used in dev/zuul deployment to tag & push images to cluster
+# https://github.com/packit/deployment/issues/112#issuecomment-673343049
+# container_engine: "{{ lookup('pipe', 'command -v podman 2> /dev/null || echo docker') }}"
+container_engine: docker
+celery_app: packit_service.worker.tasks
+celery_retry_limit: 2
+celery_retry_backoff: 3
+workers_all_tasks: 1
+workers_short_running: 0
+workers_long_running: 0
+distgit_url: https://src.fedoraproject.org/
+distgit_namespace: rpms
+sourcegit_namespace: "" # fedora-source-git only
+pushgateway_address: http://pushgateway
+# Check that the deployment repo is up-to-date
+check_up_to_date: true
+# Check that the current vars file is up-to-date with the template
+check_vars_template_diff: true
+deployment_repo_url: https://github.com/packit/deployment.git
+# used by a few tasks below
+k8s_apply: true
+tokman:
+  workers: 1
+  resources:
+    requests:
+      memory: "88Mi"
+      cpu: "5m"
+    limits:
+      memory: "128Mi"
+      cpu: "50m"
+appcode: PCKT-002
+servicephase: lab
+costcenter: "700"
+registry: 172.30.1.1:5000
+registry_user: developer
