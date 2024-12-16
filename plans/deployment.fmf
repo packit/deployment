@@ -22,16 +22,16 @@ discover:
   prepare:
     - how: ansible
       playbook: playbooks/oc-cluster-user.yml
-      extra-args: "-vvv --extra-vars user=tmt"
+      extra-args: "-vv --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-setup.yml
-      extra-args: "-vvv --extra-vars user=tmt"
+      extra-args: "-vv --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-run.yml
-      extra-args: "-vvv --extra-vars user=tmt"
+      extra-args: "-vv --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-tests-setup.yml
-      extra-args: "-vvv"
+      extra-args: "-vv"
 
 /local:
   summary: Run packit-service deployment test on a local machine managed by tmt
@@ -54,16 +54,16 @@ discover:
   prepare:
     - how: ansible
       playbook: playbooks/oc-cluster-user.yml
-      extra-args: "-vvv --extra-vars user=tmt"
+      extra-args: "-vv --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-setup.yml
-      extra-args: "-vvv --extra-vars user=tmt"
+      extra-args: "-vv --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-run.yml
-      extra-args: "-vvv --extra-vars @./secrets/openshift-local-pull-secret.yml --extra-vars user=tmt"
+      extra-args: "-vv --extra-vars @./secrets/openshift-local-pull-secret.yml --extra-vars user=tmt"
     - how: ansible
       playbook: playbooks/oc-cluster-tests-setup.yml
-      extra-args: "-vvv"
+      extra-args: "-vv"
 
 /vagrant:
   summary: Run packit-service deployment test on a vagrant machine already up and running
