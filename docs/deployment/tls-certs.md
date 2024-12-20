@@ -47,7 +47,8 @@ Make sure the DNS is all set up:
     router-default.apps.auto-prod.gi0n.p1.openshiftapps.com. 49 IN A 52.210.199.25
 
 Check if you have access to packit.dev domain in
-[Google Domains](https://domains.google.com/m/registrar/packit.dev).
+[Squarespace Domains](https://account.squarespace.com/domains/managed/packit.dev)
+(use your Red Hat Google account to log in).
 
 Install certbot locally: `dnf install certbot`.
 
@@ -72,7 +73,7 @@ You will be asked to set TXT record for every domain requested:
 
 ## Update DNS record
 
-Go to [Google Domains](https://domains.google.com/m/registrar/packit.dev/dns)
+Go to [Squarespace Domains](https://account.squarespace.com/domains/managed/packit.dev/dns/dns-settings), log in with Google/Red Hat account,
 and create/set the corresponding value:
 TXT record called `_acme-challenge.abcxyz.packit.dev`.
 If those records already exist (from previous run), don't create new records,
