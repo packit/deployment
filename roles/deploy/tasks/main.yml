@@ -1,6 +1,6 @@
 ---
-- name: Include tasks/project-dir.yml
-  ansible.builtin.include_tasks: tasks/project-dir.yml
+- name: Include project-dir.yml
+  ansible.builtin.include_tasks: project-dir.yml
   tags:
     - always
 
@@ -9,18 +9,18 @@
   tags:
     - always
 
-- name: Include tasks/check-up-to-date.yml
-  ansible.builtin.include_tasks: tasks/check-up-to-date.yml
+- name: Include check-up-to-date.yml
+  ansible.builtin.include_tasks: check-up-to-date.yml
   tags:
     - always
 
 - name: Include deployment facts
-  ansible.builtin.include_tasks: tasks/set-deployment-facts.yml
+  ansible.builtin.include_tasks: set-deployment-facts.yml
   tags:
     - always
 
-- name: Include tasks/set-facts.yml
-  ansible.builtin.include_tasks: tasks/set-facts.yml
+- name: Include set-facts.yml
+  ansible.builtin.include_tasks: set-facts.yml
   tags:
     - always
 
@@ -106,7 +106,7 @@
       changed_when: true
 
 - name: Deploy secrets
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-ssh.yml.j2') }}"
     - "{{ lookup('template', '{{ project_dir }}/openshift/secret-packit-secrets.yml.j2') }}"
@@ -135,14 +135,14 @@
       changed_when: "'added:' in rolebinding.stdout"
 
 - name: Deploy postgres
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/postgres.yml.j2') }}"
   tags:
     - postgres
 
 - name: Deploy key-value database ({{ kv_database }})
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('file', '{{ project_dir }}/openshift/configmap-redis_like_config.yml') }}"
     - "{{ lookup('template', '{{ project_dir }}/openshift/{{ kv_database }}.yml.j2') }}"
@@ -151,7 +151,7 @@
     - kv_database
 
 - name: Deploy fluentd image stream and config
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/fluentd.yml.j2') }}"
   tags:
@@ -160,7 +160,7 @@
   when: with_fluentd_sidecar
 
 - name: Deploy packit-service
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service.yml.j2') }}"
   tags:
@@ -189,7 +189,7 @@
     worker_requests_cpu: "100m"
     worker_limits_memory: "1024Mi"
     worker_limits_cpu: "400m"
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
   tags:
@@ -207,7 +207,7 @@
     worker_requests_cpu: "80m"
     worker_limits_memory: "640Mi"
     worker_limits_cpu: "700m"
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
   tags:
@@ -239,7 +239,7 @@
     worker_requests_cpu: "100m"
     worker_limits_memory: "2048Mi"
     worker_limits_cpu: "600m"
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
   tags:
@@ -247,7 +247,7 @@
   when: workers_long_running > 0
 
 - name: Deploy packit-service-beat
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-beat.yml.j2') }}"
   when: with_beat
@@ -255,7 +255,7 @@
     - packit-service-beat
 
 - name: Deploy dashboard
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/dashboard.yml.j2') }}"
   when: with_dashboard
@@ -279,7 +279,7 @@
 - name: Deploy redis-commander
   vars:
     k8s_apply: true
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/redis-commander.yml.j2') }}"
   when: with_redis_commander
@@ -288,7 +288,7 @@
   register: redis_commander
 
 - name: Deploy flower
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/flower.yml.j2') }}"
   when: with_flower
@@ -296,7 +296,7 @@
     - flower
 
 - name: Deploy packit-service-fedmsg
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/packit-service-fedmsg.yml.j2') }}"
   tags:
@@ -329,7 +329,7 @@
   when: with_tokman
 
 - name: Deploy aggregating pushgateway
-  ansible.builtin.include_tasks: tasks/k8s.yml
+  ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/pushgateway.yml.j2') }}"
   tags:
@@ -348,7 +348,7 @@
         password: "{{ vault.flower.basic_auth | regex_replace('flower-boss:', '') }}"
         mode: 0640
     - name: Deploy flower-htpasswd secret
-      # Don't use tasks/k8s.yml here because the loop item is always evaluated
+      # Don't use k8s.yml here because the loop item is always evaluated
       k8s:
         namespace: "{{ project }}"
         resource_definition: "{{ lookup('template', '{{ project_dir }}/openshift/secret-flower-htpasswd.yml.j2') }}"
@@ -373,19 +373,19 @@
 - name: Wait for worker-0 to be running
   vars:
     pod_name: packit-worker-0
-  ansible.builtin.include_tasks: tasks/wait_for_pod.yml
+  ansible.builtin.include_tasks: wait_for_pod.yml
   when: workers_all_tasks > 0
 
 - name: Wait for worker-short-running-0 to be running
   vars:
     pod_name: packit-worker-short-running-0
-  ansible.builtin.include_tasks: tasks/wait_for_pod.yml
+  ansible.builtin.include_tasks: wait_for_pod.yml
   when: workers_short_running > 0
 
 - name: Wait for worker-long-running-0 to be running
   vars:
     pod_name: packit-worker-long-running-0
-  ansible.builtin.include_tasks: tasks/wait_for_pod.yml
+  ansible.builtin.include_tasks: wait_for_pod.yml
   when: workers_long_running > 0
 
 - name: Select project to check status on command line
