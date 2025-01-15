@@ -94,7 +94,7 @@ spec:
             - name: DEPLOYMENT
               value: {{ deployment }}
             - name: DISTGIT_URL
-              value: {{ distgit_url }}
+              value: "{{ distgit_url }}"
             - name: DISTGIT_NAMESPACE
               value: {{ distgit_namespace }}
 {% if sourcegit_namespace %}
