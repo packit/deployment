@@ -31,7 +31,8 @@
         # Remove the keys expected to be different and lines specific to the diff-format.
         cmd: >-
           diff vars/{{ service }}/{{ deployment }}.yml vars/{{ service }}/{{ deployment }}_template.yml |
-          sed '/api_key/d;/[0-9]\+c[0-9]\+/d;/---/d'
+          sed '/api_key/d;/[0-9]\+c[0-9]\+/d;/---/d' |
+          sed '/host/d;/[0-9]\+c[0-9]\+/d;/---/d'
       register: vars_diff
       changed_when: vars_diff.rc != 0
       failed_when: vars_diff.rc != 0
