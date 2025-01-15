@@ -188,7 +188,6 @@
     worker_requests_memory: "384Mi"
     worker_requests_cpu: "100m"
     worker_limits_memory: "1024Mi"
-    worker_limits_cpu: "400m"
   ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
@@ -206,7 +205,6 @@
     worker_requests_memory: "320Mi"
     worker_requests_cpu: "80m"
     worker_limits_memory: "640Mi"
-    worker_limits_cpu: "2"
   ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
@@ -238,7 +236,6 @@
     worker_requests_memory: "768Mi"
     worker_requests_cpu: "100m"
     worker_limits_memory: "2048Mi"
-    worker_limits_cpu: "600m"
   ansible.builtin.include_tasks: k8s.yml
   loop:
     - "{{ lookup('template', '{{ project_dir }}/openshift/packit-worker.yml.j2') }}"
