@@ -71,7 +71,6 @@ spec:
 # based on this limit, so keep the limit reasonably high.
               memory: "{{ '4Gi' if project == 'packit--prod' else '512Mi' }}"
 # Not utilized most of the time, but useful during migrations and for some queries
-              cpu: "1"
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/pgsql/data

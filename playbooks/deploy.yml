@@ -63,7 +63,6 @@
           cpu: "5m"
         limits:
           memory: "128Mi"
-          cpu: "50m"
     appcode: PCKT-002
     servicephase: lab
     costcenter: "700"

@@ -166,7 +166,6 @@ spec:
               cpu: {{ worker_requests_cpu }}
             limits:
               memory: {{ worker_limits_memory }}
-              cpu: {{ worker_limits_cpu }}
           livenessProbe:
             exec:
               command:
@@ -197,7 +196,7 @@ spec:
               readOnly: true
           resources:
             requests: {memory: "128Mi", cpu: "10m"}
-            limits: {memory: "128Mi", cpu: "100m"}
+            limits: {memory: "128Mi"}
 {% endif %}
 ---
 kind: ImageStream
