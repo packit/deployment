@@ -99,3 +99,4 @@ tokman:
       cpu: "20m"
     limits:
       memory: "160Mi"
+      cpu: "50m"
