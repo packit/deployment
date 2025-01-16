@@ -24,7 +24,7 @@ check_up_to_date: false
 # Check that the current vars file us up to date with the template
 # check_vars_template_diff: true
 
-# with_tokman: true
+with_tokman: true
 
 # if you want to deploy fedmsg, please make sure to
 # edit the queue name in secrets/*/fedora.toml
