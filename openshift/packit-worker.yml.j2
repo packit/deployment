@@ -24,8 +24,8 @@ spec:
       component: {{ component }}
   serviceName: "{{ component }}"
   replicas: {{ worker_replicas }}
-  volumeClaimTemplates:
 {% if with_repository_cache and 'long-running' in queues %}
+  volumeClaimTemplates:
     - metadata:
         name: packit-worker-repository-cache
 {% if managed_platform %}
@@ -94,7 +94,7 @@ spec:
             - name: DEPLOYMENT
               value: {{ deployment }}
             - name: DISTGIT_URL
-              value: {{ distgit_url }}
+              value: "{{ distgit_url }}"
             - name: DISTGIT_NAMESPACE
               value: {{ distgit_namespace }}
 {% if sourcegit_namespace %}
@@ -166,6 +166,7 @@ spec:
               cpu: {{ worker_requests_cpu }}
             limits:
               memory: {{ worker_limits_memory }}
+              cpu: {{ worker_limits_cpu }}
           livenessProbe:
             exec:
               command:
@@ -196,7 +197,7 @@ spec:
               readOnly: true
           resources:
             requests: {memory: "128Mi", cpu: "10m"}
-            limits: {memory: "128Mi"}
+            limits: {memory: "128Mi", cpu: "100m"}
 {% endif %}
 ---
 kind: ImageStream
