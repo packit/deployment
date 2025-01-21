@@ -10,16 +10,16 @@ This file documents basic usage, for more info see
 - [containers/](containers/) - files used to build container images
 - [cron-jobs/](cron-jobs/) - OpenShift cron jobs
 - [docs/](docs/) - more documentation
-  - [Images](docs/images.md) - what images we have and how we build them
-  - [Continuous deployment](docs/continuous-deployment.md) - how are the deployed services/bots updated
-  - [Testing changes](docs/testing-changes.md) - how to test our services/bots locally
-  - [Let's encrypt TLS certs](docs/tls-certs.md) - generating & renewing with `certbot`
-  - [Monitoring](docs/monitoring.md)
-  - [PostgreSQL data migration](docs/postgresql-db-upgrade.md)
-  - [Packit service deployment specifics](docs/packit-service.md)
-  - [Fedora source-git bot deployment specifics](docs/fedora-source-git.md)
-  - [CentOS Stream source-git bot deployment specifics](docs/centos-stream-source-git.md)
-  - [Logs](docs/logs.md) - how we aggregate worker logs and where to find them
+  - [Images](docs/deployment/images.md) - what images we have and how we build them
+  - [Continuous deployment](docs/deployment/continuous-deployment.md) - how are the deployed services/bots updated
+  - [Testing changes](docs/deployment/testing-changes.md) - how to test our services/bots locally
+  - [Let's encrypt TLS certs](docs/deployment/tls-certs.md) - generating & renewing with `certbot`
+  - [Monitoring](docs/deployment/monitoring/index.md)
+  - [PostgreSQL specifics](docs/deployment/postgresql.md)
+  - [Packit service deployment specifics](docs/deployment/specifics/packit-service.md)
+  - [Fedora source-git bot deployment specifics](docs/deployment/specifics/fedora-source-git.md)
+  - [CentOS Stream source-git bot deployment specifics](docs/deployment/specifics/centos-stream-source-git.md)
+  - [Logs](docs/deployment/monitoring/logs.md) - how we aggregate worker logs and where to find them
 - [playbooks/](playbooks/) - Ansible playbooks
 - [roles/](roles/) - Ansible roles
 - [vars/](vars/) - Variable file(s). See [vars/README.md](vars/README.md).
