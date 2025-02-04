@@ -205,7 +205,7 @@
     # They should not require a lot of memory/cpu.
     worker_requests_memory: "768Mi"
     worker_requests_cpu: "80m"
-    worker_limits_memory: "2048Mi"
+    worker_limits_memory: "2Gi"
     worker_limits_cpu: "2"
   ansible.builtin.include_tasks: k8s.yml
   loop:
