@@ -203,9 +203,9 @@
     worker_replicas: "{{ workers_short_running }}"
     # Short-running tasks are just interactions with different services.
     # They should not require a lot of memory/cpu.
-    worker_requests_memory: "320Mi"
+    worker_requests_memory: "768Mi"
     worker_requests_cpu: "80m"
-    worker_limits_memory: "640Mi"
+    worker_limits_memory: "2048Mi"
     worker_limits_cpu: "2"
   ansible.builtin.include_tasks: k8s.yml
   loop:

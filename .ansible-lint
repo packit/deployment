@@ -1,5 +1,7 @@
 # https://ansible-lint.readthedocs.io/en/latest/configuring.html
 
+profile: basic
+
 skip_list:
   - yaml  # clashes with prettier
 
@@ -14,7 +16,6 @@ mock_modules:
   # Ansible 2.9.27 in F35 still contains the k8s module so we can ignore the error until F36,
   # where we can switch to kubernetes.core.k8s as ansible-5.x in F36 contains it.
   - k8s
-  - kubernetes.core.k8s
   # Ignore until F36, where these are in community.crypto collection (part of ansible-5.x rpm).
   - openssh_keypair
   - openssl_certificate

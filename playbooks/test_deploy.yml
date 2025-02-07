@@ -15,7 +15,7 @@
 
   post_tasks:
     - name: Delete test project namespace if already exist
-      kubernetes.core.k8s:
+      k8s:
         name: "{{ test_project_name }}"
         api_version: v1
         kind: Namespace
