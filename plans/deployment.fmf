@@ -17,8 +17,22 @@ discover:
   test:
     - deployment
 
+# testing-farm request --git-url https://github.com/packit/deployment --git-ref <ref name if any> --plan /deployment/remote --compose CentOS-Stream-9 --timeout 3600
+# testing-farm request --git-url https://github.com/majamassarini/deployment --git-ref openshift-tests-with-tf-secrets --plan /deployment/remote --compose CentOS-Stream-9 --timeout 3600
 /remote:
   summary: Run packit-service deployment test on a remote testing-farm machine (provisioning details are defined in the GitHub action)
+  environment:
+    CRC_PULL_SECRET: $CRC_PULL_SECRET_PART_1$CRC_PULL_SECRET_PART_2$CRC_PULL_SECRET_PART_3$CRC_PULL_SECRET_PART_4$CRC_PULL_SECRET_PART_5$CRC_PULL_SECRET_PART_6$CRC_PULL_SECRET_PART_7
+  provision:
+    image: fedora-latest
+    hardware:
+      disk:
+        - size: ">= 100 GB"
+      memory: ">= 14 GB"
+      cpu:
+        processors: ">= 6"
+      virtualization:
+        is-supported: true
   prepare:
     - how: ansible
       playbook: playbooks/oc-cluster-user.yml
