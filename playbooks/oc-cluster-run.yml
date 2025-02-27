@@ -12,10 +12,28 @@
       ansible.builtin.set_fact:
         pull_secret: "{{ lookup('env', 'CRC_PULL_SECRET') }}"
       when: pull_secret is undefined
-    - name: Show pull secret
-      ansible.builtin.debug:
-        msg: "{{ pull_secret }}"
-    - name: Create secret file from pull request var
+    - name: Look for pull_secret (splitted in small parts due to testing farm encryption)
+      ansible.builtin.set_fact:
+        pull_secret_part_1: "{{ lookup('env', 'CRC_PULL_SECRET_PART_1') }}"
+        pull_secret_part_2: "{{ lookup('env', 'CRC_PULL_SECRET_PART_2') }}"
+        pull_secret_part_3: "{{ lookup('env', 'CRC_PULL_SECRET_PART_3') }}"
+        pull_secret_part_4: "{{ lookup('env', 'CRC_PULL_SECRET_PART_4') }}"
+        pull_secret_part_5: "{{ lookup('env', 'CRC_PULL_SECRET_PART_5') }}"
+        pull_secret_part_6: "{{ lookup('env', 'CRC_PULL_SECRET_PART_6') }}"
+        pull_secret_part_7: "{{ lookup('env', 'CRC_PULL_SECRET_PART_7') }}"
+      when: pull_secret == ""
+
+    - name: Rebuild pull_secret from its parts
+      ansible.builtin.set_fact:
+        pull_secret: "{{ pull_secret_part_1 }}{{ pull_secret_part_2 }}{{ pull_secret_part_3 }}{{ pull_secret_part_4 }}{{ pull_secret_part_5 }}{{ pull_secret_part_6 }}{{ pull_secret_part_7 }}"
+      when: pull_secret == "" and pull_secret_part_1 != ""
+
+    - name: Check pull secret is not empty
+      ansible.builtin.fail:
+        msg: CRC pull secret is empty
+      when: pull_secret == ""
+
+    - name: Create secret file from pull secret
       ansible.builtin.copy:
         content: "{{ pull_secret }}"
         dest: "{{ dest_pull_secret_file }}"
