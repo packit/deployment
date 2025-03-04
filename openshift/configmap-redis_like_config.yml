@@ -5,4 +5,4 @@ metadata:
   name: redis-like-config
 data:
   redis.conf: |
-    timeout 1800
+    timeout 600
