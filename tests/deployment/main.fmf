@@ -2,6 +2,7 @@ duration: 60m
 
 environment+:
   DEPLOYMENT: dev
+  USER: tmt
 
 require:
   - type: file

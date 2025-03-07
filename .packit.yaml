@@ -1,0 +1,7 @@
+jobs:
+  - job: tests
+    trigger: pull_request
+    targets:
+      - centos-stream-9
+    tmt_plan: "deployment/remote"
+    skip_build: true
