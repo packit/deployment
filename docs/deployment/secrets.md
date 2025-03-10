@@ -135,7 +135,10 @@ Not all services use all of them. For example `copr` is needed only by `packit` 
 
 ### Prerequisites
 
-To run OpenShift tests triggered by Packit successfully, you need to encrypt the CRC Pull Secret **against your fork**.
+To run OpenShift tests triggered by Packit successfully, you need to encrypt the CRC Pull Secret.
+
+When submitting a contribution PR where tests are executed, the encryption should be performed against your personal fork if the PR originates from your fork.
+Otherwise, encryption should be performed against the packit/deployment repository.
 
 > **Important:** The encryption has a 448 character limit per secret. If your pull secret exceeds this limit, split it into multiple smaller chunks.
 
