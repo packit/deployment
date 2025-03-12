@@ -130,3 +130,50 @@ In both cases you have to do some tweaks before using them:
 - `id_ed25519[.pub]`: replace with your ssh keys
 
 Not all services use all of them. For example `copr` is needed only by `packit` service.
+
+## Encrypting Secrets for OpenShift Tests in Testing Farm
+
+### Prerequisites
+
+To run OpenShift tests triggered by Packit successfully, you need to encrypt the CRC Pull Secret.
+
+When submitting a contribution PR where tests are executed, the encryption should be performed against your personal fork if the PR originates from your fork.
+Otherwise, encryption should be performed against the packit/deployment repository.
+
+> **Important:** The encryption has a 448 character limit per secret. If your pull secret exceeds this limit, split it into multiple smaller chunks.
+
+### Obtaining Required Information
+
+1. **CRC Pull Secret**: Access the pull secret from "Bitwarden → RH Portal account for Image Builder and OpenShift Local → Red Hat OpenShift Local Pull Secret"
+
+2. **Token ID**: Use the public Packit testing farm token for the Public Ranch:
+   `0cfc00a8-94d7-4408-babc-4d0bc43821ea`
+
+### Encryption Process
+
+For each part of your split secret, follow these steps:
+
+1. Encrypt the secret part using the testing-farm CLI tool (if you don't have a `TESTING_FARM_API_TOKEN` yet, create one [here](https://testing-farm.io/tokens/)):
+
+```bash
+export TESTING_FARM_API_TOKEN=<your token>
+testing-farm encrypt --token-id 0cfc00a8-94d7-4408-babc-4d0bc43821ea --git-url https://github.com/YOUR_USERNAME/deployment <crc_pull_secret_part>
+```
+
+2. Add the encrypted output to the corresponding `CRC_PULL_SECRET_PART_X` list in the `.testing-farm.yaml` file in your repository.
+
+### Example Configuration Structure
+
+Your `.testing-farm.yaml` file should contain entries similar to:
+
+```yaml
+version: 1
+environments:
+  secrets:
+    CRC_PULL_SECRET_PART_1:
+      - "0cfc00a8-94d7-4408-babc-4d0bc43821ea,encrypted_string_here"
+    CRC_PULL_SECRET_PART_2:
+      - "0cfc00a8-94d7-4408-babc-4d0bc43821ea,another_encrypted_string_here"
+```
+
+Make sure to replace `YOUR_USERNAME` with your actual GitHub username in the git URL.
