@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # Mimic what we do during deployment when we render secret files
 # from their templates before we create k8s secrets from them.
