@@ -18,3 +18,16 @@ secrets/*/dev/*
 
 # used in move_stable script
 move_stable_repositories
+
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# Ansible collections from remote sources
+.ansible
+
+# Python dependencies installed from devenv.sh
+.venv
