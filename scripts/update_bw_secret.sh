@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # Script to update the attachment of a secret item in Bitwarden
 #
