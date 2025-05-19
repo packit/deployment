@@ -47,3 +47,13 @@
     - always
   ansible.builtin.set_fact:
     redis_hostname: "{{ kv_database }}"
+
+- name: Set Bitwarden URI
+  ansible.builtin.set_fact:
+    bw_uri: "ansible://{{ service }}/{{ deployment }}"
+
+- name: Fetch git forges
+  tags:
+    - always
+  ansible.builtin.set_fact:
+    git_forges: "{{ lookup('community.general.bitwarden', bw_uri + '/git', search='') }}"
