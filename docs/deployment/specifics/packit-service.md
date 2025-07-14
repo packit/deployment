@@ -60,7 +60,6 @@ To make it work, you need to:
 - Since our infrastructure does not support shared volumes, we need to attach
   one volume with a cache to each worker and one to each corresponding sandbox
   pod.
-
   - In the case of workers, this is done during the deployment.
   - For sandboxes, there is an option in the service config (the environment
     variable needs to differ for each worker and is set during startup of the

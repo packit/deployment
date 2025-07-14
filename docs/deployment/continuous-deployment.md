@@ -31,11 +31,9 @@ It has several significant benefits:
 ## Manual production re-deployment
 
 1. Trigger `:prod` images builds
-
    - Run [scripts/move_stable.py](https://github.com/packit/deployment/blob/main/scripts/move_stable.py) to move `stable` branches to a newer commit.
 
 2. Import images -> re-deploy
-
    - If you don't want to wait for [it to be done automatically](#continuous-deployment), you can
      [do that manually](#manually-import-a-newer-image) once the images are built (check Actions in each repo).
 
