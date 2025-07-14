@@ -16,7 +16,7 @@ deps are kept only for this project, i.e., they don't pollute the host system.
 Since Nix and devenv.sh support pinning, it is also possible to acquire
 a reproducible environment.
 
-direnv makes sure the development environment is set up upon entering the repo.
+[`direnv`](https://devenv.sh/automatic-shell-activation/) makes sure the development environment is set up upon entering the repo.
 
 :::
 
