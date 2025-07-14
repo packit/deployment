@@ -1,0 +1,5 @@
+inputs:
+  nixpkgs:
+    # [TODO] Ideally swap to the cachix/rolling once Ansible issues are resolved.
+    # url: github:cachix/devenv-nixpkgs/rolling
+    url: github:nixos/nixpkgs/nixos-unstable

@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # This quick script updates a data field of an OpenShift secret with the
 # content of a file.

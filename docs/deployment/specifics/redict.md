@@ -8,7 +8,6 @@ We have tested a seamless migration from Redis to Redict on our production
 deployment. To reproduce:
 
 1. We have deployed Redict to our production cluster.
-
    - Defaults have been changed to:
 
      ```yaml
@@ -34,7 +33,6 @@ deployment. To reproduce:
 
 3. After the data exchange is done, change **all** references in variables to
    redis to point to the new hostname, in this case `redis → redict`.
-
    - Run
 
      ```

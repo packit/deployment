@@ -83,14 +83,12 @@ resource requirements.
 1. Request adjustments of the quotas such that we can have some buffer (database
    migrations, higher load on service, etc.), but also could **permanently**
    scale up the workers if we find service to be more reliable that way
-
    - Based on the calculations above, 2× the current quotas on memory would be
      sufficient, but if we were to scale the workers up too (and account for
      possible adjustments, e.g., Redict) we should probably go for 3×
 
 1. Migrate tokman to different toolchain, it's a small self-contained app, so it
    is easy to migrate to either Rust or Go that should leave smaller footprint.
-
    - Opened an issue for testing out running without Tokman deployment
      https://github.com/packit/tokman/issues/72
 
