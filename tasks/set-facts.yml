@@ -53,7 +53,6 @@
     bw_uri: "ansible://{{ service }}/{{ deployment }}"
 
 - name: Fetch git forges
-  tags:
-    - always
+  when: deployment != "dev"
   ansible.builtin.set_fact:
     git_forges: "{{ lookup('community.general.bitwarden', bw_uri + '/git', search='') }}"
