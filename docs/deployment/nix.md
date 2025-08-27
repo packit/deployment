@@ -57,3 +57,7 @@ Feel free to follow the [devenv.sh' “Getting Started”](https://devenv.sh/get
 
 Bitwarden CLI is currently broken on macOS, therefore it's not included in the
 devenv.sh' config.
+
+There's also a need to set `ANSIBLE_PYTHON` as _devenv.sh_ creates a venv with
+the dependencies that need to be installed manually (such as `kubernetes`) for
+the playbooks to work properly.
