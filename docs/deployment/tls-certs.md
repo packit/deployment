@@ -12,11 +12,7 @@ The process is manual but would be awesome to
 We are using multi-domain wildcard certificates for the following domains:
 
 - `*.packit.dev`
-- `*.stream.packit.dev`
-- `*.fedora-source-git.packit.dev`
 - `*.stg.packit.dev`
-- `*.stg.stream.packit.dev`
-- `*.stg.fedora-source-git.packit.dev`
 
 In case the procedure bellow does not work,
 [previously used http challenge](https://github.com/packit/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot)
@@ -52,11 +48,17 @@ Check if you have access to packit.dev domain in
 
 Install certbot locally: `dnf install certbot`.
 
+:::note
+
+Or use the combo of nixpkg + devenv.sh.
+
+:::
+
 ## Run certbot to obtain the challenges
 
 Run certbot:
 
-    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email hello@packit.dev -d prod.packit.dev -d stg.packit.dev -d dashboard.packit.dev -d dashboard.stg.packit.dev -d workers.packit.dev -d workers.stg.packit.dev -d prod.stream.packit.dev -d stg.stream.packit.dev -d prod.fedora-source-git.packit.dev -d stg.fedora-source-git.packit.dev
+    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email hello@packit.dev -d prod.packit.dev -d stg.packit.dev -d dashboard.packit.dev -d dashboard.stg.packit.dev -d workers.packit.dev -d workers.stg.packit.dev
 
 You will be asked to set TXT record for every domain requested:
 
