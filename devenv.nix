@@ -6,6 +6,9 @@
 
     pkgs.ansible
     pkgs.ansible-navigator
+
+    # Needed for renewal of TLS certificates
+    pkgs.certbot
   ];
 
   languages.python = {
