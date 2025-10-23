@@ -24,6 +24,27 @@ packit_service_file = ROOT_DIR / "secrets/packit/prod/packit-service.yaml.j2"
 SKIP_JINJA_LINES = 32
 DIST_GIT_FORMAT = r"https://src.fedoraproject.org/rpms/{}"
 
+MAILING_LIST_ANNOUNCEMENT = """
+Dear package maintainers currently using Zuul,
+
+Packit Fedora-CI has recently reached feature-parity with the Zuul CI, and as the first step
+in the final phase implementation of the "Packit as dist-git CI" change [1] we are migrating
+the current Zuul CI users to packit Fedora-CI [2] and disabling the Zuul runners for a time.
+
+Our plan with this migration is to wait a week after this announcement is made and go forward
+with the step described above. Please let us know of any concerns you might have with the plan
+above during that week so we can quickly decide if we go forward with this proposed step.
+
+Afterwards we will monitor your feedback on this switch and decide if we can go ahead with the
+Zuul deprecation and disablement or roll-back and try again. We could also keep the Zuul CI
+running on a much smaller number of packages if requested.
+
+We are looking forward to your feedback on this matter.
+
+[1]: https://fedoraproject.org/wiki/Changes/PackitDistgitCI
+[2]: https://github.com/packit/deployment/pull/672
+"""
+
 # Using ruamel.yaml to preserve comments and format
 packit_service_yaml = ruamel.yaml.YAML()
 packit_service_yaml.indent(mapping=2, sequence=4, offset=2)
