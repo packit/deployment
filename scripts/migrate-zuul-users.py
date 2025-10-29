@@ -35,14 +35,17 @@ Our plan with this migration is to wait a week after this announcement is made a
 with the step described above. Please let us know of any concerns you might have with the plan
 above during that week so we can quickly decide if we go forward with this proposed step.
 
-Afterwards we will monitor your feedback on this switch and decide if we can go ahead with the
-Zuul deprecation and disablement or roll-back and try again. We could also keep the Zuul CI
-running on a much smaller number of packages if requested.
+Afterwards we will monitor your feedback [3-5] on this switch and decide if we can go ahead
+with the Zuul deprecation and disablement or roll-back and try again. We could also keep the
+Zuul CI temporarily running on a much smaller number of packages if requested.
 
 We are looking forward to your feedback on this matter.
 
 [1]: https://fedoraproject.org/wiki/Changes/PackitDistgitCI
 [2]: https://github.com/packit/deployment/pull/672
+[3]: Fedora-CI channel https://matrix.to/#/#fedora-ci:fedoraproject.org
+[4]: Packit channel https://matrix.to/#/#packit:fedora.im
+[5]: This email and discussion thread
 """
 
 # Using ruamel.yaml to preserve comments and format
