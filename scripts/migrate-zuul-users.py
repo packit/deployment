@@ -5,7 +5,7 @@
 
 # /// script
 # dependencies = [
-#   "runamel.yaml",
+#   "ruamel.yaml",
 #   "requests",
 # ]
 # ///
@@ -27,23 +27,23 @@ DIST_GIT_FORMAT = r"https://src.fedoraproject.org/rpms/{}"
 MAILING_LIST_ANNOUNCEMENT = """
 Dear package maintainers currently using Zuul,
 
-Packit Fedora-CI has recently reached feature-parity with the Zuul CI, and as the first step
+Packit as Fedora dist-git CI has recently reached feature-parity with the Zuul CI, and as the first step
 in the final phase implementation of the "Packit as dist-git CI" change [1] we are migrating
-the current Zuul CI users to packit Fedora-CI [2] and disabling the Zuul runners for a time.
+the current Zuul CI users to packit Fedora CI [2] and disabling the Zuul runners for the time being.
 
-Our plan with this migration is to wait a week after this announcement is made and go forward
-with the step described above. Please let us know of any concerns you might have with the plan
-above during that week so we can quickly decide if we go forward with this proposed step.
+Our plan with this migration is to wait for a week after this announcement is made and then go forward
+with the step described above. Please let us know of any concerns you might have with the migration
+during that week so we can decide whether we can go forward with it.
 
-Afterwards we will monitor your feedback [3-5] on this switch and decide if we can go ahead
-with the Zuul deprecation and disablement or roll-back and try again. We could also keep the
-Zuul CI temporarily running on a much smaller number of packages if requested.
+Afterwards we will monitor your feedback [3-5] on this migration and decide if we can go ahead
+with the Zuul deprecation and disablement or if we will roll-back and try again. We could also keep the
+Zuul CI temporarily running on a small subset of packages if requested.
 
 We are looking forward to your feedback on this matter.
 
 [1]: https://fedoraproject.org/wiki/Changes/PackitDistgitCI
 [2]: https://github.com/packit/deployment/pull/672
-[3]: Fedora-CI channel https://matrix.to/#/#fedora-ci:fedoraproject.org
+[3]: Fedora CI channel https://matrix.to/#/#fedora-ci:fedoraproject.org
 [4]: Packit channel https://matrix.to/#/#packit:fedora.im
 [5]: This email and discussion thread
 """
