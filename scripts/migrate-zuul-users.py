@@ -29,23 +29,30 @@ Dear package maintainers currently using Zuul,
 
 Packit as Fedora dist-git CI has recently reached feature-parity with the Zuul CI, and as the first step
 in the final phase implementation of the "Packit as dist-git CI" change [1] we are migrating
-the current Zuul CI users to packit Fedora CI [2] and disabling the Zuul runners for the time being.
+the current Zuul CI users to packit Fedora CI [2] and disabling the Zuul runners on
+src.fedoraproject.org/rpms/* for the time being.
 
-Our plan with this migration is to wait for a week after this announcement is made and then go forward
-with the step described above. Please let us know of any concerns you might have with the migration
-during that week so we can decide whether we can go forward with it.
+Our plan is to automatically migrate the Zuul dist-git packages on 2026-01-12 (January 12).
+Please let us know of any concerns you might have with the migration up until then so we can decide whether
+we can go forward with it. We will send another reminder of this as a reply to this announcement one week
+before the migration 2026-01-05 (January 5).
 
-Afterwards we will monitor your feedback [3-5] on this migration and decide if we can go ahead
+After the packages are migrated we will monitor your feedback [3-5] on this migration and decide if we can go ahead
 with the Zuul deprecation and disablement or if we will roll-back and try again. We could also keep the
 Zuul CI temporarily running on a small subset of packages if requested.
 
 We are looking forward to your feedback on this matter.
+
+PS: The migration of the other Zuul jobs that are linked to pagure.io [6] will be addressed at a later
+time as these require custom handling and are tied with the forge migration. We do not have a timeline
+for this part yet, but we will provide an update as soon as we have a plan for this.
 
 [1]: https://fedoraproject.org/wiki/Changes/PackitDistgitCI
 [2]: https://github.com/packit/deployment/pull/672
 [3]: Fedora CI channel https://matrix.to/#/#fedora-ci:fedoraproject.org
 [4]: Packit channel https://matrix.to/#/#packit:fedora.im
 [5]: This email and discussion thread
+[6]: https://pagure.io/fedora-project-config/blob/master/f/resources/fedora-sources.yaml
 """
 
 # Using ruamel.yaml to preserve comments and format
