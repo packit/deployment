@@ -37,13 +37,13 @@ Please let us know of any concerns you might have with the migration up until th
 we can go forward with it. We will send another reminder of this as a reply to this announcement one week
 before the migration 2026-01-05 (January 5).
 
-After the packages are migrated we will monitor your feedback [3-5] on this migration and decide if we can go ahead
-with the Zuul deprecation and disablement or if we will roll-back and try again. We could also keep the
+After the packages are migrated we will monitor your feedback [3-6] on this migration and decide if we can go ahead
+with the Zuul deprecation and disablement or need to resolve any blocking issues first. We could also keep the
 Zuul CI temporarily running on a small subset of packages if requested.
 
 We are looking forward to your feedback on this matter.
 
-PS: The migration of the other Zuul jobs that are linked to pagure.io [6] will be addressed at a later
+PS: The migration of the other Zuul jobs that are linked to pagure.io [7] will be addressed at a later
 time as these require custom handling and are tied with the forge migration. We do not have a timeline
 for this part yet, but we will provide an update as soon as we have a plan for this.
 
@@ -51,8 +51,9 @@ for this part yet, but we will provide an update as soon as we have a plan for t
 [2]: https://github.com/packit/deployment/pull/672
 [3]: Fedora CI channel https://matrix.to/#/#fedora-ci:fedoraproject.org
 [4]: Packit channel https://matrix.to/#/#packit:fedora.im
-[5]: This email and discussion thread
-[6]: https://pagure.io/fedora-project-config/blob/master/f/resources/fedora-sources.yaml
+[5]: Packit issues https://github.com/packit/packit-service/issues/new?template=fedora-ci.yml
+[6]: This email and discussion thread
+[7]: https://pagure.io/fedora-project-config/blob/master/f/resources/fedora-sources.yaml
 """
 
 # Using ruamel.yaml to preserve comments and format
