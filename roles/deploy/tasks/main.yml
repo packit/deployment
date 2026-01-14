@@ -180,10 +180,10 @@
     - packit-worker
   when: workers_all_tasks > 0 and with_repository_cache
 
-- name: Deploy packit-worker to serve both queues
+- name: Deploy packit-worker to serve all queues
   vars:
     component: packit-worker
-    queues: "short-running,long-running"
+    queues: "short-running,long-running,rate-limited"
     worker_replicas: "{{ workers_all_tasks }}"
     worker_requests_memory: "384Mi"
     worker_requests_cpu: "100m"
@@ -228,10 +228,10 @@
     - packit-worker
   when: workers_long_running > 0 and with_repository_cache
 
-- name: Deploy packit-worker to serve long-running queue
+- name: Deploy packit-worker to serve long-running and rate-limited queue
   vars:
     component: packit-worker-long-running
-    queues: "long-running"
+    queues: "long-running,rate-limited"
     worker_replicas: "{{ workers_long_running }}"
     # cloning repos is memory intensive: glibc needs 300M+, kernel 600M+
     # during cloning, we need to account for git and celery worker processes
