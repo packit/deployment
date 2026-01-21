@@ -32,6 +32,8 @@ spec:
               value: redis://{{ redis_hostname }}:6379/0
             - name: FLOWER_PORT
               value: "5555"
+            - name: FLOWER_UNAUTHENTICATED_API
+              value: "true"
           ports:
             - containerPort: 5555
           resources:
