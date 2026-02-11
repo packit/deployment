@@ -39,10 +39,10 @@ spec:
           resources:
             # requests and limits have to be the same to have Guaranteed QoS
             requests:
-              memory: "128Mi"
+              memory: "3Gi"
               cpu: "10m"
             limits:
-              memory: "256Mi"
+              memory: "4Gi"
               cpu: "50m"
       volumes:
         - name: valkey-pv
@@ -85,7 +85,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 4Gi
 {% if managed_platform %}
   storageClassName: aws-ebs
 {% endif %}
