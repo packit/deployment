@@ -5,4 +5,14 @@ metadata:
   name: redis-like-config
 data:
   redis.conf: |
+    # Connection timeout (seconds)
     timeout 600
+
+    # Memory management
+    # Set maxmemory to ~87.5% of pod limit (4Gi = 4096Mi, so 3500Mi ≈ 3670M)
+    maxmemory 3670mb
+
+    # Eviction policy: only evict keys with TTL set (volatile-lru)
+    # This is the safest option - won't touch task queues or pidbox keys without TTL
+    # But pidbox keys should now have TTL set in Celery config
+    maxmemory-policy volatile-lru
