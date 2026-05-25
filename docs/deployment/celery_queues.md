@@ -61,9 +61,16 @@ After a long outage, the task queue may accumulate too many stale tasks that no
 longer make sense to process. This section describes how to safely purge the
 queue.
 
-**Important:** Purging while workers are actively processing tasks can cause
+:::warning Important
+
+Purging while workers are actively processing tasks can cause
 issues - workers may fail to acknowledge completed tasks, potentially leading
 to duplicate processing on restart.
+
+You should also notify users in the public channels that it is required
+to manually retrigger the jobs via comments.
+
+:::
 
 ### Safe purge
 
