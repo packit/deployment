@@ -16,7 +16,6 @@ from git import Repo, GitConfigParser
 
 import changelog
 
-
 NAMESPACE: str = "packit"
 REPOSITORIES: List[str] = [
     "ogr",
