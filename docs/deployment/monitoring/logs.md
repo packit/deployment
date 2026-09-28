@@ -10,6 +10,24 @@ We are following the first solution described in this [document](https://source.
 
 ## Where do I find the logs?
 
+### Sumo Logic
+
+Open [Sumo Logic](https://rhcorporate.sumologic.com/home) and sign in with Red Hat SSO to view Packit logs. Saved queries are under `Library → Folders → packit`. You can also create queries for production and staging:
+
+Production:
+
+```text
+_index="rh_paas" _sourcecategory=openshift "packit--prod"
+```
+
+Staging:
+
+```text
+_index="rh_paas_preprod" _sourcecategory=openshift "packit--stg"
+```
+
+### Splunk
+
 First, you have to [get access to Splunk](https://source.redhat.com/departments/it/splunk/splunk_wiki/faq#jive_content_id_How_do_I_request_access_to_Splunk)
 (CMDB ID is 'PCKT-002').
 
