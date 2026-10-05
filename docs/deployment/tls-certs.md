@@ -58,7 +58,7 @@ Or use the combo of nixpkg + devenv.sh.
 
 Run certbot:
 
-    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email hello@packit.dev -d prod.packit.dev -d stg.packit.dev -d dashboard.packit.dev -d dashboard.stg.packit.dev -d workers.packit.dev -d workers.stg.packit.dev
+    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email hello@packit.dev -d \*.packit.dev -d \*.stg.packit.dev -d \*.prod.packit.dev -d \*.internal.packit.dev
 
 You will be asked to set TXT record for every domain requested:
 
