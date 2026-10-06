@@ -6,6 +6,7 @@ vars/**/*.yml
 
 secrets/packit/prod/*
 secrets/packit/stg/*
+secrets/packit/internal/*
 secrets/stream/prod/*
 secrets/stream/stg/*
 secrets/fedora-source-git/prod/*
