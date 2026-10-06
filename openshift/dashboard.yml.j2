@@ -80,10 +80,14 @@ metadata:
 {% if managed_platform %}
   labels:
     paas.redhat.com/appcode: {{ appcode }}
-    shard: external
+    shard: {{ 'internal' if deployment == 'internal' else 'external' }}
 {% endif %}
 spec:
-  host: "{{ 'dashboard.stg.packit.dev' if deployment == 'stg' else 'dashboard.packit.dev' if deployment == 'prod'}}"
+{% if deployment == 'prod' %}
+  host: dashboard.packit.dev
+{% else %}
+  host: "dashboard.{{ deployment }}.packit.dev"
+{% endif %}
   port:
     targetPort: packit-dashboard-https
   to:
