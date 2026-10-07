@@ -178,7 +178,10 @@
   loop: "{{ range(0, workers_all_tasks) | list }}"
   tags:
     - packit-worker
-  when: workers_all_tasks > 0 and with_repository_cache and with_sandbox
+  when:
+    - workers_all_tasks > 0
+    - with_repository_cache
+    - with_sandbox
 
 - name: Deploy packit-worker to serve all queues
   vars:
@@ -226,7 +229,10 @@
   loop: "{{ range(0, workers_long_running) | list }}"
   tags:
     - packit-worker
-  when: workers_long_running > 0 and with_repository_cache and with_sandbox
+  when:
+    - workers_long_running > 0
+    - with_repository_cache
+    - with_sandbox
 
 - name: Deploy packit-worker to serve long-running and rate-limited queue
   vars:
@@ -368,7 +374,9 @@
   tags:
     - pushgateway
   register: nginx
-  when: with_pushgateway and with_flower
+  when:
+    - with_pushgateway
+    - with_flower
 
 - name: Wait for worker-0 to be running
   vars:

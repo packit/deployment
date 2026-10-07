@@ -26,7 +26,9 @@
     - name: Rebuild pull_secret from its parts
       ansible.builtin.set_fact:
         pull_secret: "{{ pull_secret_part_1 }}{{ pull_secret_part_2 }}{{ pull_secret_part_3 }}{{ pull_secret_part_4 }}{{ pull_secret_part_5 }}{{ pull_secret_part_6 }}{{ pull_secret_part_7 }}"
-      when: pull_secret == "" and pull_secret_part_1 != ""
+      when:
+        - pull_secret == ""
+        - pull_secret_part_1 != ""
 
     - name: Check pull secret is not empty
       ansible.builtin.fail:
