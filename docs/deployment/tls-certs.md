@@ -13,6 +13,8 @@ We are using multi-domain wildcard certificates for the following domains:
 
 - `*.packit.dev`
 - `*.stg.packit.dev`
+- `*.prod.packit.dev`
+- `*.internal.packit.dev`
 
 In case the procedure bellow does not work,
 [previously used http challenge](https://github.com/packit/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot)
@@ -113,7 +115,7 @@ to `secrets-tls-certs` item in our shared `Packit` collection in Bitwarden vault
 
     for cert in fullchain privkey; do scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/prod.packit.dev/${cert}.pem; done
 
-or update `api_key` in `vars/{packit|stream|fedora-source-git}/{prod|stg}.yml` and run:
+or update `api_key` in `vars/{packit|stream|fedora-source-git}/{prod|stg|internal}.yml` and run:
 
     `SERVICE=‹service› DEPLOYMENT=‹deployment› make deploy TAGS=secrets`
 

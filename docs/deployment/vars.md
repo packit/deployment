@@ -8,7 +8,7 @@ There are also `{service}/{deployment}_template.yml` files,
 where
 
 - `{service}` is either `packit` or `stream`
-- `{deployment}` is one of `prod`, `stg` or `dev`
+- `{deployment}` is one of `prod`, `stg`, `internal`, or `dev`
 
 You have to copy `{service}/{deployment}_template.yml` to `{service}/{deployment}.yml`
 depending on what service and environment you want to deploy to
