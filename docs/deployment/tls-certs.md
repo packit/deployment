@@ -13,6 +13,8 @@ We are using multi-domain wildcard certificates for the following domains:
 
 - `*.packit.dev`
 - `*.stg.packit.dev`
+- `*.prod.packit.dev`
+- `*.internal.packit.dev`
 
 In case the procedure bellow does not work,
 [previously used http challenge](https://github.com/packit/deployment/blob/008f5eaad69a620c54784f1fc19c7c775af9ec7d/README.md#obtaining-a-lets-encrypt-cert-using-certbot)
@@ -58,7 +60,7 @@ Or use the combo of nixpkg + devenv.sh.
 
 Run certbot:
 
-    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email hello@packit.dev -d prod.packit.dev -d stg.packit.dev -d dashboard.packit.dev -d dashboard.stg.packit.dev -d workers.packit.dev -d workers.stg.packit.dev
+    $ certbot certonly --config-dir ~/.certbot --work-dir ~/.certbot --logs-dir ~/.certbot --manual --preferred-challenges dns --email hello@packit.dev -d \*.packit.dev -d \*.stg.packit.dev -d \*.prod.packit.dev -d \*.internal.packit.dev
 
 You will be asked to set TXT record for every domain requested:
 
@@ -104,16 +106,16 @@ the last one and once you have the correct answer, hit Enter )
 ## Update secrets in the vault
 
 [Upload](https://bitwarden.com/help/attachments/#upload-a-file)
-`fullchain.pem` and `privkey.pem` from `~/.certbot/live/prod.packit.dev/`
+`fullchain.pem` and `privkey.pem` from `~/.certbot/live/packit.dev/`
 to `secrets-tls-certs` item in our shared `Packit` collection in Bitwarden vault.
 
 ## Re-deploy secrets for all services and environments
 
 `oc login ‹cluster›; oc project ‹project›` and
 
-    for cert in fullchain privkey; do scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/prod.packit.dev/${cert}.pem; done
+    for cert in fullchain privkey; do scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/packit.dev/${cert}.pem; done
 
-or update `api_key` in `vars/{packit|stream|fedora-source-git}/{prod|stg}.yml` and run:
+or update `api_key` in `vars/{packit|stream|fedora-source-git}/{prod|stg|internal}.yml` and run:
 
     `SERVICE=‹service› DEPLOYMENT=‹deployment› make deploy TAGS=secrets`
 

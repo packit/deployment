@@ -11,6 +11,7 @@
 - name: Set with_sandbox
   ansible.builtin.set_fact:
     with_sandbox: "{{ service == 'packit' }}"
+  when: with_sandbox is undefined
   tags:
     - always
 
@@ -40,7 +41,7 @@
     - name: Set servicephase for production
       ansible.builtin.set_fact:
         servicephase: prod
-      when: deployment == "prod"
+      when: 'deployment in ("prod", "internal")'
 
 - name: Set Redis-like hostname
   tags:

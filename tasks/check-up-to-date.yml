@@ -3,7 +3,9 @@
 
 ---
 - name: Check that the deployment resources are up-to-date
-  when: zuul is not defined and check_up_to_date
+  when:
+    - zuul is not defined
+    - check_up_to_date
   block:
     - name: Get HEAD from the remote # noqa: command-instead-of-module
       ansible.builtin.command:

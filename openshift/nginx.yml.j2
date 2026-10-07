@@ -133,10 +133,15 @@ metadata:
   labels:
     paas.redhat.com/appcode: {{ appcode }}
     # used by internal Grafana
-    shard: external
+    shard: {{ 'internal' if deployment == 'internal' else 'external' }}
 {% endif %}
+
 spec:
-  host: "{{ 'workers.stg.packit.dev' if deployment == 'stg' else 'workers.packit.dev' if deployment == 'prod'}}"
+{% if deployment == 'prod' %}
+  host: workers.packit.dev
+{% else %}
+  host: "workers.{{ deployment }}.packit.dev"
+{% endif %}
   port:
     targetPort: nginx-https
   to:
