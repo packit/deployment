@@ -106,14 +106,14 @@ the last one and once you have the correct answer, hit Enter )
 ## Update secrets in the vault
 
 [Upload](https://bitwarden.com/help/attachments/#upload-a-file)
-`fullchain.pem` and `privkey.pem` from `~/.certbot/live/prod.packit.dev/`
+`fullchain.pem` and `privkey.pem` from `~/.certbot/live/packit.dev/`
 to `secrets-tls-certs` item in our shared `Packit` collection in Bitwarden vault.
 
 ## Re-deploy secrets for all services and environments
 
 `oc login ‹cluster›; oc project ‹project›` and
 
-    for cert in fullchain privkey; do scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/prod.packit.dev/${cert}.pem; done
+    for cert in fullchain privkey; do scripts/update_oc_secret.sh packit-secrets ~/.certbot/live/packit.dev/${cert}.pem; done
 
 or update `api_key` in `vars/{packit|stream|fedora-source-git}/{prod|stg|internal}.yml` and run:
 
