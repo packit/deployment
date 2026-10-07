@@ -11,6 +11,7 @@
 - name: Set with_sandbox
   ansible.builtin.set_fact:
     with_sandbox: "{{ service == 'packit' }}"
+  when: with_sandbox is undefined
   tags:
     - always
 
