@@ -6,6 +6,11 @@ FROM registry.fedoraproject.org/fedora:43
 ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
     ANSIBLE_STDOUT_CALLBACK=debug
 
+# Install RH IT Root CAs for internal GitLab instance
+COPY secrets/Current-IT-Root-CAs.pem /etc/pki/ca-trust/source/anchors/
+RUN update-ca-trust
+ENV REQUESTS_CA_BUNDLE /etc/pki/tls/certs/ca-certificates.crt
+
 RUN dnf -y upgrade && \
     dnf -y install ansible python3-pip && \
     dnf clean all
