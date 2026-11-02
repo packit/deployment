@@ -1,7 +1,7 @@
 # Be aware that this image is used for all stages, so if a dependency is removed be sure that it is
 # not required in anywhere
 
-FROM registry.fedoraproject.org/fedora:43
+FROM registry.fedoraproject.org/fedora:44
 
 ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
     ANSIBLE_STDOUT_CALLBACK=debug
@@ -9,7 +9,7 @@ ENV ANSIBLE_PYTHON_INTERPRETER=/usr/bin/python3 \
 # Install RH IT Root CAs for internal GitLab instance
 COPY secrets/Current-IT-Root-CAs.pem /etc/pki/ca-trust/source/anchors/
 RUN update-ca-trust
-ENV REQUESTS_CA_BUNDLE /etc/pki/tls/certs/ca-certificates.crt
+ENV REQUESTS_CA_BUNDLE /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
 
 RUN dnf -y upgrade && \
     dnf -y install ansible python3-pip && \
