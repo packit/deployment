@@ -172,7 +172,7 @@ spec:
               command:
                 - bash
                 - '-c'
-                - 'celery -A $APP status | grep "$(uname -n): OK"'
+                - '/usr/bin/python3 -P -m celery -A $APP status | grep "$(uname -n): OK"'
             # Start after 10m, every 10m with 5m timeout
             initialDelaySeconds: 600
             periodSeconds: 600
