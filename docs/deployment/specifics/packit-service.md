@@ -93,3 +93,16 @@ To make it work, you need to:
   with the volume attached. This will block the creation of the sandbox pods
   because the volume can't be mounted from multiple pods, so don't forget to
   delete the pod after you finished populating the cache.
+
+## Log Detective
+
+Deploy these templates with a Packit Service version that supports separate
+Koji and Copr switches. The former `logdetective_enabled` setting is now
+`log_detective_koji_enabled`: Koji analysis stays enabled in staging and
+production and disabled internally. Copr analysis is opt-in via
+`log_detective_copr_enabled` and is disabled in all three environments.
+
+The old and new schemas do not accept each other's switches. Coordinate the
+configuration change with the service and worker image rollout so that no
+process starts with a mismatched configuration. If rolling back to the old
+images, restore the old configuration as part of the same cutover.
